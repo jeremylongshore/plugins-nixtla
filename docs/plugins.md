@@ -307,10 +307,10 @@ flowchart TD
     Start --> InitPlugin[Plugin Initialization]
     InitPlugin --> GatherReq{Gather Requirements}
 
-    GatherReq --> DataConfig[📊 Data Configuration<br/>- Dataset path<br/>- Time column<br/>- Target column<br/>- Frequency]
-    GatherReq --> ModelSelect[🤖 Model Selection<br/>☑ TimeGPT<br/>☑ StatsForecast<br/>☑ MLForecast<br/>☑ NeuralForecast]
-    GatherReq --> EvalConfig[📈 Evaluation Setup<br/>- Train/test split ratio<br/>- Cross-validation folds<br/>- Forecast horizon]
-    GatherReq --> MetricSelect[📏 Metrics Selection<br/>☑ MAPE<br/>☑ RMSE<br/>☑ MAE<br/>☑ MASE]
+    GatherReq --> DataConfig[Data Configuration<br/>- Dataset path<br/>- Time column<br/>- Target column<br/>- Frequency]
+    GatherReq --> ModelSelect[Model Selection<br/>- TimeGPT<br/>- StatsForecast<br/>- MLForecast<br/>- NeuralForecast]
+    GatherReq --> EvalConfig[Evaluation Setup<br/>- Train/test split ratio<br/>- Cross-validation folds<br/>- Forecast horizon]
+    GatherReq --> MetricSelect[Metrics Selection<br/>- MAPE<br/>- RMSE<br/>- MAE<br/>- MASE]
 
     DataConfig --> BuildScript{Build Benchmark Script}
     ModelSelect --> BuildScript
@@ -332,7 +332,7 @@ flowchart TD
     Combine --> WriteFile[Write bench_nixtla_models.py]
     WriteFile --> WriteConfig[Write configs/models.yaml]
 
-    WriteFile --> NotifyUser[📢 Notify User:<br/>"Benchmark harness ready"]
+    WriteFile --> NotifyUser[Notify User:<br/>"Benchmark harness ready"]
     WriteConfig --> NotifyUser
 
     NotifyUser --> UserExecute[User Executes Script]
@@ -353,12 +353,12 @@ flowchart TD
     CalcMetrics --> ComparePerf[Compare Performance<br/>- Accuracy metrics<br/>- Speed metrics<br/>- Resource usage]
 
     ComparePerf --> GenOutput{Generate Output}
-    GenOutput --> MarkdownReport[📄 Markdown Report]
-    GenOutput --> HTMLReport[🌐 HTML Dashboard]
-    GenOutput --> CSVResults[📊 CSV Export]
-    GenOutput --> Plots[📈 Comparison Plots]
+    GenOutput --> MarkdownReport[Markdown Report]
+    GenOutput --> HTMLReport[HTML Dashboard]
+    GenOutput --> CSVResults[CSV Export]
+    GenOutput --> Plots[Comparison Plots]
 
-    MarkdownReport --> Success([✅ Success:<br/>Results in benchmark_results/])
+    MarkdownReport --> Success([Success:<br/>Results in benchmark_results/])
     HTMLReport --> Success
     CSVResults --> Success
     Plots --> Success
@@ -760,21 +760,21 @@ flowchart TD
     Start --> AnalyzeReq[Plugin Analyzes Requirements]
     AnalyzeReq --> GatherInfo{Gather API Configuration}
 
-    GatherInfo --> ServiceConfig[⚙️ Service Configuration<br/>- API name & version<br/>- Port number<br/>- CORS settings<br/>- Rate limits]
-    GatherInfo --> ModelConfig[🤖 Model Selection<br/>- Primary: TimeGPT<br/>- Fallback: StatsForecast<br/>- Model parameters]
-    GatherInfo --> AuthConfig[🔐 Authentication Setup<br/>- API key strategy<br/>- JWT tokens<br/>- OAuth2 optional]
-    GatherInfo --> DeployConfig[🚀 Deployment Target<br/>- Docker container<br/>- Kubernetes<br/>- Cloud Run<br/>- AWS Lambda]
+    GatherInfo --> ServiceConfig[Service Configuration<br/>- API name & version<br/>- Port number<br/>- CORS settings<br/>- Rate limits]
+    GatherInfo --> ModelConfig[Model Selection<br/>- Primary: TimeGPT<br/>- Fallback: StatsForecast<br/>- Model parameters]
+    GatherInfo --> AuthConfig[Authentication Setup<br/>- API key strategy<br/>- JWT tokens<br/>- OAuth2 optional]
+    GatherInfo --> DeployConfig[Deployment Target<br/>- Docker container<br/>- Kubernetes<br/>- Cloud Run<br/>- AWS Lambda]
 
     ServiceConfig --> GenerateCode{Generate Service Components}
     ModelConfig --> GenerateCode
     AuthConfig --> GenerateCode
     DeployConfig --> GenerateCode
 
-    GenerateCode --> GenMain[📄 Generate main.py<br/>- FastAPI app setup<br/>- Middleware config<br/>- Exception handlers]
-    GenerateCode --> GenModels[📦 Generate models.py<br/>- Pydantic schemas<br/>- Request validation<br/>- Response models]
-    GenerateCode --> GenEndpoints[🔌 Generate Endpoints<br/>- POST /forecast<br/>- GET /health<br/>- GET /metrics<br/>- GET /docs]
-    GenerateCode --> GenServices[⚡ Generate services.py<br/>- Nixtla client wrapper<br/>- Caching logic<br/>- Error handling]
-    GenerateCode --> GenConfig[📝 Generate config.py<br/>- Environment vars<br/>- Settings management<br/>- Feature flags]
+    GenerateCode --> GenMain[Generate main.py<br/>- FastAPI app setup<br/>- Middleware config<br/>- Exception handlers]
+    GenerateCode --> GenModels[Generate models.py<br/>- Pydantic schemas<br/>- Request validation<br/>- Response models]
+    GenerateCode --> GenEndpoints[Generate Endpoints<br/>- POST /forecast<br/>- GET /health<br/>- GET /metrics<br/>- GET /docs]
+    GenerateCode --> GenServices[Generate services.py<br/>- Nixtla client wrapper<br/>- Caching logic<br/>- Error handling]
+    GenerateCode --> GenConfig[Generate config.py<br/>- Environment vars<br/>- Settings management<br/>- Feature flags]
 
     GenMain --> BuildStructure[Build Directory Structure]
     GenModels --> BuildStructure
@@ -782,25 +782,25 @@ flowchart TD
     GenServices --> BuildStructure
     GenConfig --> BuildStructure
 
-    BuildStructure --> GenDocker[🐳 Generate Dockerfile<br/>- Multi-stage build<br/>- Security hardening<br/>- Health checks]
-    BuildStructure --> GenCompose[📦 Generate docker-compose.yml<br/>- Service definition<br/>- Redis cache<br/>- Environment config]
-    BuildStructure --> GenK8s[☸️ Generate K8s Manifests<br/>- Deployment YAML<br/>- Service YAML<br/>- ConfigMap]
-    BuildStructure --> GenTests[🧪 Generate Tests<br/>- Unit tests<br/>- Integration tests<br/>- Load tests]
+    BuildStructure --> GenDocker[Generate Dockerfile<br/>- Multi-stage build<br/>- Security hardening<br/>- Health checks]
+    BuildStructure --> GenCompose[Generate docker-compose.yml<br/>- Service definition<br/>- Redis cache<br/>- Environment config]
+    BuildStructure --> GenK8s[Generate K8s Manifests<br/>- Deployment YAML<br/>- Service YAML<br/>- ConfigMap]
+    BuildStructure --> GenTests[Generate Tests<br/>- Unit tests<br/>- Integration tests<br/>- Load tests]
 
     GenDocker --> WriteFiles[Write All Files]
     GenCompose --> WriteFiles
     GenK8s --> WriteFiles
     GenTests --> WriteFiles
 
-    WriteFiles --> CreateStructure[📁 Create Directory Tree<br/>service/<br/>├── app/<br/>│   ├── main.py<br/>│   ├── models.py<br/>│   ├── services.py<br/>│   └── config.py<br/>├── tests/<br/>├── docker/<br/>└── k8s/]
+    WriteFiles --> CreateStructure[Create Directory Tree<br/>service/<br/>├── app/<br/>│   ├── main.py<br/>│   ├── models.py<br/>│   ├── services.py<br/>│   └── config.py<br/>├── tests/<br/>├── docker/<br/>└── k8s/]
 
-    CreateStructure --> NotifyComplete[✅ Notify User:<br/>"API service scaffolded"]
+    CreateStructure --> NotifyComplete[Notify User:<br/>"API service scaffolded"]
 
     NotifyComplete --> UserActions{User Actions}
 
-    UserActions --> LocalDev[🔧 Local Development<br/>uvicorn app.main:app --reload]
-    UserActions --> DockerBuild[🐳 Docker Build<br/>docker build -t forecast-api .]
-    UserActions --> RunTests[🧪 Run Tests<br/>pytest tests/]
+    UserActions --> LocalDev[Local Development<br/>uvicorn app.main:app --reload]
+    UserActions --> DockerBuild[Docker Build<br/>docker build -t forecast-api .]
+    UserActions --> RunTests[Run Tests<br/>pytest tests/]
 
     LocalDev --> TestAPI{Test API Endpoints}
     DockerBuild --> TestAPI
@@ -814,11 +814,11 @@ flowchart TD
     TestHealth --> Deploy
     TestMetrics --> Deploy
 
-    Deploy --> DeployDocker[🐳 Docker Deploy<br/>docker run -p 8000:8000]
-    Deploy --> DeployK8s[☸️ K8s Deploy<br/>kubectl apply -f k8s/]
-    Deploy --> DeployCloud[☁️ Cloud Deploy<br/>gcloud run deploy]
+    Deploy --> DeployDocker[Docker Deploy<br/>docker run -p 8000:8000]
+    Deploy --> DeployK8s[K8s Deploy<br/>kubectl apply -f k8s/]
+    Deploy --> DeployCloud[Cloud Deploy<br/>gcloud run deploy]
 
-    DeployDocker --> Live([🎉 Service Live:<br/>API available at endpoint])
+    DeployDocker --> Live([Service Live:<br/>API available at endpoint])
     DeployK8s --> Live
     DeployCloud --> Live
 
