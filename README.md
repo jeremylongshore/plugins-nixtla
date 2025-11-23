@@ -174,6 +174,7 @@ plugins/[plugin-name]/
 - [Plugin Architecture Documentation](./000-docs/002-AT-ARCH-plugin-architecture.md)
 - [Document Standards](./000-docs/005-DR-META-document-standards.md)
 - [Validation Script](./scripts/validate-all-plugins.sh) (ready for when plugins are created)
+- **[Educational Resources](./EDUCATIONAL_RESOURCES.md)** - Links to 254 production plugins, learning paths, and best practices from the main Claude Code Plugins marketplace
 
 ## Why Claude Code for ML Teams?
 
@@ -239,9 +240,11 @@ Visit our **[GitHub Pages documentation](https://jeremylongshore.github.io/claud
 
 ### Repository Documentation
 
+- **[Educational Resources](./EDUCATIONAL_RESOURCES.md)** - Comprehensive learning paths and links to 254 production plugins
 - **[Technical Documentation](./000-docs/README.md)** - Complete planning and architecture documents
 - **[API Reference](./000-docs/002-AT-ARCH-plugin-architecture.md)** - Plugin development specifications
 - **[Document Standards](./000-docs/005-DR-META-document-standards.md)** - Filing system v3.0 reference
+- **[Discussion Guidelines](./DISCUSSIONS.md)** - Community collaboration categories
 
 ## Community & Collaboration
 
