@@ -23,28 +23,66 @@ This repository contains both **working plugins** and **concept designs** for ac
 
 These plugins are designed to reduce the gap between "I want to use TimeGPT" and "I have working code in production."
 
-## 🚀 Quick Start - Working Plugin
+## 📦 Installation
 
-### Nixtla Search-to-Slack Digest (Available Now!)
+### From Claude Code Marketplace (Coming Soon)
+
+Once published to the Claude Code marketplace, you'll be able to install these plugins directly:
 
 ```bash
-# 1. Navigate to the plugin directory
+# In Claude Code terminal
+/marketplace install nixtla-search-to-slack
+/marketplace install nixtla-timegpt-builder
+/marketplace install nixtla-bench-harness
+```
+
+### Manual Installation (Available Now)
+
+Since this is currently a private repository, follow these steps for manual installation:
+
+1. **Clone the Repository**
+```bash
+git clone https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
+cd claude-code-plugins-nixtla
+```
+
+2. **Install the Working Plugin**
+```bash
+# Navigate to the plugin directory
 cd plugins/nixtla-search-to-slack
 
-# 2. Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
 pip install openai  # or pip install anthropic
+```
 
-# 3. Configure environment
+3. **Configure Your Environment**
+```bash
+# Copy the example configuration
 cp .env.example .env
-# Edit .env with your API keys (Slack, SerpAPI, GitHub, OpenAI/Anthropic)
 
-# 4. Run the digest
+# Edit .env with your API keys
+# Required: Slack, SerpAPI, GitHub, OpenAI/Anthropic
+```
+
+📚 **[Complete Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** - Step-by-step instructions with screenshots, troubleshooting, and test scripts (90% success rate when following all steps)
+
+## 🚀 Quick Start
+
+Once installed (see [Installation](#-installation) above), you can immediately start using the Nixtla Search-to-Slack plugin:
+
+```bash
+# Run your first digest
 python -m nixtla_search_to_slack --topic nixtla-core
 
-# 5. Check available topics
+# List all available topics
 python -m nixtla_search_to_slack --list-topics
+
+# Dry run mode (test without posting to Slack)
+python -m nixtla_search_to_slack --topic nixtla-core --dry-run
 ```
+
+**Need help?** Check the **[Complete Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** for detailed instructions and troubleshooting.
 
 ## 📊 Nixtla Search-to-Slack Plugin
 
@@ -88,25 +126,9 @@ Perfect for teams wanting to stay updated on:
 - Includes source links and metadata
 - Dry-run mode for testing
 
-### Installation & Configuration
+### Configuration
 
-#### Prerequisites
-- Python 3.8+
-- Slack workspace with bot token
-- API keys for:
-  - SerpAPI (web search)
-  - GitHub (repository access)
-  - OpenAI or Anthropic (AI summaries)
-
-#### Setup Guide
-
-1. **Create Slack App**:
-   - Visit https://api.slack.com/apps
-   - Create new app with `chat:write` scope
-   - Install to workspace and copy bot token
-   - Invite bot to target channel(s)
-
-2. **Configure Topics** (`config/topics.yaml`):
+#### Configure Topics (`config/topics.yaml`)
 ```yaml
 topics:
   nixtla-core:
@@ -120,13 +142,15 @@ topics:
     slack_channel: "#nixtla-updates"
 ```
 
-3. **Set Environment Variables** (`.env`):
+#### Environment Variables (`.env`)
 ```bash
 SLACK_BOT_TOKEN=xoxb-your-token
 SERP_API_KEY=your-serpapi-key
 GITHUB_TOKEN=ghp_your-token
-OPENAI_API_KEY=sk-your-key
+OPENAI_API_KEY=sk-your-key  # or ANTHROPIC_API_KEY
 ```
+
+📚 **Full setup instructions**: See the **[Complete Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** for API key acquisition, Slack bot creation, and detailed configuration.
 
 ### Usage Examples
 

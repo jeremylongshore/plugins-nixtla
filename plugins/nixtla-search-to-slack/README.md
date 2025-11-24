@@ -56,21 +56,49 @@ This plugin is explicitly **NOT**:
 
 ## Installation
 
-### Prerequisites
+### 📚 Complete Setup Guide Available!
+
+**New to the plugin?** Follow our comprehensive **[SETUP_GUIDE.md](./SETUP_GUIDE.md)** for:
+- ✅ Step-by-step instructions with screenshots
+- ✅ Troubleshooting for common errors
+- ✅ Test scripts for each component
+- ✅ 90% success rate when following all steps
+
+### Quick Setup (Experienced Users)
+
+#### Prerequisites
 
 - Python 3.8+
 - Slack workspace with bot permissions
 - API keys for:
-  - SerpAPI (web search)
-  - GitHub (repository search)
-  - OpenAI or Anthropic (AI summaries)
+  - SerpAPI (web search) - $50/month
+  - GitHub (repository search) - Free
+  - OpenAI or Anthropic (AI summaries) - Pay per use
 
-### Setup
+#### Required Python Packages
+
+```bash
+# Core dependencies (REQUIRED - must install all):
+pip install python-dotenv    # Environment variables
+pip install pyyaml           # YAML configuration
+pip install requests         # HTTP requests
+pip install slack-sdk        # Slack integration
+
+# LLM provider (REQUIRED - choose one):
+pip install openai           # For GPT-3.5/GPT-4
+# OR
+pip install anthropic        # For Claude
+
+# Testing (optional but recommended):
+pip install pytest pytest-mock pytest-cov
+```
+
+#### Setup Steps
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/your-org/nixtla-search-to-slack
-cd nixtla-search-to-slack
+git clone https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
+cd claude-code-plugins-nixtla/plugins/nixtla-search-to-slack
 ```
 
 2. **Create virtual environment:**
@@ -79,14 +107,14 @@ python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-3. **Install dependencies:**
+3. **Install ALL dependencies:**
 ```bash
-pip install -r requirements.txt
+# Install everything at once (recommended)
+pip install python-dotenv pyyaml requests slack-sdk openai
 
-# Choose your LLM provider:
-pip install openai  # For OpenAI
-# OR
-pip install anthropic  # For Anthropic
+# Or use requirements.txt (note: choose LLM provider after)
+pip install -r requirements.txt
+pip install openai  # or anthropic
 ```
 
 4. **Configure environment:**
