@@ -12,10 +12,16 @@ slack-sdk>=3.23.0
 # LLM providers (at least one required)
 # Uncomment the provider you want to use:
 
-# Option 1: OpenAI
+# Option 1: Google Gemini (FREE - Recommended!)
+# google-generativeai>=0.3.0
+
+# Option 2: Groq (FREE tier available)
+# groq>=0.4.0
+
+# Option 3: OpenAI (Paid)
 # openai>=1.0.0
 
-# Option 2: Anthropic
+# Option 4: Anthropic (Paid)
 # anthropic>=0.5.0
 
 # Development dependencies

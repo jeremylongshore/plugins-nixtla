@@ -379,12 +379,55 @@ In Slack:
 
 ### 4. LLM Provider Setup
 
-Choose ONE of these:
+Choose ONE provider (FREE options available!):
 
-#### Option A: OpenAI
+#### 🎉 Option A: Google Gemini (FREE) - RECOMMENDED
+
+**Time**: 2 minutes
+**Cost**: **COMPLETELY FREE** via Google AI Studio!
+**Quality**: Excellent for summaries and technical content
+
+1. Go to https://makersuite.google.com/app/apikey
+2. Click **"Create API Key"** (Google account required)
+3. Select **"Create API key in new project"**
+4. Copy your key immediately
+5. **No credit card required!**
+
+**Save this key**: Your Gemini API key (you'll need it for .env)
+
+**Why Gemini?**
+- ✅ 100% free for personal use
+- ✅ No credit card needed
+- ✅ High-quality summaries
+- ✅ JSON mode support
+- ✅ Generous rate limits
+
+#### 🚀 Option B: Groq (FREE Tier) - FASTEST
+
+**Time**: 3 minutes
+**Cost**: **FREE tier** with generous limits
+**Speed**: Ultra-fast inference (10x faster than GPT-3.5)
+
+1. Go to https://console.groq.com/
+2. Sign up with email (no credit card for free tier)
+3. Go to **API Keys** (https://console.groq.com/keys)
+4. Click **"Create API Key"**
+5. Name it: `Nixtla Plugin`
+6. Copy the key
+
+**Save this key**: Your Groq API key (you'll need it for .env)
+
+**Why Groq?**
+- ✅ Free tier included
+- ✅ Blazing fast responses
+- ✅ Uses open models (Mixtral, Llama)
+- ✅ Great for real-time applications
+
+#### 💰 Option C: OpenAI (PAID)
 
 **Time**: 5 minutes
-**Cost**: Pay per use (~$0.002 per digest item)
+**Cost**: ~$0.10-0.50 per full digest run
+**Quality**: Industry standard, reliable
 
 1. Go to https://platform.openai.com/
 2. Sign up / Sign in
@@ -392,14 +435,15 @@ Choose ONE of these:
 4. Click **"Create new secret key"**
 5. Name it: `Nixtla Plugin`
 6. Copy the key (starts with `sk-`)
-7. Add payment method in **Billing** section
+7. **Add payment method** in Billing section (required)
 
 **Save this key**: `sk-...` (you'll need it for .env)
 
-#### Option B: Anthropic (Claude)
+#### 💎 Option D: Anthropic Claude (PAID)
 
 **Time**: 5 minutes
-**Cost**: Pay per use (~$0.003 per digest item)
+**Cost**: ~$0.15-0.60 per full digest run
+**Quality**: Best for complex analysis
 
 1. Go to https://console.anthropic.com/
 2. Sign up / Sign in
@@ -407,9 +451,20 @@ Choose ONE of these:
 4. Click **"Create Key"**
 5. Name it: `Nixtla Plugin`
 6. Copy the key (starts with `sk-ant-`)
-7. Add payment method in **Billing**
+7. **Add payment method** in Billing (required)
 
 **Save this key**: `sk-ant-...` (you'll need it for .env)
+
+#### 🔧 Option E: Custom LLM Provider
+
+**For Advanced Users**: Use your own LLM endpoint
+
+If you have access to:
+- Local LLMs (Ollama, LM Studio)
+- Corporate LLM endpoints
+- Other API providers (Together AI, Replicate, etc.)
+
+See the **[Custom LLM Guide](./docs/custom-llm.md)** for integration instructions.
 
 ---
 
@@ -437,15 +492,26 @@ SLACK_CHANNEL=#nixtla-updates
 SERP_API_KEY=YOUR-SERPAPI-KEY-HERE
 GITHUB_TOKEN=ghp_YOUR-GITHUB-TOKEN-HERE
 
-# Choose ONE of these:
-OPENAI_API_KEY=sk-YOUR-OPENAI-KEY-HERE
-# OR
+# Choose ONE LLM provider (FREE options recommended!):
+
+# Option 1: Gemini (FREE - Recommended)
+GEMINI_API_KEY=YOUR-GEMINI-KEY-HERE
+
+# Option 2: Groq (FREE tier - Fast!)
+# GROQ_API_KEY=YOUR-GROQ-KEY-HERE
+
+# Option 3: OpenAI (Paid)
+# OPENAI_API_KEY=sk-YOUR-OPENAI-KEY-HERE
+
+# Option 4: Anthropic (Paid)
 # ANTHROPIC_API_KEY=sk-ant-YOUR-ANTHROPIC-KEY-HERE
 
 # Optional settings
 DEBUG=false
 MAX_ITEMS_PER_DIGEST=10
 ```
+
+**💡 Pro Tip**: Start with Gemini (completely free) to test everything works, then switch to your preferred provider later!
 
 ### Step 3: Verify Configuration
 
@@ -474,13 +540,22 @@ for key, value in configs.items():
     else:
         print(f"❌ {key}: NOT SET")
 
-# Check LLM provider
-if configs["OPENAI_API_KEY"]:
-    print("\n✅ LLM Provider: OpenAI")
+# Check LLM provider (with new free options!)
+gemini_key = os.getenv("GEMINI_API_KEY")
+groq_key = os.getenv("GROQ_API_KEY")
+
+if gemini_key:
+    print("\n✅ LLM Provider: Google Gemini (FREE!)")
+elif groq_key:
+    print("\n✅ LLM Provider: Groq (FREE tier)")
+elif configs["OPENAI_API_KEY"]:
+    print("\n✅ LLM Provider: OpenAI (Paid)")
 elif configs["ANTHROPIC_API_KEY"]:
-    print("\n✅ LLM Provider: Anthropic")
+    print("\n✅ LLM Provider: Anthropic (Paid)")
 else:
-    print("\n❌ LLM Provider: MISSING - Need either OpenAI or Anthropic key")
+    print("\n❌ LLM Provider: MISSING")
+    print("   Need one of: GEMINI_API_KEY (free), GROQ_API_KEY (free),")
+    print("   OPENAI_API_KEY, or ANTHROPIC_API_KEY")
 EOF
 
 python test_config.py
@@ -747,20 +822,31 @@ Run: `python test_components.py`
 
 ## Cost Estimates
 
-### Per Digest Run
+### 🎉 FREE Configuration (RECOMMENDED)
 
-| Service | Cost per Run | Monthly (Daily) | Notes |
-|---------|-------------|-----------------|-------|
-| **Slack** | Free | Free | No limits |
-| **GitHub** | Free | Free | 5,000 requests/hour |
-| **SerpAPI** | ~$0.01 | ~$0.30 | 10 searches per digest |
-| **OpenAI** | ~$0.05 | ~$1.50 | GPT-3.5, 10 items |
-| **Anthropic** | ~$0.08 | ~$2.40 | Claude Haiku, 10 items |
-| **Total** | ~$0.06-0.09 | ~$2-3 | Per daily digest |
+| Service | Cost | Limits | Quality |
+|---------|------|--------|---------|
+| **Google Gemini** | **$0** | 60 requests/min | Excellent |
+| **Groq** | **$0** | 30 requests/min | Very Good |
+| **GitHub API** | **$0** | 5,000/hour | N/A |
+| **Slack** | **$0** | Unlimited | N/A |
+| **SerpAPI** | $50/month | 100 searches/month* | N/A |
+| **Total with Gemini** | **$50/month** | Daily digests | High quality |
 
-### Monthly Subscription Costs
+*Note: SerpAPI is the only required paid service. All other components can be FREE!
 
-| Service | Monthly Cost | Free Tier |
+### 💰 Paid Configurations
+
+| Configuration | Monthly Cost | Per Digest | Notes |
+|---------------|--------------|------------|-------|
+| **Gemini + SerpAPI** | $50 | $1.67 | Best value! |
+| **Groq + SerpAPI** | $50 | $1.67 | Fastest! |
+| **OpenAI + SerpAPI** | ~$52 | ~$1.73 | Industry standard |
+| **Anthropic + SerpAPI** | ~$53 | ~$1.77 | Premium quality |
+
+### Component Cost Breakdown
+
+| Service | Free Option | Paid Options | Required? |
 |---------|-------------|-----------|
 | **SerpAPI** | $50 minimum | 100 searches trial |
 | **OpenAI** | Pay as you go | $5 free credit |

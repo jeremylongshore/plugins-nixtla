@@ -37,6 +37,8 @@ claude marketplace add https://github.com/jeremylongshore/claude-code-plugins-ni
 claude plugin install nixtla-search-to-slack
 ```
 
+📚 **[Complete Marketplace Setup Guide](./MARKETPLACE_SETUP.md)** - Step-by-step marketplace installation, plugin configuration, and troubleshooting
+
 **Note**: Plugin concepts (TimeGPT Builder, Bench Harness, Service Template) are documented but not yet implemented. Only `nixtla-search-to-slack` is currently functional.
 
 ### Manual Installation (Alternative)

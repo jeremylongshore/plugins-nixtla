@@ -26,6 +26,18 @@ except ImportError:
     anthropic = None
     logger.debug("Anthropic library not installed")
 
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
+    logger.debug("Google Generative AI library not installed")
+
+try:
+    from groq import Groq
+except ImportError:
+    Groq = None
+    logger.debug("Groq library not installed")
+
 
 @dataclass
 class CuratedContent:
@@ -57,17 +69,44 @@ Be concise but informative. Avoid marketing language."""
         self.llm_client = self._initialize_client()
 
     def _determine_provider(self) -> str:
-        """Determine which LLM provider to use based on available keys."""
-        if self.env_config.get("OPENAI_API_KEY") and openai:
+        """Determine which LLM provider to use based on available keys.
+
+        Priority order (first available wins):
+        1. Gemini (FREE via AI Studio)
+        2. Groq (FREE tier available)
+        3. OpenAI (paid)
+        4. Anthropic (paid)
+        """
+        if self.env_config.get("GEMINI_API_KEY") and genai:
+            return "gemini"
+        elif self.env_config.get("GROQ_API_KEY") and Groq:
+            return "groq"
+        elif self.env_config.get("OPENAI_API_KEY") and openai:
             return "openai"
         elif self.env_config.get("ANTHROPIC_API_KEY") and anthropic:
             return "anthropic"
         else:
-            raise ValueError("No LLM provider configured. Need OPENAI_API_KEY or ANTHROPIC_API_KEY")
+            raise ValueError(
+                "No LLM provider configured. Need one of: "
+                "GEMINI_API_KEY (free), GROQ_API_KEY (free tier), "
+                "OPENAI_API_KEY, or ANTHROPIC_API_KEY"
+            )
 
     def _initialize_client(self):
         """Initialize the LLM client based on provider."""
-        if self.llm_provider == "openai":
+        if self.llm_provider == "gemini":
+            if not genai:
+                raise ImportError(
+                    "Google Generative AI library not installed. "
+                    "Run: pip install google-generativeai"
+                )
+            genai.configure(api_key=self.env_config["GEMINI_API_KEY"])
+            return genai.GenerativeModel('gemini-pro')
+        elif self.llm_provider == "groq":
+            if not Groq:
+                raise ImportError("Groq library not installed. Run: pip install groq")
+            return Groq(api_key=self.env_config["GROQ_API_KEY"])
+        elif self.llm_provider == "openai":
             if not openai:
                 raise ImportError("OpenAI library not installed. Run: pip install openai")
             openai.api_key = self.env_config["OPENAI_API_KEY"]
@@ -190,7 +229,11 @@ Respond ONLY with valid JSON in this exact format:
         Returns:
             LLM response text
         """
-        if self.llm_provider == "openai":
+        if self.llm_provider == "gemini":
+            return self._call_gemini(prompt)
+        elif self.llm_provider == "groq":
+            return self._call_groq(prompt)
+        elif self.llm_provider == "openai":
             return self._call_openai(prompt)
         elif self.llm_provider == "anthropic":
             return self._call_anthropic(prompt)
@@ -235,6 +278,47 @@ Respond ONLY with valid JSON in this exact format:
 
         except Exception as e:
             logger.error(f"Anthropic API call failed: {e}")
+            raise
+
+    def _call_gemini(self, prompt: str) -> str:
+        """Call Google Gemini API (FREE via AI Studio)."""
+        try:
+            # Combine system and user prompts for Gemini
+            full_prompt = f"{self.SYSTEM_PROMPT}\n\n{prompt}"
+
+            response = self.llm_client.generate_content(
+                full_prompt,
+                generation_config={
+                    "temperature": 0.3,
+                    "max_output_tokens": 500,
+                    "response_mime_type": "application/json",
+                }
+            )
+            return response.text
+
+        except Exception as e:
+            logger.error(f"Gemini API call failed: {e}")
+            raise
+
+    def _call_groq(self, prompt: str) -> str:
+        """Call Groq API (FREE tier available)."""
+        model = os.getenv("LLM_MODEL", "mixtral-8x7b-32768")  # Free and fast model
+
+        try:
+            response = self.llm_client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": self.SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.3,
+                max_tokens=500,
+                response_format={"type": "json_object"}  # Ensure JSON output
+            )
+            return response.choices[0].message.content
+
+        except Exception as e:
+            logger.error(f"Groq API call failed: {e}")
             raise
 
     def _create_fallback(self, content: Content) -> CuratedContent:
