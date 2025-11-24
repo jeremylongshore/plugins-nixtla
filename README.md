@@ -25,20 +25,23 @@ These plugins are designed to reduce the gap between "I want to use TimeGPT" and
 
 ## 📦 Installation
 
-### From Claude Code Marketplace (Coming Soon)
+### From Claude Code Marketplace
 
-Once published to the Claude Code marketplace, you'll be able to install these plugins directly:
+Install the nixtla-plugins marketplace to access all available plugins:
 
 ```bash
-# In Claude Code terminal
-/marketplace install nixtla-search-to-slack
-/marketplace install nixtla-timegpt-builder
-/marketplace install nixtla-bench-harness
+# In Claude Code CLI
+claude marketplace add https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
+
+# Install the working plugin
+claude plugin install nixtla-search-to-slack
 ```
 
-### Manual Installation (Available Now)
+**Note**: Plugin concepts (TimeGPT Builder, Bench Harness, Service Template) are documented but not yet implemented. Only `nixtla-search-to-slack` is currently functional.
 
-Since this is currently a private repository, follow these steps for manual installation:
+### Manual Installation (Alternative)
+
+For direct installation without the marketplace:
 
 1. **Clone the Repository**
 ```bash
