@@ -114,6 +114,24 @@ Inspired by Bob's Brain, this system follows these principles:
 - All code changes require approval
 - Continuous feedback loop for improvement
 
+### Agent Engine: Vertex AI
+
+This system is built on **Google Cloud Vertex AI Agent Engine**—the same production-grade platform powering Bob's Brain. This isn't an experimental framework; it's enterprise infrastructure designed for multi-agent orchestration at scale.
+
+**Why Vertex AI Agent Engine**:
+
+**Advanced Memory Management** - Agents maintain both short-term context (current task) and long-term memory (learned patterns, historical decisions), enabling them to improve over time and make context-aware decisions across sessions.
+
+**Native Agent-to-Agent Protocol** - Built-in A2A communication allows specialist agents to collaborate seamlessly. The baseline builder can hand off results to the backtest QA agent, which can trigger the CI triage agent—all through standardized protocols, not custom glue code.
+
+**Production Telemetry** - Every agent action is logged, traced, and observable. When an agent makes a decision, we see the reasoning chain. When workflows fail, we have complete audit trails. This isn't debugging by printf; it's instrumented observability from the ground up.
+
+**Unified Cloud Integration** - Since Nixtla's infrastructure runs on Google Cloud, Vertex AI agents natively connect to BigQuery for datasets, Cloud Storage for artifacts, Secret Manager for credentials, and Cloud Build for CI integration—no bridge services required.
+
+**Proven at Scale** - Bob's Brain handles ADK deployments, GitHub automation, and Slack orchestration on this same platform. We're not prototyping infrastructure; we're adapting proven patterns to a new domain.
+
+The result: agents that remember context, communicate clearly, operate transparently, and scale naturally as Nixtla's needs grow.
+
 ## Example Workflows
 
 These are concrete workflows this system is designed to handle:
