@@ -7,7 +7,7 @@
 [![TimeGPT](https://img.shields.io/badge/TimeGPT-Integrated-green)](https://docs.nixtla.io/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-> **Status**: Experimental | Private collaboration workspace between Jeremy Longshore (Intent Solutions) and Max Mergenthaler-Canseco (Nixtla)
+> **Status**: Experimental | Private collaboration workspace between Jeremy Longshore (Intent Solutions) and Max Mergenthaler (Nixtla)
 
 ## Overview
 
@@ -337,7 +337,7 @@ This is a **private workspace** for experimentation between Intent Solutions and
 
 For questions or collaboration inquiries:
 - **Jeremy Longshore**: jeremy@intentsolutions.io | 251.213.1115
-- **Max Mergenthaler-Canseco**: max@nixtla.io
+- **Max Mergenthaler**: max@nixtla.io
 
 ## License
 
@@ -346,12 +346,12 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 ## Acknowledgments
 
 - **Nixtla Team**: For building world-class time-series forecasting tools and collaborating on this experiment
-- **Max Mergenthaler-Canseco**: For partnership and vision
+- **Max Mergenthaler**: For partnership and vision
 - **Anthropic**: For Claude and the agent infrastructure that makes this possible
 - **Bob's Brain Contributors**: For the foundational architecture we're adapting
 
 ---
 
-**Maintainers**: Jeremy Longshore (Intent Solutions io) · Max Mergenthaler-Canseco (Nixtla)
+**Maintainers**: Jeremy Longshore (Intent Solutions io) · Max Mergenthaler (Nixtla)
 **Status**: Experimental | Private Collaboration
 **Version**: 0.2.0
