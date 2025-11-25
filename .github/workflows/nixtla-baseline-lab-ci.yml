@@ -1,0 +1,61 @@
+name: Nixtla Baseline Lab CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'plugins/nixtla-baseline-lab/**'
+      - '.github/workflows/nixtla-baseline-lab-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'plugins/nixtla-baseline-lab/**'
+      - '.github/workflows/nixtla-baseline-lab-ci.yml'
+
+jobs:
+  test-baseline-lab:
+    name: Test Nixtla Baseline Lab Plugin
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: 'plugins/nixtla-baseline-lab/scripts/requirements.txt'
+
+      - name: Install Nixtla OSS dependencies
+        working-directory: plugins/nixtla-baseline-lab
+        run: |
+          echo "Installing Nixtla OSS dependencies..."
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+          echo "Installed packages:"
+          pip list | grep -E "(statsforecast|datasetsforecast|pandas|numpy)"
+
+      - name: Run MCP server test
+        working-directory: plugins/nixtla-baseline-lab
+        run: |
+          echo "Running MCP server in test mode..."
+          python scripts/nixtla_baseline_mcp.py test
+
+      - name: Run golden task validation
+        working-directory: plugins/nixtla-baseline-lab
+        run: |
+          echo "Running golden task smoke test..."
+          python tests/run_baseline_m4_smoke.py
+
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nixtla-baseline-test-results
+          path: |
+            plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
+          retention-days: 7
