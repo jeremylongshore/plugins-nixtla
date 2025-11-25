@@ -1,484 +1,343 @@
-# Claude Code Plugins for Nixtla
+# Nixtla Agentic Engineering Workspace (Private)
+
+> A Bob-style multi-agent system that wraps Nixtla's time series stack to prototype 'junior engineer' agents for internal use.
 
 [![Private Repository](https://img.shields.io/badge/Repository-Private-red)](https://github.com/jeremylongshore/claude-code-plugins-nixtla)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Plugins-blue)](https://claude.ai/docs/claude-code)
+[![Bob's Brain Architecture](https://img.shields.io/badge/Architecture-Bob's%20Brain-blue)]()
 [![TimeGPT](https://img.shields.io/badge/TimeGPT-Integrated-green)](https://docs.nixtla.io/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-> **Status**: v0.2.0 - First Working Plugin Released! Initial implementation and concepts built by Intent Solutions io for potential collaboration with Nixtla. Not affiliated with or endorsed by Nixtla.
-
-> **NEW**: First working plugin `nixtla-search-to-slack` now available! Plus three additional plugin concepts for Nixtla: TimeGPT Pipeline Builder, Model Benchmark Generator, and FastAPI Service Scaffolding.
+> **Status**: Experimental | Private collaboration workspace between Jeremy Longshore (Intent Solutions) and Max Mergenthaler-Canseco (Nixtla)
 
 ## Overview
 
-This repository contains both **working plugins** and **concept designs** for accelerating Nixtla workflows through AI-powered code generation:
+This is a **private, experimental workspace** for prototyping an agentic system built on Claude + tools that understands Nixtla's time series workflows and can take on repetitive engineering work.
+
+The system is intentionally modeled after **Bob's Brain** (foreman + specialist agents, CI-only deploys, strict guardrails) but re-skinned for the Nixtla ecosystem. Rather than managing ADK deployments, these agents handle time-series forecasting workflows, model benchmarking, CI triage, and documentation sync across Nixtla's libraries.
+
+The goal is to build a "junior engineer agent crew" that wraps around Nixtla's existing tooling—not to replace it, but to automate the repetitive parts while senior engineers focus on research, new models, and strategic decisions.
+
+## Nixtla Context
 
-### ✅ Implemented Plugin (v0.2.0)
-- **Nixtla Search-to-Slack Digest** - Automated content discovery and curation for time-series practitioners
-
-### 📋 Plugin Concepts (v0.1.0)
-1. **TimeGPT Quickstart Pipeline Builder** - Generate complete TimeGPT integration code
-2. **Nixtla Bench Harness Generator** - Create model comparison benchmarks
-3. **Forecast Service Template Builder** - Scaffold production-ready APIs
-
-These plugins are designed to reduce the gap between "I want to use TimeGPT" and "I have working code in production."
-
-## 📦 Installation
-
-### From Claude Code Marketplace
-
-Install the nixtla-plugins marketplace to access all available plugins:
-
-```bash
-# In Claude Code CLI
-claude marketplace add https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
-
-# Install the working plugin
-claude plugin install nixtla-search-to-slack
-```
-
-📚 **[Complete Marketplace Setup Guide](./MARKETPLACE_SETUP.md)** - Step-by-step marketplace installation, plugin configuration, and troubleshooting
-
-**Note**: Plugin concepts (TimeGPT Builder, Bench Harness, Service Template) are documented but not yet implemented. Only `nixtla-search-to-slack` is currently functional.
-
-### Manual Installation (Alternative)
-
-For direct installation without the marketplace:
-
-1. **Clone the Repository**
-```bash
-git clone https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
-cd claude-code-plugins-nixtla
-```
-
-2. **Install the Working Plugin**
-```bash
-# Navigate to the plugin directory
-cd plugins/nixtla-search-to-slack
-
-# Install Python dependencies
-pip install -r requirements.txt
-pip install openai  # or pip install anthropic
-```
-
-3. **Configure Your Environment**
-```bash
-# Copy the example configuration
-cp .env.example .env
-
-# Edit .env with your API keys
-# Required: Slack, SerpAPI, GitHub, OpenAI/Anthropic
-```
-
-📚 **[Complete Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** - Step-by-step instructions with screenshots, troubleshooting, and test scripts (90% success rate when following all steps)
-
-## 🚀 Quick Start
-
-Once installed (see [Installation](#-installation) above), you can immediately start using the Nixtla Search-to-Slack plugin:
-
-```bash
-# Run your first digest
-python -m nixtla_search_to_slack --topic nixtla-core
-
-# List all available topics
-python -m nixtla_search_to_slack --list-topics
-
-# Dry run mode (test without posting to Slack)
-python -m nixtla_search_to_slack --topic nixtla-core --dry-run
-```
-
-**Need help?** Check the **[Complete Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** for detailed instructions and troubleshooting.
-
-## 📊 Nixtla Search-to-Slack Plugin
-
-### What It Does
-
-The **Nixtla Search-to-Slack Digest** plugin automatically:
-1. **Searches** for Nixtla and time-series forecasting content across web and GitHub
-2. **Curates** findings using AI to generate summaries and key insights
-3. **Publishes** a formatted digest to your Slack channel
-
-Perfect for teams wanting to stay updated on:
-- TimeGPT releases and updates
-- StatsForecast, MLForecast, NeuralForecast developments
-- Time-series forecasting research and best practices
-- Community discussions and issues
-
-### Features
-
-#### Current Capabilities (v0.2.0)
-✅ **Web Search Integration**
-- SerpAPI integration for targeted searches
-- Nixtla and time-series focused queries
-- Configurable time ranges (default: last 7 days)
-- Domain filtering to exclude low-quality sources
-
-✅ **GitHub Monitoring**
-- Tracks Nixtla organization repositories
-- Monitors issues, PRs, releases, and discussions
-- Configurable repo allowlist for related projects
-- Automatic deduplication of content
-
-✅ **AI-Powered Curation**
-- Generates 2-3 sentence summaries
-- Extracts 2-3 key technical points
-- Explains relevance for Nixtla practitioners
-- Relevance scoring (0-100) for filtering
-
-✅ **Slack Publishing**
-- Rich Block Kit formatting
-- Customizable channels per topic
-- Includes source links and metadata
-- Dry-run mode for testing
-
-### Configuration
-
-#### Configure Topics (`config/topics.yaml`)
-```yaml
-topics:
-  nixtla-core:
-    name: "Nixtla Core Updates"
-    keywords:
-      - TimeGPT
-      - StatsForecast
-      - MLForecast
-      - NeuralForecast
-    sources: [web, github]
-    slack_channel: "#nixtla-updates"
-```
-
-#### Environment Variables (`.env`)
-```bash
-SLACK_BOT_TOKEN=xoxb-your-token
-SERP_API_KEY=your-serpapi-key
-GITHUB_TOKEN=ghp_your-token
-OPENAI_API_KEY=sk-your-key  # or ANTHROPIC_API_KEY
-```
-
-📚 **Full setup instructions**: See the **[Complete Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** for API key acquisition, Slack bot creation, and detailed configuration.
-
-### Usage Examples
-
-#### Manual Execution
-```bash
-# Run digest for Nixtla core updates
-python -m nixtla_search_to_slack --topic nixtla-core
-
-# Dry run (no Slack posting)
-python -m nixtla_search_to_slack --topic nixtla-core --dry-run
-
-# List all configured topics
-python -m nixtla_search_to_slack --list-topics
-```
-
-#### Scheduling with Cron
-```cron
-# Daily at 9 AM
-0 9 * * * cd /path/to/plugin && python -m nixtla_search_to_slack --topic nixtla-core
-```
-
-#### Example Slack Output
-```
-📊 Nixtla & Time Series Digest
-Generated: Nov 23, 2025 at 9:00 AM | Items: 5
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-1. TimeGPT 2.0 Released with Multivariate Support
-Source: GitHub • Relevance: 95%
-
-> TimeGPT now supports multivariate forecasting with
-> automatic feature selection and improved accuracy.
-
-Key Points:
-• Handles up to 100 variables
-• 15% accuracy improvement
-• New async Python SDK
-
-Why this matters: Enables enterprise forecasting
-scenarios previously requiring custom solutions.
-
-[View Source →]
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-### Technical Architecture
-
-The plugin follows a modular pipeline architecture:
-
-```
-Search Sources → Content Aggregation → AI Curation → Slack Publishing
-```
-
-- **Search Orchestrator**: Coordinates multiple search sources
-- **Content Aggregator**: Deduplicates and normalizes results
-- **AI Curator**: Generates summaries using LLMs
-- **Slack Publisher**: Formats and posts to channels
-
-### Limitations (MVP)
-
-This is a **construction kit** and **reference implementation**:
-- Limited to 2 search sources (web + GitHub)
-- Basic deduplication (may miss some similar content)
-- No persistence (may re-send content)
-- Manual triggering (scheduling examples provided)
-- Not a production monitoring service
-
-### Future Roadmap
-
-- [ ] Additional sources (Reddit, arXiv, RSS feeds)
-- [ ] Advanced deduplication with semantic similarity
-- [ ] User personalization and preferences
-- [ ] Database persistence for history
-- [ ] Multi-channel support with different filters
-- [ ] Engagement metrics and analytics
-
-## Plugin Architecture
-
-```mermaid
-graph TB
-    User[User Request] --> Claude[Claude Code]
-    Claude --> Plugins[Plugin System]
-
-    Plugins --> P1[TimeGPT Quickstart Builder]
-    Plugins --> P2[Bench Harness Generator]
-    Plugins --> P3[Service Template Builder]
-
-    P1 --> Code1[Generate Python Script]
-    P2 --> Code2[Generate Benchmark Code]
-    P3 --> Code3[Generate FastAPI Service]
-
-    Code1 --> TG[TimeGPT API]
-    Code2 --> Models[All Nixtla Models]
-    Code3 --> API[REST Endpoints]
-
-    Models --> SF[StatsForecast]
-    Models --> MF[MLForecast]
-    Models --> NF[NeuralForecast]
-    Models --> TimeGPT[TimeGPT]
-
-    style P1 fill:#e8f5e9
-    style P2 fill:#e3f2fd
-    style P3 fill:#fff3e0
-```
-
-## Three Initial Plugin Concepts
-
-We're exploring three specific plugin concepts to accelerate Nixtla workflows:
-
-### 1. TimeGPT Quickstart Pipeline Builder
-**Status**: `Initial Concept · v0.1`
-
-Generates ready-to-run Python scripts that integrate with TimeGPT. Takes your dataset requirements and produces complete pipeline code with error handling, logging, and visualization.
-
-[→ View detailed design](https://jeremylongshore.github.io/claude-code-plugins-nixtla/plugins#1-timegpt-quickstart-pipeline-builder)
-
-### 2. Nixtla Bench Harness Generator
-**Status**: `Initial Concept · v0.1`
-
-Creates benchmark harnesses to compare TimeGPT, StatsForecast, MLForecast, and NeuralForecast on your data. Outputs comparative metrics and performance reports.
-
-[→ View detailed design](https://jeremylongshore.github.io/claude-code-plugins-nixtla/plugins#2-nixtla-bench-harness-generator)
-
-### 3. Forecast Service Template Builder
-**Status**: `Initial Concept · v0.1`
-
-Scaffolds production-ready FastAPI services that expose Nixtla models via REST endpoints. Includes containerization, validation, and deployment configurations.
-
-[→ View detailed design](https://jeremylongshore.github.io/claude-code-plugins-nixtla/plugins#3-forecast-service-template-builder-fastapi--nixtla)
+Nixtla already has a sophisticated, modern time-series forecasting stack:
+
+**Nixtlaverse Libraries**:
+- **StatsForecast**: Classical statistical methods (ARIMA, ETS, etc.)
+- **MLForecast**: Machine learning forecasting (LightGBM, XGBoost, etc.)
+- **NeuralForecast**: Deep learning models (NHITS, NBEATS, TFT, etc.)
+- **HierarchicalForecast**: Hierarchical reconciliation methods
+- **DatasetsForecast**: Benchmark datasets and evaluation utilities
+
+**TimeGPT / Enterprise Engine**:
+- Foundation model for time-series forecasting
+- Anomaly detection and monitoring
+- Integration with existing data infrastructure (Snowflake, GCP, AWS, Azure, on-prem)
+- BI tool connectivity
+
+This agent system is **designed to plug into these repos, APIs, and workflows**—not to create a parallel universe. The agents handle repetitive tasks and boilerplate so human engineers can focus on high-value work.
+
+## Agentic System: "Bob for Nixtla"
+
+### Architecture
+
+The system follows Bob's Brain's proven pattern:
+- **One orchestrator agent** that understands Nixtla-flavored engineering jobs
+- **Multiple specialist agents** that handle specific tasks
+- **Human-in-the-loop review** for all code changes
+- **CI-only deployments** with strict guardrails
+- **Golden tasks** and ARV-style validation
+
+### Specialist Agents
+
+**1. Baseline Builder**
+- Creates baseline forecasts using StatsForecast / MLForecast / NeuralForecast
+- Generates notebooks with metrics tables
+- Works on internal or public datasets
+- Standardizes evaluation methodology
+
+**2. Backtest & Benchmark QA**
+- Runs standardized backtests on benchmark datasets
+- Uses Nixtla's `datasetsforecast` + existing tutorials
+- Compares model performance across approaches
+- Summarizes results with statistical significance
+
+**3. TimeGPT Experiment Runner**
+- Spins up TimeGPT experiments with different configs
+- Tracks parameters and results
+- Stores experiment artifacts
+- Generates comparison reports
+
+**4. CI & Test Triage**
+- Parses CI logs from Nixtla repositories
+- Identifies likely root causes of failures
+- Proposes fixes or comments on PRs
+- Reduces time-to-fix for common issues
+
+**5. Docs & Examples Sync**
+- Detects drift between code and documentation
+- Finds outdated notebooks and examples
+- Drafts PRs to update docs after API changes
+- Maintains consistency across tutorials
+
+**6. Anomaly Monitor**
+- Leverages TimeGPT and Nixtla methods
+- Detects anomalies in key time series
+- Proposes follow-up actions
+- Monitors production pipeline health
+
+These agents aim to **automate repetitive engineering tasks** while keeping humans in the loop for strategy, research, and complex decision-making.
+
+## Architecture & Principles
+
+Inspired by Bob's Brain, this system follows these principles:
+
+**Orchestrator + Specialist Pattern**:
+- Central orchestrator delegates to domain-specific agents
+- Each specialist has deep knowledge of one workflow
+- Agents communicate through structured interfaces
+
+**Strict Guardrails & Testing**:
+- Golden tasks validate agent behavior
+- ARV-style checks before any deployment
+- CI-only deployments, never direct to prod
+- Comprehensive test coverage
+
+**GitHub Integration**:
+- Reading repos and understanding codebases
+- Opening PRs with proper context
+- Commenting on issues with analysis
+- Later: Claude Code plugin integration
+
+**Human-in-the-Loop**:
+- Agentic automation with human review
+- Not a fully autonomous production system (yet)
+- All code changes require approval
+- Continuous feedback loop for improvement
+
+## Example Workflows
+
+These are concrete workflows this system is designed to handle:
+
+**Baseline Generation**:
+- "Given a new dataset, generate baselines and a metrics table using Nixtla libraries"
+- Agent produces notebook with StatsForecast, MLForecast, NeuralForecast results
+- Human reviews metrics and decides next steps
+
+**PR Backtesting**:
+- "Given a PR that changes model code, run standardized backtests on benchmark datasets and comment with a comparison summary"
+- Agent runs experiments, generates comparison table
+- Comments on PR with before/after metrics
+
+**CI Failure Triage**:
+- "Given a CI failure, parse logs, identify likely cause, and propose a patch"
+- Agent analyzes stack traces and error messages
+- Opens draft PR with proposed fix
+
+**Pipeline Monitoring**:
+- "On a schedule, monitor key TimeGPT pipelines for drift/anomalies and alert with suggested next steps"
+- Agent detects anomalies using TimeGPT methods
+- Sends alert with context and recommendations
+
+**Documentation Sync**:
+- "After API changes in StatsForecast, find affected notebooks and update them"
+- Agent identifies outdated code examples
+- Opens PR with updated notebooks
 
 ## Roadmap
 
-### Phase 1: Foundation
-- Repository structure and documentation
-- Core plugin architecture
-- TimeGPT deployment automation
-- Basic validation framework
+### Phase 1: Foundation & Single-Repo Integration
+- Define core agent architecture
+- Wire orchestrator + 2-3 specialist agents
+- Integrate with one Nixtla repo (likely StatsForecast)
+- Establish golden tasks and validation framework
+- Build human approval workflow
 
-### Phase 2: Integration
-- Pipeline orchestration with Airflow/Prefect
-- Advanced model comparison tools
-- Real-time monitoring dashboards
-- Team collaboration features
+### Phase 2: Multi-Workflow Support
+- Add backtesting automation across all Nixtlaverse libraries
+- Implement doc-sync for notebooks and examples
+- Build CI triage agent with auto-fix proposals
+- Expand to 3-4 Nixtla repositories
+- Create agent performance metrics
 
-### Phase 3: Scale
-- Multi-region deployment patterns
-- Advanced AutoML integration
-- Custom metric frameworks
-- Enterprise SSO/RBAC
+### Phase 3: TimeGPT & Production Data
+- Integrate with TimeGPT API and Enterprise Engine
+- Connect to production-like data sources
+- Build anomaly monitoring workflows
+- Add experiment tracking and comparison
+- Implement cross-repo coordination
 
-### Phase 4: Intelligence
-- AI-powered optimization suggestions
-- Automated hyperparameter tuning
-- Anomaly detection and alerting
-- Natural language reporting
+### Phase 4: Plugin Extraction & Team Use
+- Extract proven workflows into reusable Claude Code plugins
+- Enable Nixtla engineers to use agents directly
+- Build internal documentation and training
+- Scale to full Nixtlaverse coverage
+- Consider external release for community
 
-## How These Plugins Will Work
+## Current Implementation Status
 
-Each plugin generates production-ready code based on your specific requirements:
+### ✅ Completed (v0.2.0)
+- **Search-to-Slack Plugin**: Automated content discovery and curation
+- **Claude Skills**: Interactive research assistant, pipeline builder, model benchmarker
+- **FREE Provider Support**: Gemini, Groq, Brave Search (can run at $0/month)
+- **Documentation**: Setup guides, educational materials, troubleshooting
 
-### TimeGPT Quickstart Pipeline Builder
+### 🚧 In Progress
+- Agent architecture design based on Bob's Brain patterns
+- Specialist agent prototypes
+- Integration with Nixtla repositories
+- Golden task framework
 
-**User says**: "Create a TimeGPT pipeline for my sales data"
+### 📋 Planned
+- Orchestrator implementation
+- CI triage automation
+- Backtest harness generation
+- Documentation sync workflows
+- TimeGPT experiment runner
 
-**Plugin generates**: Complete Python script with:
-```python
-# timegpt_quickstart.py - generated code example
-from nixtla import NixtlaClient
-import pandas as pd
+## Technical Architecture
 
-client = NixtlaClient(api_key="YOUR_API_KEY")
-df = pd.read_csv("data/sales.csv")
-forecast = client.forecast(df=df, h=30)
+```mermaid
+graph TB
+    User[Human Engineer] --> Orch[Orchestrator Agent]
+
+    Orch --> BB[Baseline Builder]
+    Orch --> BT[Backtest QA]
+    Orch --> TG[TimeGPT Runner]
+    Orch --> CI[CI Triage]
+    Orch --> DS[Doc Sync]
+    Orch --> AM[Anomaly Monitor]
+
+    BB --> Nixtla[Nixtlaverse]
+    BT --> Nixtla
+    TG --> TimeGPT[TimeGPT API]
+    CI --> GitHub[GitHub Repos]
+    DS --> GitHub
+    AM --> TimeGPT
+
+    Nixtla --> SF[StatsForecast]
+    Nixtla --> MF[MLForecast]
+    Nixtla --> NF[NeuralForecast]
+    Nixtla --> HF[HierarchicalForecast]
+    Nixtla --> DF[DatasetsForecast]
+
+    style Orch fill:#e8f5e9
+    style BB fill:#e3f2fd
+    style BT fill:#e3f2fd
+    style TG fill:#e3f2fd
+    style CI fill:#e3f2fd
+    style DS fill:#e3f2fd
+    style AM fill:#e3f2fd
 ```
 
-### Nixtla Bench Harness Generator
+## Repository Structure
 
-**User says**: "Compare all Nixtla models on my dataset"
-
-**Plugin generates**: Benchmark harness that runs multiple models and compares results
-
-### Forecast Service Template Builder
-
-**User says**: "Create a REST API for TimeGPT"
-
-**Plugin generates**: Complete FastAPI service with endpoints, validation, and Docker configuration
-
-[→ View full technical specifications](https://jeremylongshore.github.io/claude-code-plugins-nixtla/plugins)
-
-## Plugin Development Guide (Future)
-
-Once the plugin system is implemented, creating custom plugins will follow this structure:
-
-### Planned Plugin Structure
 ```
-plugins/[plugin-name]/
-├── .claude-plugin/
-│   └── plugin.json        # Plugin metadata
-├── commands/              # Slash commands
-├── agents/               # AI agents
-├── skills/              # Agent skills
-└── README.md           # Documentation
+nixtla/
+├── agents/                    # Specialist agent implementations
+│   ├── baseline-builder/
+│   ├── backtest-qa/
+│   ├── timegpt-runner/
+│   ├── ci-triage/
+│   ├── doc-sync/
+│   └── anomaly-monitor/
+├── orchestrator/             # Central orchestrator
+├── golden-tasks/            # Validation test cases
+├── plugins/                 # Claude Code plugins
+│   └── nixtla-search-to-slack/  # ✅ Working plugin
+├── config/                  # Configuration files
+├── 000-docs/               # Technical documentation
+└── scripts/                # Automation scripts
 ```
 
-### Example Plugin Configuration (Template)
-```json
-{
-  "name": "plugin-name",
-  "version": "0.1.0",
-  "description": "Clear description",
-  "author": {
-    "name": "Your Name",
-    "email": "email@example.com"
-  }
-}
-```
+## Development Principles
 
-### Development Resources
-- [Plugin Architecture Documentation](./000-docs/002-AT-ARCH-plugin-architecture.md)
-- [Document Standards](./000-docs/005-DR-META-document-standards.md)
-- [Validation Script](./scripts/validate-all-plugins.sh) (ready for when plugins are created)
-- **[Educational Resources](./EDUCATIONAL_RESOURCES.md)** - Links to 254 production plugins, learning paths, and best practices from the main Claude Code Plugins marketplace
+**1. Respectful Integration**
+- We acknowledge Nixtla's existing sophisticated infrastructure
+- We build on top of their tools, not parallel to them
+- We focus on automation, not replacement
 
-## Why Claude Code for ML Teams?
+**2. Proven Patterns**
+- Reuse Bob's Brain architecture that works
+- Apply lessons learned from ADK agent department
+- Adapt patterns to time-series domain
 
-### Traditional Workflow Challenges
-- **Deployment Complexity**: Each model requires unique configuration
-- **Validation Overhead**: Manual comparison across models is time-consuming
-- **Pipeline Maintenance**: Orchestration code becomes technical debt
-- **Knowledge Silos**: Expertise locked in specific team members
+**3. Incremental Value**
+- Start with one repo, one agent, one workflow
+- Validate each piece before expanding
+- Measure impact on engineering velocity
 
-### Claude Code Solution
-- **Natural Language**: Deploy models by describing what you want
-- **Intelligent Automation**: Claude understands context and handles details
-- **Reusable Patterns**: Capture best practices in shareable plugins
-- **Self-Documenting**: Every action is logged and explainable
+**4. Human-Centered**
+- Agents assist engineers, not replace them
+- All changes require human review
+- Focus on eliminating toil, not eliminating jobs
 
-## Security & Privacy
+## Getting Started
 
-- **Private Repository**: Your code and data stay in your control
-- **No External Dependencies**: Plugins run in your environment
-- **Credential Management**: Secure handling via environment variables
-- **Audit Trails**: Complete logging of all operations
-- **Compliance Ready**: SOC2, HIPAA, GDPR compatible patterns
+### Prerequisites
+- Python 3.12+
+- Access to Nixtla repositories
+- Claude API access
+- GitHub token with appropriate permissions
 
-## Contributing
-
-We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
-### Quick Contribution Guide
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-plugin`)
-3. Commit your changes (`git commit -m 'Add amazing plugin'`)
-4. Push to the branch (`git push origin feature/amazing-plugin`)
-5. Open a Pull Request
-
-### Development Setup
-
+### Quick Setup
 ```bash
-# Clone the repository
+# Clone the workspace
 git clone https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
 cd claude-code-plugins-nixtla
 
-# Set up development environment
-./scripts/setup-dev-environment.sh
+# Set up environment
+cp .env.example .env
+# Edit .env with your credentials
 
-# Run tests
+# Install dependencies
+pip install -r requirements.txt
+
+# Run validation
 pytest
-
-# Validate plugins
-./scripts/validate-plugins.sh
 ```
+
+### Using the Search-to-Slack Plugin
+
+The first working component is the content discovery plugin:
+
+```bash
+# Navigate to plugin
+cd plugins/nixtla-search-to-slack
+
+# Run digest
+python -m nixtla_search_to_slack --topic nixtla-core
+
+# See full setup guide
+cat SETUP_GUIDE.md
+```
+
+For detailed setup instructions, see:
+- **[Search-to-Slack Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)** - Complete installation and configuration
+- **[Marketplace Setup](./MARKETPLACE_SETUP.md)** - Claude Code marketplace integration
 
 ## Documentation
 
-### Interactive Documentation Site
-
-Visit our **[GitHub Pages documentation](https://jeremylongshore.github.io/claude-code-plugins-nixtla/)** for:
-
-- **[Plugin Concepts](https://jeremylongshore.github.io/claude-code-plugins-nixtla/plugins)** - Detailed technical specifications for three initial plugin ideas
-- **[Architecture Overview](https://jeremylongshore.github.io/claude-code-plugins-nixtla/architecture)** - Visual diagrams showing Claude Code + Nixtla integration
-- **Interactive examples** with Mermaid diagrams and working code snippets
-- **Implementation patterns** for production deployments
-
 ### Repository Documentation
+- **[000-docs/](./000-docs/)** - Technical architecture and planning documents
+- **[EDUCATIONAL_RESOURCES.md](./EDUCATIONAL_RESOURCES.md)** - Learning paths and references
 
-- **[Educational Resources](./EDUCATIONAL_RESOURCES.md)** - Comprehensive learning paths and links to 254 production plugins
-- **[Technical Documentation](./000-docs/README.md)** - Complete planning and architecture documents
-- **[API Reference](./000-docs/002-AT-ARCH-plugin-architecture.md)** - Plugin development specifications
-- **[Document Standards](./000-docs/005-DR-META-document-standards.md)** - Filing system v3.0 reference
-- **[Discussion Guidelines](./DISCUSSIONS.md)** - Community collaboration categories
+### External Resources
+- **[Bob's Brain Repository](https://github.com/jeremylongshore/bobs-brain)** - Reference architecture
+- **[Nixtla Documentation](https://docs.nixtla.io/)** - Official Nixtla docs
+- **[Claude Code Plugins](https://code.claude.com/docs/en/plugins)** - Plugin development guide
 
-## Community & Collaboration
+## Collaboration
 
-### Join the Discussion
+This is a **private workspace** for experimentation between Intent Solutions and Nixtla. We are:
 
-We encourage collaboration through [GitHub Discussions](https://github.com/jeremylongshore/claude-code-plugins-nixtla/discussions). Share your ideas, use cases, and collaborate on plugin development. See [DISCUSSIONS.md](./DISCUSSIONS.md) for category guidelines.
+- Prototyping agent workflows before wider release
+- Validating architecture with real Nixtla codebases
+- Building reusable patterns for time-series engineering
+- Testing automation that respects existing infrastructure
 
-**Active Discussion Topics:**
-- Plugin Ideas & Proposals
-- Show and Tell - Share Your Workflows
-- Technical Q&A
-- Collaboration Opportunities
-- Feature Requests
-- Use Cases & Examples
-
-### Report Issues
-
-Use our [issue templates](https://github.com/jeremylongshore/claude-code-plugins-nixtla/issues/new/choose) to:
-- Propose new plugin concepts
-- Report bugs or documentation issues
-- Request collaboration opportunities
-- Suggest documentation improvements
-
-## Support
-
-- **Community**: [GitHub Discussions](https://github.com/jeremylongshore/claude-code-plugins-nixtla/discussions)
-- **Issues**: [GitHub Issues](https://github.com/jeremylongshore/claude-code-plugins-nixtla/issues)
-- **Direct Contact**: jeremy@intentsolutions.io | Cell: 251.213.1115
-- **Priority Support**: Dedicated Slack channel at Intent Solutions IO workspace
-- **Response Time**: Same-day response for all Nixtla inquiries
+For questions or collaboration inquiries:
+- **Jeremy Longshore**: jeremy@intentsolutions.io | 251.213.1115
+- **Max Mergenthaler-Canseco**: max@nixtla.io
 
 ## License
 
@@ -486,11 +345,13 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## Acknowledgments
 
-- **Nixtla Team**: For creating the incredible TimeGPT and Nixtlaverse ecosystem
-- **Anthropic**: For Claude Code and the plugin architecture
-- **Contributors**: Everyone who helps improve these tools
+- **Nixtla Team**: For building world-class time-series forecasting tools and collaborating on this experiment
+- **Max Mergenthaler-Canseco**: For partnership and vision
+- **Anthropic**: For Claude and the agent infrastructure that makes this possible
+- **Bob's Brain Contributors**: For the foundational architecture we're adapting
 
 ---
 
-**Version**: 1.0.0
-**Maintainer**: Jeremy Longshore (jeremy@intentsolutions.io)
+**Maintainers**: Jeremy Longshore (Intent Solutions io) · Max Mergenthaler-Canseco (Nixtla)
+**Status**: Experimental | Private Collaboration
+**Version**: 0.2.0
