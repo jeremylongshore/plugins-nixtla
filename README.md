@@ -126,7 +126,7 @@ This system is built on **Google Cloud Vertex AI Agent Engine**—the same produ
 
 **Production Telemetry** - Every agent action is logged, traced, and observable. When an agent makes a decision, we see the reasoning chain. When workflows fail, we have complete audit trails. This isn't debugging by printf; it's instrumented observability from the ground up.
 
-**Unified Cloud Integration** - Since Nixtla's infrastructure runs on Google Cloud, Vertex AI agents natively connect to BigQuery for datasets, Cloud Storage for artifacts, Secret Manager for credentials, and Cloud Build for CI integration—no bridge services required.
+**Unified Cloud Integration** - Vertex AI agents natively connect to BigQuery for datasets, Cloud Storage for artifacts, Secret Manager for credentials, and Cloud Build for CI integration—no bridge services required when working within Google Cloud.
 
 **Proven at Scale** - Bob's Brain handles ADK deployments, GitHub automation, and Slack orchestration on this same platform. We're not prototyping infrastructure; we're adapting proven patterns to a new domain.
 
