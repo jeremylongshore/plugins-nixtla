@@ -68,16 +68,79 @@ For complete technical details, see the canonical 6767 documentation:
   - Success metrics and validation strategy
   - Future extension roadmap
 
+## Installation
+
+### From the Dev Marketplace
+
+From the repository root:
+
+```bash
+# Start Claude Code
+claude
+
+# In Claude Code, add the local marketplace:
+/plugin marketplace add ./
+
+# Install the plugin:
+/plugin install nixtla-baseline-lab@nixtla-dev-marketplace
+```
+
+### Install Python Dependencies
+
+The MCP server requires Nixtla's open-source libraries:
+
+```bash
+cd plugins/nixtla-baseline-lab/scripts
+pip install -r requirements.txt
+```
+
+This installs:
+- `statsforecast` - Classical forecasting methods
+- `datasetsforecast` - M4 benchmark datasets
+- `pandas` and `numpy` - Data processing
+
+## Quick Smoke Test
+
+Test the plugin with a minimal baseline run:
+
+1. **Install the plugin** (see Installation above)
+
+2. **Install Python dependencies** (if not already done)
+
+3. **Run a small baseline experiment** in Claude Code:
+   ```
+   /nixtla-baseline-m4 horizon=7 series_limit=5
+   ```
+
+   This will:
+   - Load 5 series from M4 Daily dataset
+   - Run SeasonalNaive, AutoETS, AutoTheta models
+   - Forecast 7 days ahead
+   - Write results to `nixtla_baseline_m4/` directory
+
+4. **Analyze the results** by asking Claude:
+   ```
+   Which baseline model performed best in that run?
+   ```
+
+   Claude will use the `NixtlaBaselineReview` skill to interpret the metrics and provide analysis.
+
+**Expected Runtime**: 30-60 seconds for 5 series
+
+**Expected Output Files**:
+- `nixtla_baseline_m4/results_M4_Daily_h7.csv` - Full metrics table
+- `nixtla_baseline_m4/summary_M4_Daily_h7.txt` - Human-readable summary
+
 ## Status
 
-**Current Phase**: Phase 1 - Repository structure and plugin skeleton
+**Current Phase**: Phase 4 - Testing, Skills wiring, dev marketplace
 
-This README will be expanded in future phases to include:
-- Setup and installation instructions
-- How to enable the plugin in Claude Code
-- How to run `/nixtla-baseline-m4` command
-- Example workflows and outputs
-- Troubleshooting guide
+**Capabilities**:
+- ✅ Run baseline forecasts on M4 Daily benchmark
+- ✅ Calculate sMAPE and MASE metrics
+- ✅ AI-powered result interpretation via Skills
+- ✅ Strategic analysis via analyst agent
+- ✅ Local dev marketplace for easy installation
 
 ## License
 
@@ -91,5 +154,5 @@ MIT License - see repository root LICENSE file.
 
 ---
 
-**Version**: 0.1.0 (Phase 1)
+**Version**: 0.2.0 (Phase 4)
 **Last Updated**: 2025-11-24
