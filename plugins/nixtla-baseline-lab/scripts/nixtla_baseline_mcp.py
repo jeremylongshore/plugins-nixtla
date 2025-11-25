@@ -72,6 +72,18 @@ class NixtlaBaselineMCP:
                         "csv_path": {
                             "type": "string",
                             "description": "Path to custom CSV file (required when dataset_type='csv'). Must have columns: unique_id, ds, y"
+                        },
+                        "include_timegpt": {
+                            "type": "boolean",
+                            "description": "Include TimeGPT comparison (requires NIXTLA_TIMEGPT_API_KEY)",
+                            "default": False
+                        },
+                        "timegpt_max_series": {
+                            "type": "integer",
+                            "description": "Maximum series for TimeGPT (cost/time cap)",
+                            "default": 5,
+                            "minimum": 1,
+                            "maximum": 20
                         }
                     },
                     "required": []
@@ -86,7 +98,9 @@ class NixtlaBaselineMCP:
         output_dir: str = "nixtla_baseline_m4",
         enable_plots: bool = False,
         dataset_type: str = "m4",
-        csv_path: str = None
+        csv_path: str = None,
+        include_timegpt: bool = False,
+        timegpt_max_series: int = 5
     ) -> Dict[str, Any]:
         """
         Execute baseline forecasting workflow using real Nixtla libraries.
@@ -98,11 +112,13 @@ class NixtlaBaselineMCP:
             enable_plots: Generate PNG forecast plots
             dataset_type: 'm4' for M4 Daily dataset or 'csv' for custom CSV
             csv_path: Path to custom CSV file (required when dataset_type='csv')
+            include_timegpt: Include TimeGPT comparison (requires API key)
+            timegpt_max_series: Max series for TimeGPT (cost/time cap)
 
         Returns:
             Dict with success status, message, files, and summary
         """
-        logger.info(f"Running baselines: horizon={horizon}, series_limit={series_limit}, dataset_type={dataset_type}")
+        logger.info(f"Running baselines: horizon={horizon}, series_limit={series_limit}, dataset_type={dataset_type}, include_timegpt={include_timegpt}")
 
         try:
             # Import Nixtla libraries
@@ -324,13 +340,34 @@ class NixtlaBaselineMCP:
                     max_series=2
                 )
 
-            return {
+            # TimeGPT comparison if requested
+            timegpt_result = self._run_timegpt_comparison(
+                include_timegpt=include_timegpt,
+                df_train=df_train,
+                df_test=df_test,
+                metrics_data=metrics_data,
+                model_summaries=model_summaries,
+                horizon=horizon,
+                timegpt_max_series=timegpt_max_series,
+                output_dir=out_path,
+                dataset_label=dataset_label,
+                dataset_name=dataset_name
+            )
+
+            # Build response
+            response = {
                 "success": True,
                 "message": f"Baseline models completed on {dataset_name} ({len(df_train['unique_id'].unique())} series, horizon={horizon})",
                 "files": [str(metrics_file), str(summary_file)] + plot_files,
                 "summary": model_summaries,
                 "plots_generated": len(plot_files)
             }
+
+            # Add TimeGPT fields if comparison was attempted
+            if timegpt_result:
+                response.update(timegpt_result)
+
+            return response
 
         except ImportError as e:
             error_msg = f"Missing required library: {e}. Please install with: pip install -r requirements.txt"
@@ -563,6 +600,194 @@ class NixtlaBaselineMCP:
             logger.warning(f"Error generating plots: {e}")
             return []
 
+    def _run_timegpt_comparison(
+        self,
+        include_timegpt: bool,
+        df_train,
+        df_test,
+        metrics_data: List[Dict[str, Any]],
+        model_summaries: Dict[str, Any],
+        horizon: int,
+        timegpt_max_series: int,
+        output_dir: Path,
+        dataset_label: str,
+        dataset_name: str
+    ) -> Dict[str, Any]:
+        """
+        Run TimeGPT comparison if requested and generate showdown report.
+
+        Returns dict with timegpt_status, timegpt_summary, timegpt_per_series, or None.
+        """
+        if not include_timegpt:
+            return None
+
+        try:
+            # Import TimeGPT client
+            from timegpt_client import create_timegpt_client
+            import pandas as pd
+            import numpy as np
+
+            client = create_timegpt_client()
+
+            # Check if API is available
+            if not client.is_available():
+                logger.warning("TimeGPT comparison requested but API key not found")
+                return {
+                    "timegpt_status": "skipped_no_api_key",
+                    "timegpt_message": "NIXTLA_TIMEGPT_API_KEY environment variable not set"
+                }
+
+            logger.info(f"Starting TimeGPT comparison (max {timegpt_max_series} series)")
+
+            # Select series for TimeGPT (limited by timegpt_max_series)
+            unique_series = df_train['unique_id'].unique()
+            timegpt_series = unique_series[:min(len(unique_series), timegpt_max_series)]
+            logger.info(f"Selected {len(timegpt_series)} series for TimeGPT: {list(timegpt_series)}")
+
+            # Prepare data for TimeGPT (train data only)
+            df_timegpt_input = df_train[df_train['unique_id'].isin(timegpt_series)].copy()
+
+            # Call TimeGPT API
+            timegpt_response = client.forecast(
+                df=df_timegpt_input,
+                horizon=horizon,
+                freq='D'
+            )
+
+            if not timegpt_response["success"]:
+                logger.error(f"TimeGPT API error: {timegpt_response.get('error', 'Unknown error')}")
+                return {
+                    "timegpt_status": "error",
+                    "timegpt_error": timegpt_response.get("error", "Unknown error")
+                }
+
+            forecast_df = timegpt_response["forecast"]
+            logger.info(f"TimeGPT forecast received: {len(forecast_df)} predictions")
+
+            # Compute TimeGPT metrics for each series
+            timegpt_per_series = []
+            timegpt_smapes = []
+            timegpt_mases = []
+
+            for uid in timegpt_series:
+                # Get test data
+                test_data = df_test[df_test['unique_id'] == uid]
+                if len(test_data) == 0:
+                    continue
+
+                actual = test_data['y'].values
+
+                # Get TimeGPT forecast
+                timegpt_forecast = forecast_df[forecast_df['unique_id'] == uid]
+                if len(timegpt_forecast) == 0:
+                    logger.warning(f"No TimeGPT forecast for series {uid}")
+                    continue
+
+                predicted = timegpt_forecast['TimeGPT'].values[:len(actual)]
+
+                # Calculate metrics
+                smape = self._calculate_smape(actual, predicted)
+                train_values = df_train[df_train['unique_id'] == uid]['y'].values
+                mase = self._calculate_mase(actual, predicted, train_values, season_length=7)
+
+                timegpt_smapes.append(smape)
+                timegpt_mases.append(mase)
+
+                # Get baseline metrics for this series
+                baseline_metrics = [m for m in metrics_data if m["series_id"] == uid]
+                baseline_best = min(baseline_metrics, key=lambda x: x["sMAPE"]) if baseline_metrics else None
+
+                # Determine winner
+                if baseline_best:
+                    winner = "timegpt" if smape < baseline_best["sMAPE"] else "baseline"
+                    if abs(smape - baseline_best["sMAPE"]) < 0.1:  # Close call
+                        winner = "tie"
+                else:
+                    winner = "unknown"
+
+                timegpt_per_series.append({
+                    "series_id": uid,
+                    "baseline_model": baseline_best["model"] if baseline_best else "unknown",
+                    "baseline_sMAPE": round(baseline_best["sMAPE"], 2) if baseline_best else None,
+                    "baseline_MASE": round(baseline_best["MASE"], 3) if baseline_best else None,
+                    "timegpt_sMAPE": round(smape, 2),
+                    "timegpt_MASE": round(mase, 3),
+                    "winner": winner
+                })
+
+            # Calculate TimeGPT averages
+            avg_timegpt_smape = round(sum(timegpt_smapes) / len(timegpt_smapes), 2) if timegpt_smapes else 0
+            avg_timegpt_mase = round(sum(timegpt_mases) / len(timegpt_mases), 3) if timegpt_mases else 0
+
+            # Get baseline best average (from model_summaries)
+            baseline_best_model = min(model_summaries.items(), key=lambda x: x[1]["avg_smape"])
+            baseline_best_smape = baseline_best_model[1]["avg_smape"]
+
+            # Determine overall winner
+            overall_winner = "timegpt" if avg_timegpt_smape < baseline_best_smape else "baseline"
+            if abs(avg_timegpt_smape - baseline_best_smape) < 0.1:
+                overall_winner = "tie"
+
+            timegpt_summary = {
+                "num_series": len(timegpt_series),
+                "avg_sMAPE": avg_timegpt_smape,
+                "avg_MASE": avg_timegpt_mase,
+                "winner": overall_winner
+            }
+
+            logger.info(f"TimeGPT comparison complete: winner={overall_winner}, avg_sMAPE={avg_timegpt_smape}")
+
+            # Generate showdown text report
+            showdown_file = output_dir / f"timegpt_showdown_{dataset_label}_h{horizon}.txt"
+            with open(showdown_file, 'w') as f:
+                f.write(f"TimeGPT Showdown Report\n")
+                f.write(f"======================\n\n")
+                f.write(f"Dataset: {dataset_name}\n")
+                f.write(f"Horizon: {horizon} days\n")
+                f.write(f"Series Compared: {len(timegpt_series)} (subset)\n\n")
+
+                f.write(f"Baseline Best Model: {baseline_best_model[0]}\n")
+                f.write(f"  Avg sMAPE: {baseline_best_smape:.2f}%\n")
+                f.write(f"  Avg MASE: {baseline_best_model[1]['avg_mase']:.3f}\n\n")
+
+                f.write(f"TimeGPT:\n")
+                f.write(f"  Avg sMAPE: {avg_timegpt_smape:.2f}%\n")
+                f.write(f"  Avg MASE: {avg_timegpt_mase:.3f}\n\n")
+
+                f.write(f"Winner: {overall_winner.upper()}\n\n")
+
+                f.write(f"Per-Series Breakdown:\n")
+                f.write(f"-" * 60 + "\n")
+                for item in timegpt_per_series:
+                    f.write(f"  {item['series_id']}: {item['winner']} ")
+                    f.write(f"(Baseline: {item['baseline_sMAPE']:.2f}%, TimeGPT: {item['timegpt_sMAPE']:.2f}%)\n")
+
+                f.write(f"\n")
+                f.write(f"Note: This is a limited comparison on {len(timegpt_series)} series.\n")
+                f.write(f"Not a comprehensive benchmark. Results may vary on full dataset.\n")
+
+            logger.info(f"Wrote TimeGPT showdown to {showdown_file}")
+
+            return {
+                "timegpt_status": "ok",
+                "timegpt_summary": timegpt_summary,
+                "timegpt_per_series": timegpt_per_series,
+                "timegpt_showdown_file": str(showdown_file)
+            }
+
+        except ImportError as e:
+            logger.error(f"TimeGPT import error: {e}")
+            return {
+                "timegpt_status": "error",
+                "timegpt_error": f"Missing TimeGPT dependencies: {e}"
+            }
+        except Exception as e:
+            logger.error(f"TimeGPT comparison failed: {e}", exc_info=True)
+            return {
+                "timegpt_status": "error",
+                "timegpt_error": str(e)
+            }
+
     def handle_request(self, request: Dict[str, Any]) -> Dict[str, Any]:
         """Handle MCP request."""
         method = request.get("method")
@@ -612,13 +837,16 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "test":
         logger.info("Running in test mode...")
         server = NixtlaBaselineMCP()
-        # Check if --enable-plots flag is present
+        # Check for optional flags
         enable_plots = "--enable-plots" in sys.argv
+        include_timegpt = "--include-timegpt" in sys.argv
         result = server.run_baselines(
             horizon=7,
             series_limit=5,
             output_dir="nixtla_baseline_m4_test",
-            enable_plots=enable_plots
+            enable_plots=enable_plots,
+            include_timegpt=include_timegpt,
+            timegpt_max_series=3  # Limit for testing
         )
         print(json.dumps(result, indent=2))
     else:

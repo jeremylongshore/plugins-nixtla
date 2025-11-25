@@ -15,3 +15,6 @@ numpy>=1.24.0
 
 # Optional: visualization (for forecast plots)
 matplotlib>=3.7.0
+
+# Optional: TimeGPT API integration (requires API key)
+nixtla>=0.5.0
