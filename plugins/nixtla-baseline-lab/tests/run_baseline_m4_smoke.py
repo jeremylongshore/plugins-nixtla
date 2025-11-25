@@ -73,6 +73,11 @@ def parse_args():
         type=str,
         help="Path to custom CSV file (required when dataset-type=csv)"
     )
+    parser.add_argument(
+        "--include-timegpt",
+        action="store_true",
+        help="Include TimeGPT comparison (requires NIXTLA_TIMEGPT_API_KEY)"
+    )
     return parser.parse_args()
 
 
@@ -85,6 +90,14 @@ def main():
         print("ERROR: --csv-path is required when --dataset-type=csv")
         return 1
 
+    # Check TimeGPT availability if requested
+    timegpt_skip_reason = None
+    if args.include_timegpt:
+        import os
+        if not os.environ.get("NIXTLA_TIMEGPT_API_KEY"):
+            timegpt_skip_reason = "NIXTLA_TIMEGPT_API_KEY not set"
+            print("⚠️  TimeGPT requested but API key not found - will skip TimeGPT checks")
+
     print("=" * 60)
     print("Nixtla Baseline Lab - Golden Task Smoke Test")
     print("=" * 60)
@@ -95,6 +108,9 @@ def main():
     print(f"  Dataset type: {args.dataset_type}")
     if args.csv_path:
         print(f"  CSV path: {args.csv_path}")
+    print(f"  Include TimeGPT: {args.include_timegpt}")
+    if timegpt_skip_reason:
+        print(f"    (will skip: {timegpt_skip_reason})")
     print()
 
     # Step 1: Run MCP test
@@ -151,8 +167,10 @@ result = server.run_baselines(
     series_limit={args.series_limit},
     output_dir="{args.output_dir}",
     enable_plots=False,
-    dataset_type="{args.dataset_type}"{"," if args.csv_path else ""}
-    {"csv_path=" + repr(args.csv_path) if args.csv_path else ""}
+    dataset_type="{args.dataset_type}",
+    {"csv_path=" + repr(args.csv_path) + "," if args.csv_path else ""}
+    include_timegpt={args.include_timegpt},
+    timegpt_max_series=3
 )
 print(json.dumps(result, indent=2))
 """

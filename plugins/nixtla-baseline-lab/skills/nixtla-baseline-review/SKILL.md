@@ -205,9 +205,49 @@ The results file exists but appears malformed. Expected columns:
 Please re-run /nixtla-baseline-m4 to regenerate clean results.
 ```
 
+## TimeGPT Showdown (Optional)
+
+If TimeGPT comparison data is present, incorporate it into your analysis.
+
+**Files to check**:
+- `timegpt_showdown_M4_Daily_h{horizon}.txt` - Showdown summary report
+- JSON response may include `timegpt_summary`, `timegpt_per_series` fields
+
+**How to interpret**:
+
+When TimeGPT comparison exists:
+1. **Read the showdown file** using Read or Bash tool
+2. **Note the comparison scope**: This is a small-sample comparison (typically 3-5 series), NOT a comprehensive M4 benchmark
+3. **Include in your response**:
+   - Overall winner (baseline vs TimeGPT)
+   - Average sMAPE for each
+   - Note that it's an illustrative comparison on a subset
+4. **Example language**:
+   ```
+   TimeGPT Comparison (Limited Sample):
+   - Tested on {N} series (subset for cost/time)
+   - TimeGPT avg sMAPE: {X.XX}%
+   - Baseline best avg sMAPE: {Y.YY}%
+   - Winner on this subset: {WINNER}
+
+   ⚠️ Note: This is an illustrative comparison on a small sample, not a full benchmark.
+   TimeGPT performance may vary significantly on the complete dataset.
+   ```
+
+**When NOT available**:
+- Don't mention TimeGPT unless the user explicitly asks
+- If asked, explain: "TimeGPT comparison was not run. Use `include_timegpt=true` to enable."
+
+**Key points to emphasize**:
+- TimeGPT is Nixtla's hosted foundation model for time series
+- Comparison is for illustration/exploration, not production claims
+- Small sample size means results are directional, not conclusive
+- For production decisions, run on larger representative samples
+
 ## Documentation
 
 For complete technical details, see:
 - Architecture: `000-docs/6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md`
 - Planning: `000-docs/6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md`
 - Phase 3 AAR: `000-docs/017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md`
+- Phase 8 AAR: `000-docs/022-AA-AACR-phase-08-timegpt-showdown-and-evals.md`
