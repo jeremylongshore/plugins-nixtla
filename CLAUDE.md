@@ -4,153 +4,157 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is the Nixtla time series forecasting integration project. The repository contains Claude Code plugins for Nixtla's forecasting ecosystem (TimeGPT, StatsForecast, MLForecast, NeuralForecast) and comprehensive documentation for integrating these tools into enterprise environments.
+Private agentic engineering workspace for Nixtla time series forecasting. Built on Bob's Brain architecture (Vertex AI Agent Engine), this project wraps Nixtla's stack (TimeGPT, StatsForecast, MLForecast, NeuralForecast) with "junior engineer" agents that automate repetitive workflows.
+
+**Status**: Experimental private collaboration between Intent Solutions and Nixtla.
 
 ## High-Level Architecture
 
-The project consists of three planned Claude Code plugins that accelerate Nixtla workflows:
+The system follows an **orchestrator + specialist agents** pattern:
 
-1. **TimeGPT Quickstart Pipeline Builder** - Generates complete TimeGPT integration code from natural language descriptions
-2. **Nixtla Bench Harness Generator** - Creates benchmark harnesses to compare all Nixtla models on user data
-3. **Forecast Service Template Builder** - Scaffolds production-ready FastAPI services exposing Nixtla models via REST APIs
+```
+User → Orchestrator Agent → Specialist Agents → Nixtla Tools/GitHub
+```
 
-### Plugin System Architecture
+**Planned Specialist Agents**:
+- **Baseline Builder** - Auto-generate forecasts with StatsForecast/MLForecast/NeuralForecast
+- **Backtest QA** - Run backtests on benchmark datasets, compare models
+- **TimeGPT Runner** - Manage TimeGPT experiments with different configs
+- **CI Triage** - Parse CI failures, propose fixes
+- **Doc Sync** - Detect drift between code and documentation
+- **Anomaly Monitor** - Detect anomalies using TimeGPT methods
 
-Plugins follow a structured format with:
-- **Command Parser**: Routes natural language to appropriate plugin actions
-- **Agent Engine**: Orchestrates multi-step AI workflows
-- **Sandboxed Execution**: Isolated environments for secure code generation
-- **Integration Layer**: Connects to Nixtla APIs, cloud providers, and data sources
-
-### Nixtla Integration Points
-
-The system integrates with the complete Nixtla ecosystem:
-- **TimeGPT API** (`api.nixtla.io/v1/`) - Zero-shot forecasting with transformer models
-- **StatsForecast** - Classical statistical methods (AutoARIMA, ETS, etc.)
-- **MLForecast** - Machine learning models (LightGBM, XGBoost)
-- **NeuralForecast** - Deep learning architectures (NBEATS, TFT, etc.)
-- **HierarchicalForecast** - Hierarchical reconciliation methods
+**Implemented Components**:
+- `plugins/nixtla-search-to-slack/` - Working content discovery and curation plugin
+- `claude-code-plugins-plus/` - Plugin marketplace with 200+ Claude Code plugins
 
 ## Commands
 
 ### Development Setup
 ```bash
-# Set up development environment with all dependencies
+# Set up development environment
 ./scripts/setup-dev-environment.sh
 
-# Run tests (when plugins are implemented)
+# Validate plugin structure
+./scripts/validate-all-plugins.sh
+./scripts/validate-marketplace.sh
+
+# Run tests
+pytest
+```
+
+### Search-to-Slack Plugin
+```bash
+cd plugins/nixtla-search-to-slack
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run content digest
+python -m nixtla_search_to_slack --topic nixtla-core
+
+# List available topics
+python -m nixtla_search_to_slack --list-topics
+
+# Dry run (no Slack posting)
+python -m nixtla_search_to_slack --dry-run --topic nixtla-core
+```
+
+### Testing
+```bash
+# Run all tests
 pytest
 
-# Validate all plugins structure
-./scripts/validate-all-plugins.sh
+# Run specific plugin tests
+pytest plugins/nixtla-search-to-slack/tests/
+
+# Run with coverage
+pytest --cov=src
 ```
 
-### Nixtla API Integration
+## Project Structure
+
+```
+nixtla/
+├── plugins/
+│   └── nixtla-search-to-slack/     # ✅ Working plugin
+│       ├── src/nixtla_search_to_slack/
+│       │   ├── main.py             # Entry point, digest workflow
+│       │   ├── search_orchestrator.py
+│       │   ├── content_aggregator.py
+│       │   ├── ai_curator.py
+│       │   └── slack_publisher.py
+│       ├── config/                  # YAML configs for topics/sources
+│       └── tests/
+├── claude-code-plugins-plus/        # Plugin marketplace (200+ plugins)
+├── 000-docs/                        # Technical documentation
+├── scripts/                         # Automation scripts
+└── docs/                            # MkDocs site
+```
+
+## Search-to-Slack Architecture
+
+The only implemented plugin follows a 4-phase pipeline:
+
+1. **Search** (`search_orchestrator.py`) - Query multiple sources (SerpAPI, GitHub)
+2. **Aggregate** (`content_aggregator.py`) - Deduplicate and normalize results
+3. **Curate** (`ai_curator.py`) - AI scoring and summary generation
+4. **Publish** (`slack_publisher.py`) - Format and post to Slack
+
+**Required Environment Variables**:
+```bash
+SLACK_BOT_TOKEN=xoxb-...
+SERP_API_KEY=...
+GITHUB_TOKEN=ghp_...
+# Plus one LLM provider:
+OPENAI_API_KEY=... OR ANTHROPIC_API_KEY=... OR GOOGLE_API_KEY=...
+```
+
+## Nixtla Integration Patterns
+
+Reference patterns for Nixtla API usage (not yet in agents):
+
 ```python
-# Initialize Nixtla client
+# TimeGPT
 from nixtla import NixtlaClient
 client = NixtlaClient(api_key='YOUR_API_KEY')
+forecast = client.forecast(df=data, h=24, freq='H', level=[80, 90, 95])
 
-# Generate forecast with TimeGPT
-forecast = client.forecast(
-    df=data,
-    h=24,  # forecast horizon
-    freq='H',  # hourly frequency
-    level=[80, 90, 95]  # confidence intervals
-)
-
-# Detect anomalies
-anomalies = client.detect_anomalies(df=data, freq='D')
-
-# Cross-validation
-cv_results = client.cross_validation(df=data, h=7, n_windows=5)
-```
-
-### StatsForecast Quick Start
-```python
+# StatsForecast
 from statsforecast import StatsForecast
 from statsforecast.models import AutoARIMA, AutoETS
-
-# Initialize with models
-sf = StatsForecast(
-    models=[AutoARIMA(season_length=12), AutoETS(season_length=12)],
-    freq='M'
-)
-
-# Fit and predict
+sf = StatsForecast(models=[AutoARIMA(season_length=12)], freq='M')
 sf.fit(df)
 forecasts = sf.predict(h=12)
-```
 
-### MLForecast Pattern
-```python
+# MLForecast
 from mlforecast import MLForecast
-from sklearn.ensemble import RandomForestRegressor
-
-# Create ML forecaster
-mlf = MLForecast(
-    models=[RandomForestRegressor()],
-    freq='D',
-    lags=[1, 7, 14],
-    date_features=['dayofweek', 'month']
-)
-
-# Train and forecast
+mlf = MLForecast(models=[RandomForestRegressor()], freq='D', lags=[1,7,14])
 mlf.fit(df)
 predictions = mlf.predict(h=30)
 ```
 
 ## Document Organization
 
-All documentation follows the Document Filing System v3.0 in `000-docs/`:
-- **Format**: `NNN-CC-ABCD-description.ext`
-- **Categories**: PP (Product), AT (Architecture), DR (Documentation), etc.
-- **Special**: `6767-` prefix for cross-repo canonical standards
+Documentation in `000-docs/` follows format: `NNN-CC-ABCD-description.md`
+- **001-PP-PROD** - Product requirements
+- **002-AA-AUDT** - Audits and analysis
+- **003-PP-PLAN** - Planning documents
+- **004-AT-ARCH** - Architecture docs
 
-Key documents:
-- `001-PP-PROD-nixtla-integration-requirements.md` - Complete product requirements
-- `002-AT-ARCH-plugin-architecture.md` - Technical plugin architecture
-- `005-DR-META-document-standards.md` - Filing system standards
+## Key Dependencies
 
-## Plugin Development (Future)
+**Search-to-Slack Plugin**:
+- `slack-sdk` - Slack API integration
+- `requests` - HTTP client
+- `pyyaml` - Configuration loading
+- `python-dotenv` - Environment management
+- One LLM: `google-generativeai`, `groq`, `openai`, or `anthropic`
 
-When plugins are implemented, they'll follow this structure:
-```
-plugins/[plugin-name]/
-├── .claude-plugin/plugin.json    # Manifest with permissions
-├── commands/                     # Slash commands
-├── agents/                       # AI agents for complex workflows
-├── hooks/                        # Event hooks
-└── scripts/                      # Supporting Python/shell scripts
-```
+## Reference Architecture
 
-## Security & Permissions
-
-Plugins require explicit permissions defined in manifests:
-- **Network**: Allowed hosts for API calls
-- **Filesystem**: Read/write paths
-- **Environment**: Accessible environment variables
-- **Sandboxing**: All execution in isolated environments
-
-## Testing Strategy
-
-Three levels of testing (to be implemented):
-1. **Unit Tests** - Individual functions with mocked dependencies
-2. **Integration Tests** - Plugin integration with Nixtla APIs
-3. **End-to-End Tests** - Complete forecasting workflows
-
-Target coverage: 80% minimum, 90% goal
-
-## Repository Links
-
-- **GitHub**: https://github.com/jeremylongshore/claude-code-plugins-nixtla
-- **Documentation**: https://jeremylongshore.github.io/claude-code-plugins-nixtla/
-- **Nixtla Docs**: https://docs.nixtla.io
-- **TimeGPT Paper**: https://arxiv.org/abs/2310.03589
-
-## Contact
-
-- **Technical Lead**: Jeremy Longshore
-- **Email**: jeremy@intentsolutions.io
-- **Cell**: 251.213.1115
-- **Priority Support**: Dedicated Slack channel at Intent Solutions IO
+This project adapts patterns from Bob's Brain (https://github.com/jeremylongshore/bobs-brain):
+- Vertex AI Agent Engine for orchestration
+- A2A protocol for agent communication
+- Golden tasks for validation
+- CI-only deployments with guardrails
