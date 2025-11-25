@@ -116,3 +116,8 @@ dmypy.json
 # Local development
 local/
 scratch/
+
+# Nixtla Baseline Lab local artifacts
+plugins/nixtla-baseline-lab/.venv-nixtla-baseline/
+plugins/nixtla-baseline-lab/data/
+plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
