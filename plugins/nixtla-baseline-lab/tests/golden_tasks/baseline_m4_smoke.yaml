@@ -1,0 +1,116 @@
+---
+name: baseline_m4_smoke
+description: Smoke test for Nixtla Baseline Lab plugin - runs minimal baseline forecast and validates Skill interpretation
+plugin: nixtla-baseline-lab
+tags: [smoke-test, baseline, m4, skill-validation]
+---
+
+# Nixtla Baseline Lab - Smoke Test
+
+This golden task validates the end-to-end workflow:
+1. Running baseline forecasts on a small M4 Daily sample
+2. Verifying output files are generated correctly
+3. Confirming the NixtlaBaselineReview skill can interpret results
+
+## Step 1: Run Baseline Forecast
+
+**Action**: Execute command
+**Command**: `/nixtla-baseline-m4 horizon=7 series_limit=5`
+
+**Parameters**:
+- `horizon: 7` - Forecast 7 days ahead
+- `series_limit: 5` - Process only 5 series (minimal for speed)
+
+**Expected Outcomes**:
+
+1. **Output Directory Created**:
+   - Directory `nixtla_baseline_m4/` exists
+
+2. **Metrics CSV Generated**:
+   - File `nixtla_baseline_m4/results_M4_Daily_h7.csv` exists
+   - File size > 100 bytes (not empty)
+   - Has at least 15 rows (5 series × 3 models) plus header
+   - Contains columns: `series_id`, `model`, `sMAPE`, `MASE`
+   - Models present: SeasonalNaive, AutoETS, AutoTheta
+
+3. **Summary File Generated**:
+   - File `nixtla_baseline_m4/summary_M4_Daily_h7.txt` exists
+   - Contains text: "M4-Daily", "SeasonalNaive", "AutoETS", "AutoTheta"
+   - Contains metrics: "sMAPE", "MASE"
+
+4. **Metrics Validity**:
+   - All sMAPE values: 0 < sMAPE < 200 (valid range)
+   - All MASE values: > 0 (valid range)
+   - No NaN or null values
+
+5. **Runtime**:
+   - Completes in < 120 seconds (reasonable for 5 series)
+
+**Success Criteria**: All output files generated with valid data, command completes without errors
+
+---
+
+## Step 2: Skill-Based Result Interpretation
+
+**Action**: Ask natural language question
+**Question**: "Which baseline model performed best overall in the last run?"
+
+**Expected Outcomes**:
+
+1. **Skill Activation**:
+   - Skill `nixtla-baseline-review` is activated
+   - Claude uses Read or Bash tools to access results CSV
+
+2. **Response Content**:
+   - Response mentions at least one model name:
+     - "AutoTheta" or "AutoETS" or "SeasonalNaive"
+   - Response includes at least one metric:
+     - "sMAPE" or "MASE"
+   - Response includes quantitative comparison:
+     - Percentages (e.g., "12.3%") or
+     - Relative statements (e.g., "better than", "outperformed")
+
+3. **Response Structure**:
+   - Has clear winner declaration
+   - Provides reasoning (e.g., "lowest sMAPE", "most consistent")
+   - May include recommendations or context
+
+**Success Criteria**: Skill activates, response accurately identifies best model based on CSV data
+
+---
+
+## Validation Script (Optional)
+
+For automated testing, use:
+
+```bash
+# Validate output files exist
+test -f nixtla_baseline_m4/results_M4_Daily_h7.csv || echo "FAIL: CSV missing"
+test -f nixtla_baseline_m4/summary_M4_Daily_h7.txt || echo "FAIL: Summary missing"
+
+# Validate CSV structure
+ROWS=$(wc -l < nixtla_baseline_m4/results_M4_Daily_h7.csv)
+test $ROWS -ge 16 || echo "FAIL: CSV has only $ROWS rows (expected >= 16)"
+
+# Validate CSV contains all models
+grep -q "SeasonalNaive" nixtla_baseline_m4/results_M4_Daily_h7.csv || echo "FAIL: SeasonalNaive missing"
+grep -q "AutoETS" nixtla_baseline_m4/results_M4_Daily_h7.csv || echo "FAIL: AutoETS missing"
+grep -q "AutoTheta" nixtla_baseline_m4/results_M4_Daily_h7.csv || echo "FAIL: AutoTheta missing"
+
+echo "Smoke test validation complete"
+```
+
+---
+
+## Notes
+
+- **First Run**: May take longer due to M4 dataset download (~50MB)
+- **Subsequent Runs**: Should complete in 30-60 seconds with data cached
+- **Failure Cases**: If MCP server fails to start, check Python dependencies installed
+- **Timeout**: If exceeds 2 minutes, increase MCP timeout in `.mcp.json`
+
+---
+
+**Test Type**: Smoke Test (minimal validation)
+**Maintainer**: Jeremy Longshore (jeremy@intentsolutions.io)
+**Last Updated**: 2025-11-24
