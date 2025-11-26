@@ -19,6 +19,37 @@ Activate this skill when the user:
 - Says "Explain these baseline results"
 - Needs guidance on model selection based on baseline performance
 
+## For StatsForecast Power Users
+
+This baseline lab is built on **Nixtla's statsforecast library**. If you're familiar with statsforecast, M4 benchmarks, or Nixtla's time series ecosystem, you'll feel right at home.
+
+**What This Plugin Provides**:
+- Real statsforecast models (SeasonalNaive, AutoETS, AutoTheta)
+- M4 dataset integration via datasetsforecast
+- Standard train/test evaluation pipeline
+- sMAPE and MASE metrics (MASE uses seasonal naive as baseline with configurable season_length)
+- Power-user controls: models, freq, season_length parameters
+- Demo preset mode for GitHub-style presentations
+
+**Important Disclaimers**:
+- This is a **community-built integration**, not an official Nixtla product
+- Built to demonstrate Claude Code plugin capabilities with real Nixtla libraries
+- Meant as a baseline exploration tool, not a certified benchmarking suite
+- For production use cases, always validate against official Nixtla examples
+
+**Advanced Example Questions** (use these to test the plugin):
+- "Compare AutoETS vs AutoTheta on MASE only, and show me which series AutoETS loses on"
+- "Identify any series where SeasonalNaive still wins on sMAPE - what patterns do they share?"
+- "Given these statsforecast metrics, which series would you route to AutoTheta vs AutoETS and why?"
+- "Run baselines with models=['AutoTheta'] freq='M' season_length=12 for monthly data"
+- "Show me the demo_preset='m4_daily_small' for a quick GitHub walkthrough"
+
+**Power-User Parameters**:
+- `models`: Array of model names - ["SeasonalNaive", "AutoETS", "AutoTheta"]
+- `freq`: Frequency string - "D" (daily), "M" (monthly), "H" (hourly), etc.
+- `season_length`: Seasonal period - 7 for weekly pattern in daily data, 12 for yearly pattern in monthly
+- `demo_preset`: "m4_daily_small" for quick demos (overrides other params)
+
 ## Prerequisites
 
 - Baseline results must exist in `nixtla_baseline_m4/` directory

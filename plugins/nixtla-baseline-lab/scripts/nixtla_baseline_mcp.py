@@ -84,6 +84,32 @@ class NixtlaBaselineMCP:
                             "default": 5,
                             "minimum": 1,
                             "maximum": 20
+                        },
+                        "models": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": ["SeasonalNaive", "AutoETS", "AutoTheta"]
+                            },
+                            "description": "List of statsforecast models to run. Available: SeasonalNaive, AutoETS, AutoTheta",
+                            "default": ["SeasonalNaive", "AutoETS", "AutoTheta"]
+                        },
+                        "freq": {
+                            "type": "string",
+                            "description": "Frequency string for time series (D=daily, M=monthly, H=hourly, etc.)",
+                            "default": "D"
+                        },
+                        "season_length": {
+                            "type": "integer",
+                            "description": "Seasonal period length for models and MASE calculation (e.g., 7 for weekly pattern in daily data)",
+                            "default": 7,
+                            "minimum": 1
+                        },
+                        "demo_preset": {
+                            "type": ["string", "null"],
+                            "description": "Demo preset configuration for quick GitHub-style demos. 'm4_daily_small' runs a fast demo on M4 Daily subset",
+                            "enum": ["m4_daily_small", null],
+                            "default": null
                         }
                     },
                     "required": []
@@ -100,7 +126,11 @@ class NixtlaBaselineMCP:
         dataset_type: str = "m4",
         csv_path: str = None,
         include_timegpt: bool = False,
-        timegpt_max_series: int = 5
+        timegpt_max_series: int = 5,
+        models: List[str] = None,
+        freq: str = "D",
+        season_length: int = 7,
+        demo_preset: str = None
     ) -> Dict[str, Any]:
         """
         Execute baseline forecasting workflow using real Nixtla libraries.
@@ -114,11 +144,40 @@ class NixtlaBaselineMCP:
             csv_path: Path to custom CSV file (required when dataset_type='csv')
             include_timegpt: Include TimeGPT comparison (requires API key)
             timegpt_max_series: Max series for TimeGPT (cost/time cap)
+            models: List of model names to run (SeasonalNaive, AutoETS, AutoTheta)
+            freq: Frequency string for time series (D, M, H, etc.)
+            season_length: Seasonal period for models and MASE calculation
+            demo_preset: Demo preset ('m4_daily_small' for GitHub-style demo)
 
         Returns:
-            Dict with success status, message, files, and summary
+            Dict with success status, message, files, summary, and resolved parameters
         """
+        # Apply demo preset if specified
+        if demo_preset == "m4_daily_small":
+            logger.info("🎬 Running Nixtla statsforecast GitHub-style demo: M4 Daily subset")
+            dataset_type = "m4"
+            models = ["SeasonalNaive", "AutoETS", "AutoTheta"]
+            freq = "D"
+            season_length = 7
+            series_limit = 5
+            horizon = 7
+            logger.info("Demo preset applied: 5 series, 7-day horizon, all models")
+
+        # Set default models if not provided
+        if models is None:
+            models = ["SeasonalNaive", "AutoETS", "AutoTheta"]
+
+        # Validate models
+        ALLOWED_MODELS = {"SeasonalNaive", "AutoETS", "AutoTheta"}
+        invalid_models = [m for m in models if m not in ALLOWED_MODELS]
+        if invalid_models:
+            return {
+                "success": False,
+                "message": f"Invalid model names: {invalid_models}. Allowed: {sorted(ALLOWED_MODELS)}"
+            }
+
         logger.info(f"Running baselines: horizon={horizon}, series_limit={series_limit}, dataset_type={dataset_type}, include_timegpt={include_timegpt}")
+        logger.info(f"Power-user params: models={models}, freq={freq}, season_length={season_length}")
 
         try:
             # Import Nixtla libraries
@@ -185,21 +244,28 @@ class NixtlaBaselineMCP:
             df_sample = df[df['unique_id'].isin(unique_ids)].copy()
             logger.info(f"Sampled {len(unique_ids)} series for processing")
 
-            # Define models
-            models = [
-                SeasonalNaive(season_length=7),  # Weekly seasonality for Daily data
-                AutoETS(season_length=7),
-                AutoTheta(season_length=7)
-            ]
-            logger.info(f"Models: SeasonalNaive, AutoETS, AutoTheta (season_length=7)")
+            # Define models dynamically based on user input
+            # Map model names to model classes
+            MODEL_MAP = {
+                "SeasonalNaive": SeasonalNaive,
+                "AutoETS": AutoETS,
+                "AutoTheta": AutoTheta
+            }
 
-            # Create StatsForecast instance
+            # Instantiate requested models with user-specified season_length
+            model_instances = [
+                MODEL_MAP[model_name](season_length=season_length)
+                for model_name in models
+            ]
+            logger.info(f"Models: {', '.join(models)} (season_length={season_length})")
+
+            # Create StatsForecast instance with user-specified frequency
             sf = StatsForecast(
-                models=models,
-                freq='D',
+                models=model_instances,
+                freq=freq,
                 n_jobs=-1  # Use all available cores
             )
-            logger.info("StatsForecast instance created")
+            logger.info(f"StatsForecast instance created (freq={freq})")
 
             # Split data into train/test for metric calculation
             # Use last 'horizon' points as test set
@@ -360,7 +426,11 @@ class NixtlaBaselineMCP:
                 "message": f"Baseline models completed on {dataset_name} ({len(df_train['unique_id'].unique())} series, horizon={horizon})",
                 "files": [str(metrics_file), str(summary_file)] + plot_files,
                 "summary": model_summaries,
-                "plots_generated": len(plot_files)
+                "plots_generated": len(plot_files),
+                "resolved_models": models,
+                "resolved_freq": freq,
+                "resolved_season_length": season_length,
+                "demo_preset": demo_preset
             }
 
             # Add TimeGPT fields if comparison was attempted

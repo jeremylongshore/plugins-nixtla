@@ -146,6 +146,108 @@ Get your first baseline forecast in < 5 minutes:
 - `nixtla_baseline_m4/results_M4_Daily_h7.csv` - Full metrics table (15 rows)
 - `nixtla_baseline_m4/summary_M4_Daily_h7.txt` - Human-readable summary
 
+## Nixtla StatsForecast Live Demo
+
+This demo shows the plugin running Nixtla's **statsforecast** library on M4 Daily data, suitable for live presentations, GitHub walkthroughs, or quick experiments.
+
+### Quick Demo Mode
+
+For the fastest possible demo experience, use the built-in demo preset:
+
+```
+/nixtla-baseline-m4 demo_preset=m4_daily_small
+```
+
+**What this does**:
+- Overrides all parameters with demo-optimized defaults
+- Runs on 5 series from M4 Daily
+- 7-day forecast horizon
+- All three statsforecast models (SeasonalNaive, AutoETS, AutoTheta)
+- Completes in ~30-60 seconds
+
+**What you get**:
+- `results_M4_Daily_h7.csv` - Metrics for 15 model runs (5 series × 3 models)
+- `summary_M4_Daily_h7.txt` - Human-readable summary with averages
+- Response includes `resolved_models`, `resolved_freq`, `resolved_season_length` fields
+
+### Power-User Demo Mode
+
+Want to showcase specific statsforecast features? Use power-user parameters:
+
+```
+/nixtla-baseline-m4 models=['AutoTheta'] freq='D' season_length=7 horizon=14 series_limit=10
+```
+
+**Available power-user controls**:
+- `models`: Array of model names - `['SeasonalNaive', 'AutoETS', 'AutoTheta']`
+- `freq`: Frequency string - `'D'` (daily), `'M'` (monthly), `'H'` (hourly), etc.
+- `season_length`: Seasonal period - 7 for weekly pattern, 12 for monthly pattern, etc.
+
+**Example workflows**:
+- Monthly data: `freq='M' season_length=12`
+- Single model test: `models=['AutoETS']`
+- Longer horizon: `horizon=30 series_limit=3`
+
+### Demo Script for Presentations
+
+**Step 1: Setup** (one-time, if self-hosting):
+```bash
+cd plugins/nixtla-baseline-lab
+./scripts/setup_nixtla_env.sh --venv
+```
+
+**Step 2: Run Demo** (in Claude Code):
+```
+/nixtla-baseline-m4 demo_preset=m4_daily_small
+```
+
+**Step 3: Ask Claude to Interpret**:
+- "Which statsforecast model performed best on this run, and why?"
+- "Explain the sMAPE and MASE results in simple terms"
+- "Compare AutoETS vs AutoTheta - when would you use each?"
+- "Show me which series SeasonalNaive won on"
+
+### What This Demonstrates
+
+**Real Nixtla Integration**:
+- Uses actual `statsforecast` library (not mocked or simulated)
+- Runs on Nixtla's M4 dataset via `datasetsforecast`
+- Produces metrics validated by CI on every push
+
+**Power-User Features**:
+- Configurable models, frequency, and seasonality
+- Demo preset for instant GitHub-style demos
+- Full control over forecasting parameters
+
+**AI-Powered Interpretation**:
+- Claude automatically analyzes metrics
+- Compares model performance
+- Recommends next steps based on results
+
+**Production Patterns**:
+- Train/test evaluation pipeline
+- sMAPE and MASE metrics (industry standard)
+- Extensible architecture for custom models and datasets
+
+### Demo Tips
+
+**For GitHub walkthroughs**:
+1. Show the demo preset command first (instant gratification)
+2. Then show power-user params (flexibility)
+3. Ask Claude to interpret results (AI analysis)
+
+**For live presentations**:
+1. Pre-run setup script before presentation
+2. Use `demo_preset` for reliable 30-second execution
+3. Have results file open to show raw CSV
+4. Ask Claude advanced questions to show skill depth
+
+**For statsforecast users**:
+1. Emphasize real Nixtla library usage (not wrapper)
+2. Show configurable season_length for MASE calculation
+3. Demonstrate models parameter for subset testing
+4. Explain community-built vs official Nixtla distinction
+
 ## Proof It Works (Actual Results)
 
 We validated the plugin with a real test run on November 25, 2025:
