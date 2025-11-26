@@ -154,6 +154,23 @@ class NixtlaBaselineMCP:
                             "type": "boolean",
                             "description": "If true, write compat_info.json and run_manifest.json alongside metrics/summary/benchmark report for full reproducibility",
                             "default": true
+                        },
+                        "include_timegpt": {
+                            "type": "boolean",
+                            "description": "If true, and a valid NIXTLA_TIMEGPT_API_KEY is set, run a limited TimeGPT comparison against the statsforecast baselines",
+                            "default": false
+                        },
+                        "timegpt_max_series": {
+                            "type": "integer",
+                            "description": "Maximum number of series to send to TimeGPT in a single showdown run (cost control)",
+                            "default": 5,
+                            "minimum": 1
+                        },
+                        "timegpt_mode": {
+                            "type": "string",
+                            "description": "TimeGPT usage mode. Currently only 'comparison' is supported",
+                            "enum": ["comparison"],
+                            "default": "comparison"
                         }
                     },
                     "required": []
@@ -234,13 +251,14 @@ class NixtlaBaselineMCP:
         enable_plots: bool = False,
         dataset_type: str = "m4",
         csv_path: str = None,
-        include_timegpt: bool = False,
-        timegpt_max_series: int = 5,
         models: List[str] = None,
         freq: str = "D",
         season_length: int = 7,
         demo_preset: str = None,
-        generate_repro_bundle: bool = True
+        generate_repro_bundle: bool = True,
+        include_timegpt: bool = False,
+        timegpt_max_series: int = 5,
+        timegpt_mode: str = "comparison"
     ) -> Dict[str, Any]:
         """
         Execute baseline forecasting workflow using real Nixtla libraries.
@@ -252,13 +270,14 @@ class NixtlaBaselineMCP:
             enable_plots: Generate PNG forecast plots
             dataset_type: 'm4' for M4 Daily dataset or 'csv' for custom CSV
             csv_path: Path to custom CSV file (required when dataset_type='csv')
-            include_timegpt: Include TimeGPT comparison (requires API key)
-            timegpt_max_series: Max series for TimeGPT (cost/time cap)
             models: List of model names to run (SeasonalNaive, AutoETS, AutoTheta)
             freq: Frequency string for time series (D, M, H, etc.)
             season_length: Seasonal period for models and MASE calculation
             demo_preset: Demo preset ('m4_daily_small' for GitHub-style demo)
             generate_repro_bundle: Write compat_info.json and run_manifest.json for reproducibility
+            include_timegpt: Enable TimeGPT showdown comparison (requires NIXTLA_TIMEGPT_API_KEY)
+            timegpt_max_series: Maximum series for TimeGPT (cost control)
+            timegpt_mode: TimeGPT usage mode (currently only 'comparison')
 
         Returns:
             Dict with success status, message, files, summary, and resolved parameters
@@ -531,7 +550,167 @@ class NixtlaBaselineMCP:
                 dataset_name=dataset_name
             )
 
-            # Generate repro bundle if requested
+            # Run TimeGPT showdown if requested (opt-in only)
+            timegpt_status = None
+            timegpt_showdown_file = None
+            if include_timegpt:
+                logger.info("TimeGPT showdown requested (include_timegpt=True)")
+                try:
+                    from .timegpt_client import run_timegpt_forecast
+
+                    # Run TimeGPT forecast on limited series
+                    timegpt_result = run_timegpt_forecast(
+                        series_df=df_train,
+                        horizon=horizon,
+                        freq=freq,
+                        max_series=timegpt_max_series
+                    )
+
+                    if not timegpt_result["success"]:
+                        # TimeGPT unavailable or failed - not a fatal error
+                        timegpt_status = {
+                            "enabled": True,
+                            "success": False,
+                            "reason": timegpt_result["reason"],
+                            "message": f"TimeGPT comparison was skipped: {timegpt_result['details']}"
+                        }
+                        logger.info(f"TimeGPT skipped: {timegpt_result['reason']}")
+                    else:
+                        # TimeGPT succeeded - compute metrics and create showdown
+                        logger.info(f"TimeGPT forecast successful for {timegpt_result['series_count']} series")
+
+                        # Import metric helpers
+                        from datasetsforecast.losses import smape, mase
+
+                        # Get TimeGPT forecasts
+                        timegpt_forecast = timegpt_result["forecast"]
+
+                        # Compute metrics for each series
+                        timegpt_metrics = []
+                        series_evaluated = timegpt_forecast['unique_id'].unique()
+
+                        for series_id in series_evaluated:
+                            # Get test data for this series
+                            series_test = df_test[df_test['unique_id'] == series_id].copy()
+                            series_train = df_train[df_train['unique_id'] == series_id].copy()
+                            series_forecast = timegpt_forecast[timegpt_forecast['unique_id'] == series_id].copy()
+
+                            if len(series_forecast) == 0 or len(series_test) == 0:
+                                logger.warning(f"Skipping metrics for {series_id}: missing forecast or test data")
+                                continue
+
+                            # Ensure same length
+                            min_len = min(len(series_test), len(series_forecast))
+                            y_true = series_test['y'].values[:min_len]
+                            y_pred = series_forecast['TimeGPT'].values[:min_len]
+                            y_train = series_train['y'].values
+
+                            # Compute sMAPE and MASE
+                            series_smape = smape(y_true, y_pred)
+                            series_mase = mase(y_true, y_pred, y_train, seasonality=season_length)
+
+                            timegpt_metrics.append({
+                                "series_id": series_id,
+                                "smape": float(series_smape),
+                                "mase": float(series_mase)
+                            })
+
+                        # Compute averages
+                        if len(timegpt_metrics) > 0:
+                            avg_smape = sum(m["smape"] for m in timegpt_metrics) / len(timegpt_metrics)
+                            avg_mase = sum(m["mase"] for m in timegpt_metrics) / len(timegpt_metrics)
+
+                            # Compare to best baseline model (from model_summaries)
+                            best_baseline_smape = min(s["avg_smape"] for s in model_summaries.values())
+                            best_baseline_mase = min(s["avg_mase"] for s in model_summaries.values())
+
+                            timegpt_status = {
+                                "enabled": True,
+                                "success": True,
+                                "reason": "ok",
+                                "series_evaluated": len(timegpt_metrics),
+                                "avg_smape": avg_smape,
+                                "avg_mase": avg_mase,
+                                "comparison": {
+                                    "timegpt_vs_best_baseline_smape": avg_smape - best_baseline_smape,
+                                    "timegpt_vs_best_baseline_mase": avg_mase - best_baseline_mase
+                                }
+                            }
+
+                            # Write showdown summary file
+                            showdown_filename = f"timegpt_showdown_{dataset_label.replace(' ', '_')}_h{horizon}.txt"
+                            timegpt_showdown_file = out_path / showdown_filename
+
+                            showdown_lines = []
+                            showdown_lines.append("=" * 60)
+                            showdown_lines.append("TimeGPT Showdown Summary")
+                            showdown_lines.append("=" * 60)
+                            showdown_lines.append(f"Dataset: {dataset_label}")
+                            showdown_lines.append(f"Horizon: {horizon}")
+                            showdown_lines.append(f"Series Evaluated: {len(timegpt_metrics)} (of {len(df_train['unique_id'].unique())} total)")
+                            showdown_lines.append(f"TimeGPT Mode: {timegpt_mode}")
+                            showdown_lines.append("")
+                            showdown_lines.append("TimeGPT Performance:")
+                            showdown_lines.append(f"  Average sMAPE: {avg_smape:.2%}")
+                            showdown_lines.append(f"  Average MASE: {avg_mase:.3f}")
+                            showdown_lines.append("")
+                            showdown_lines.append("Best Baseline Performance:")
+                            showdown_lines.append(f"  Average sMAPE: {best_baseline_smape:.2%}")
+                            showdown_lines.append(f"  Average MASE: {best_baseline_mase:.3f}")
+                            showdown_lines.append("")
+                            showdown_lines.append("Comparison:")
+                            smape_diff = avg_smape - best_baseline_smape
+                            mase_diff = avg_mase - best_baseline_mase
+                            showdown_lines.append(f"  sMAPE Difference: {smape_diff:+.2%} ({'better' if smape_diff < 0 else 'worse'} than best baseline)")
+                            showdown_lines.append(f"  MASE Difference: {mase_diff:+.3f} ({'better' if mase_diff < 0 else 'worse'} than best baseline)")
+                            showdown_lines.append("")
+                            showdown_lines.append("Notes:")
+                            showdown_lines.append(f"  - This is a limited comparison on {len(timegpt_metrics)} series")
+                            showdown_lines.append("  - Results are indicative, not conclusive")
+                            showdown_lines.append("  - TimeGPT is Nixtla's hosted foundation model")
+                            showdown_lines.append("  - Baselines are statsforecast classical models")
+                            showdown_lines.append("")
+                            showdown_lines.append("Generated by Nixtla Baseline Lab (Claude Code plugin)")
+                            showdown_lines.append("=" * 60)
+
+                            timegpt_showdown_file.write_text("\n".join(showdown_lines))
+                            logger.info(f"Wrote TimeGPT showdown summary to {timegpt_showdown_file}")
+                        else:
+                            # No metrics computed
+                            timegpt_status = {
+                                "enabled": True,
+                                "success": False,
+                                "reason": "no_metrics",
+                                "message": "TimeGPT forecast succeeded but no metrics could be computed"
+                            }
+                            logger.warning("TimeGPT: No metrics computed (no matching series)")
+
+                except ImportError as e:
+                    timegpt_status = {
+                        "enabled": True,
+                        "success": False,
+                        "reason": "import_error",
+                        "message": f"Failed to import TimeGPT client: {e}"
+                    }
+                    logger.error(f"TimeGPT import error: {e}")
+                except Exception as e:
+                    timegpt_status = {
+                        "enabled": True,
+                        "success": False,
+                        "reason": "error",
+                        "message": f"TimeGPT showdown failed: {str(e)}"
+                    }
+                    logger.error(f"TimeGPT showdown error: {e}", exc_info=True)
+            else:
+                # TimeGPT not requested
+                timegpt_status = {
+                    "enabled": False,
+                    "success": False,
+                    "reason": "disabled",
+                    "message": "TimeGPT comparison not requested (include_timegpt=False)"
+                }
+
+            # Generate repro bundle if requested (after TimeGPT showdown so status is available)
             repro_bundle_files = []
             if generate_repro_bundle:
                 logger.info("Generating reproducibility bundle (compat_info.json, run_manifest.json)")
@@ -546,18 +725,28 @@ class NixtlaBaselineMCP:
                         models=models,
                         freq=freq,
                         season_length=season_length,
-                        demo_preset=demo_preset
+                        demo_preset=demo_preset,
+                        include_timegpt=include_timegpt,
+                        timegpt_max_series=timegpt_max_series,
+                        timegpt_mode=timegpt_mode,
+                        timegpt_status=timegpt_status,
+                        timegpt_showdown_file=str(timegpt_showdown_file) if timegpt_showdown_file else None
                     )
                     repro_bundle_files = [str(compat_path), str(manifest_path)]
                     logger.info(f"Repro bundle generated: {len(repro_bundle_files)} files")
                 except Exception as e:
                     logger.warning(f"Failed to generate repro bundle: {e}")
 
+            # Add TimeGPT showdown file to files list if generated
+            timegpt_files = []
+            if timegpt_showdown_file and timegpt_showdown_file.exists():
+                timegpt_files = [str(timegpt_showdown_file)]
+
             # Build response
             response = {
                 "success": True,
                 "message": f"Baseline models completed on {dataset_name} ({len(df_train['unique_id'].unique())} series, horizon={horizon})",
-                "files": [str(metrics_file), str(summary_file)] + plot_files + repro_bundle_files,
+                "files": [str(metrics_file), str(summary_file)] + plot_files + repro_bundle_files + timegpt_files,
                 "summary": model_summaries,
                 "plots_generated": len(plot_files),
                 "resolved_models": models,
@@ -566,12 +755,9 @@ class NixtlaBaselineMCP:
                 "demo_preset": demo_preset,
                 "repro_bundle_generated": len(repro_bundle_files) > 0,
                 "repro_bundle_files": repro_bundle_files,
+                "timegpt_status": timegpt_status,
                 "compatibility_hint": "Run get_nixtla_compatibility_info tool for detailed version info."
             }
-
-            # Add TimeGPT fields if comparison was attempted
-            if timegpt_result:
-                response.update(timegpt_result)
 
             return response
 
@@ -999,7 +1185,12 @@ class NixtlaBaselineMCP:
         models: List[str],
         freq: str,
         season_length: int,
-        demo_preset: str = None
+        demo_preset: str = None,
+        include_timegpt: bool = False,
+        timegpt_max_series: int = 5,
+        timegpt_mode: str = "comparison",
+        timegpt_status: Dict[str, Any] = None,
+        timegpt_showdown_file: str = None
     ) -> Path:
         """
         Write run manifest JSON to repro bundle.
@@ -1014,6 +1205,11 @@ class NixtlaBaselineMCP:
             freq: Frequency string
             season_length: Seasonal period
             demo_preset: Demo preset name if used
+            include_timegpt: Whether TimeGPT was requested
+            timegpt_max_series: TimeGPT series limit
+            timegpt_mode: TimeGPT mode used
+            timegpt_status: TimeGPT status dict
+            timegpt_showdown_file: Path to showdown file if generated
 
         Returns:
             Path to written run_manifest.json file
@@ -1033,6 +1229,24 @@ class NixtlaBaselineMCP:
             "output_dir": str(output_dir),
             "generated_at": datetime.now(timezone.utc).isoformat()
         }
+
+        # Add TimeGPT section
+        if timegpt_status:
+            timegpt_info = {
+                "include_timegpt": include_timegpt,
+                "timegpt_mode": timegpt_mode,
+                "timegpt_max_series": timegpt_max_series,
+                "status": timegpt_status.get("reason", "unknown")
+            }
+            if timegpt_showdown_file:
+                timegpt_info["showdown_file"] = timegpt_showdown_file
+            manifest["timegpt"] = timegpt_info
+        else:
+            # TimeGPT not used
+            manifest["timegpt"] = {
+                "include_timegpt": False,
+                "status": "disabled"
+            }
 
         # Write to file
         manifest_path = output_dir / "run_manifest.json"

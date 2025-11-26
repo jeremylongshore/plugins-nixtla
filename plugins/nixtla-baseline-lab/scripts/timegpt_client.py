@@ -153,3 +153,88 @@ def create_timegpt_client() -> TimeGPTClient:
         TimeGPTClient instance
     """
     return TimeGPTClient()
+
+
+def run_timegpt_forecast(
+    series_df: pd.DataFrame,
+    horizon: int,
+    freq: str,
+    max_series: int
+) -> Dict[str, Any]:
+    """
+    Run TimeGPT forecast for showdown comparison (top-level entry point).
+
+    This is the main entry point for TimeGPT showdown mode. It handles:
+    - Limiting series to max_series for cost control
+    - Calling TimeGPT API with appropriate parameters
+    - Returning structured response with clear success/failure reasons
+
+    Args:
+        series_df: DataFrame with columns [unique_id, ds, y]
+        horizon: Forecast horizon
+        freq: Frequency string (D, M, H, etc.)
+        max_series: Maximum number of series to forecast (cost control)
+
+    Returns:
+        Dict with:
+        - success: bool
+        - reason: "ok" | "missing_api_key" | "sdk_not_installed" | "api_error"
+        - details: str (error details if failed)
+        - forecast: DataFrame (if successful)
+        - series_count: int (number of series forecasted)
+    """
+    # Create client
+    client = create_timegpt_client()
+
+    # Check availability
+    if not client.is_available():
+        return {
+            "success": False,
+            "reason": "missing_api_key",
+            "details": "NIXTLA_TIMEGPT_API_KEY environment variable not set",
+            "series_count": 0
+        }
+
+    # Limit series for cost control
+    all_series = series_df['unique_id'].unique()
+    if len(all_series) > max_series:
+        logger.info(f"Limiting TimeGPT to first {max_series} of {len(all_series)} series")
+        series_to_use = all_series[:max_series]
+        limited_df = series_df[series_df['unique_id'].isin(series_to_use)].copy()
+    else:
+        limited_df = series_df.copy()
+
+    series_count = len(limited_df['unique_id'].unique())
+
+    # Call TimeGPT
+    result = client.forecast(
+        df=limited_df,
+        horizon=horizon,
+        freq=freq
+    )
+
+    if not result["success"]:
+        # Determine reason from error message
+        error = result.get("error", "")
+        if "not installed" in error:
+            reason = "sdk_not_installed"
+        elif "API key" in error:
+            reason = "missing_api_key"
+        else:
+            reason = "api_error"
+
+        return {
+            "success": False,
+            "reason": reason,
+            "details": error,
+            "series_count": 0
+        }
+
+    # Success
+    return {
+        "success": True,
+        "reason": "ok",
+        "forecast": result["forecast"],
+        "series_count": series_count,
+        "details": f"TimeGPT forecast successful for {series_count} series"
+    }

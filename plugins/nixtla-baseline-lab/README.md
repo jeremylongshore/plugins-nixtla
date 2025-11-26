@@ -480,6 +480,187 @@ This makes it easy to:
 - Share benchmark results professionally
 - Collaborate on statsforecast improvements
 
+## Optional: TimeGPT Showdown (Foundation Model vs Baselines)
+
+The plugin can optionally compare **Nixtla's TimeGPT foundation model** against statsforecast baselines in a controlled, cost-limited showdown.
+
+### ⚠️ Important: Strictly Opt-In
+
+**TimeGPT usage is completely optional** and disabled by default:
+- Requires explicit `include_timegpt=true` parameter
+- Requires valid `NIXTLA_TIMEGPT_API_KEY` environment variable
+- Default behavior remains offline-only (statsforecast only)
+- No network calls to TimeGPT without explicit user action
+
+### Quick Start
+
+```bash
+# 1. Export your TimeGPT API key
+export NIXTLA_TIMEGPT_API_KEY="your-key-here"
+
+# 2. Run a small showdown with demo preset
+run_baselines(
+    demo_preset="m4_daily_small",
+    include_timegpt=true,
+    timegpt_max_series=3
+)
+```
+
+### What It Does
+
+When `include_timegpt=true`:
+1. Runs statsforecast baselines normally (SeasonalNaive, AutoETS, AutoTheta)
+2. Sends up to `timegpt_max_series` series to TimeGPT API (cost control)
+3. Computes same metrics (sMAPE, MASE) for TimeGPT forecasts
+4. Generates `timegpt_showdown_*.txt` file with comparison summary
+5. Adds `timegpt_status` to response with results or failure reason
+
+### Parameters
+
+- `include_timegpt` (boolean, default `false`) - Enable TimeGPT showdown
+- `timegpt_max_series` (integer, default `5`, min `1`) - Series limit for cost control
+- `timegpt_mode` (string, default `"comparison"`) - Currently only "comparison" supported
+
+### Showdown Output Example
+
+```
+============================================================
+TimeGPT Showdown Summary
+============================================================
+Dataset: M4 Daily
+Horizon: 7
+Series Evaluated: 3 (of 5 total)
+TimeGPT Mode: comparison
+
+TimeGPT Performance:
+  Average sMAPE: 1.23%
+  Average MASE: 0.567
+
+Best Baseline Performance:
+  Average sMAPE: 0.77%
+  Average MASE: 0.422
+
+Comparison:
+  sMAPE Difference: +0.46% (worse than best baseline)
+  MASE Difference: +0.145 (worse than best baseline)
+
+Notes:
+  - This is a limited comparison on 3 series
+  - Results are indicative, not conclusive
+  - TimeGPT is Nixtla's hosted foundation model
+  - Baselines are statsforecast classical models
+============================================================
+```
+
+### Integration with Repro Bundle
+
+When TimeGPT is used, the repro bundle automatically includes:
+
+**run_manifest.json** - TimeGPT section:
+```json
+"timegpt": {
+  "include_timegpt": true,
+  "timegpt_mode": "comparison",
+  "timegpt_max_series": 3,
+  "status": "ok",
+  "showdown_file": "timegpt_showdown_M4_Daily_h7.txt"
+}
+```
+
+**Response metadata**:
+```json
+"timegpt_status": {
+  "enabled": true,
+  "success": true,
+  "reason": "ok",
+  "series_evaluated": 3,
+  "avg_smape": 0.0123,
+  "avg_mase": 0.567,
+  "comparison": {
+    "timegpt_vs_best_baseline_smape": 0.0046,
+    "timegpt_vs_best_baseline_mase": 0.145
+  }
+}
+```
+
+### When TimeGPT is Unavailable
+
+If TimeGPT fails (missing API key, SDK not installed, API error):
+- Baseline run continues normally
+- `timegpt_status` reports failure reason clearly
+- No impact on statsforecast baselines
+- Showdown file not generated
+
+Example failure status:
+```json
+"timegpt_status": {
+  "enabled": true,
+  "success": false,
+  "reason": "missing_api_key",
+  "message": "TimeGPT comparison was skipped: NIXTLA_TIMEGPT_API_KEY environment variable not set"
+}
+```
+
+### Important Disclaimers
+
+**This plugin is a community-built integration:**
+- No promises about TimeGPT latency, availability, or cost
+- No implied SLA or performance guarantees
+- Results are directional, not conclusive (limited series)
+- Users are responsible for:
+  - Managing their TimeGPT API key securely
+  - Monitoring usage and costs via Nixtla dashboard
+  - Understanding TimeGPT pricing and limits
+
+**CI/Testing:**
+- No automated tests call TimeGPT (offline-only CI)
+- Golden task test remains offline-only
+- Manual TimeGPT testing requires valid API key
+
+**Use Cases:**
+- Exploring TimeGPT performance on benchmark data
+- Comparing foundation model vs classical methods
+- Educational demonstrations
+- Internal experimentation
+
+**Not Recommended For:**
+- Production forecasting decisions (use official Nixtla SDK)
+- Conclusive performance claims (limited series)
+- Cost-insensitive operations (no built-in billing controls)
+
+### Getting a TimeGPT API Key
+
+To use TimeGPT showdown:
+1. Sign up at [Nixtla TimeGPT](https://nixtla.io/)
+2. Get your API key from the Nixtla dashboard
+3. Export it: `export NIXTLA_TIMEGPT_API_KEY="your-key-here"`
+4. Monitor usage and costs via Nixtla dashboard
+
+### Complete Workflow Example
+
+```python
+# 1. Run baselines with TimeGPT showdown (small dataset)
+result = run_baselines(
+    demo_preset="m4_daily_small",
+    include_timegpt=true,
+    timegpt_max_series=3,
+    generate_repro_bundle=true
+)
+
+# 2. Check TimeGPT status
+print(result["timegpt_status"])
+
+# 3. Read showdown summary
+with open("nixtla_baseline_m4_test/timegpt_showdown_M4_Daily_h7.txt") as f:
+    print(f.read())
+
+# 4. Generate benchmark report (includes TimeGPT if used)
+generate_benchmark_report()
+
+# 5. Create GitHub issue draft (includes TimeGPT comparison)
+generate_github_issue_draft(issue_type="benchmark")
+```
+
 ## Proof It Works (Actual Results)
 
 We validated the plugin with a real test run on November 25, 2025:

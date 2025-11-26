@@ -366,6 +366,40 @@ generate_github_issue_draft(issue_type="question")
 - Emphasize that the repro bundle makes collaboration with Nixtla more efficient
 - If user hasn't generated repro bundle, suggest: "Run with `generate_repro_bundle=True` first"
 
+## TimeGPT Showdown (Optional)
+
+If the user enabled **TimeGPT showdown** (`include_timegpt=true`), handle the comparison carefully.
+
+**When timegpt_status.success == True:**
+- Compare TimeGPT to the best statsforecast model (AutoETS, AutoTheta, SeasonalNaive)
+- Use metrics from `timegpt_status`: avg_smape, avg_mase, comparison deltas
+- Read the showdown file (`timegpt_showdown_*.txt`) for detailed summary
+- Emphasize this is a **limited comparison** (small number of series)
+- Avoid overclaiming - say "indicative" not "conclusive"
+- Example: "TimeGPT achieved 1.23% sMAPE vs 0.77% for best baseline (AutoETS) on 3 series"
+
+**When timegpt_status.success == False:**
+- Explain why TimeGPT was skipped using `timegpt_status.reason`:
+  - `missing_api_key`: "NIXTLA_TIMEGPT_API_KEY environment variable not set"
+  - `sdk_not_installed`: "nixtla SDK not installed (pip install nixtla)"
+  - `api_error`: "TimeGPT API call failed"
+  - `disabled`: "TimeGPT not requested (include_timegpt=False)"
+- Focus analysis on statsforecast baselines instead
+- If user asks about TimeGPT, explain how to enable it safely
+
+**Example user prompts:**
+- "How did TimeGPT perform compared to AutoETS?"
+- "Why was TimeGPT skipped?"
+- "What would I need to enable TimeGPT showdown?"
+- "Is TimeGPT better than the baselines on this dataset?"
+
+**Important reminders:**
+- Never fabricate TimeGPT metrics that don't exist in the response
+- Always check `timegpt_status` first before discussing TimeGPT
+- Emphasize limited series count (from `series_evaluated`)
+- Note that TimeGPT is Nixtla's hosted foundation model (not statsforecast)
+- Remind users this is optional, opt-in, and has no impact on default behavior
+
 ## Documentation
 
 For complete technical details, see:
