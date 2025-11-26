@@ -349,6 +349,137 @@ The report includes:
 - Highlights section with key insights
 - Timestamp for version control
 
+## Repro Bundle & GitHub Issue Workflow
+
+When you need to share results with the Nixtla community or report issues, the plugin can generate a complete **reproducibility bundle** and **GitHub issue draft** to make collaboration seamless.
+
+### End-to-End Workflow
+
+The typical workflow for sharing results:
+
+1. **Run baselines with repro bundle** (enabled by default):
+   ```bash
+   # Run baselines (repro bundle auto-generated)
+   python scripts/nixtla_baseline_mcp.py test
+
+   # Or explicitly request it
+   run_baselines(generate_repro_bundle=True)
+   ```
+
+2. **Generate benchmark report** (optional, but recommended):
+   ```bash
+   generate_benchmark_report()
+   ```
+
+3. **Create GitHub issue draft**:
+   ```bash
+   generate_github_issue_draft(issue_type="question")
+   # Or: "bug", "benchmark"
+   ```
+
+4. **Review and post**: The plugin creates `github_issue_draft.md` with:
+   - Your question/bug description placeholder
+   - Benchmark results (if available)
+   - Run configuration details
+   - Library versions
+   - Reproducibility information
+
+### What's in the Repro Bundle?
+
+The repro bundle includes two JSON files written alongside your metrics CSV:
+
+**compat_info.json** - Library versions:
+```json
+{
+  "engine": "nixtla.statsforecast",
+  "library_versions": {
+    "statsforecast": "2.0.3",
+    "datasetsforecast": "0.0.8",
+    "pandas": "2.1.0",
+    "numpy": "1.24.3"
+  },
+  "generated_at": "2025-11-26T06:12:13Z"
+}
+```
+
+**run_manifest.json** - Run configuration:
+```json
+{
+  "dataset_label": "M4_Daily",
+  "dataset_type": "m4",
+  "horizon": 7,
+  "series_limit": 5,
+  "models": ["SeasonalNaive", "AutoETS", "AutoTheta"],
+  "freq": "D",
+  "season_length": 7,
+  "demo_preset": "m4_daily_small",
+  "output_dir": "nixtla_baseline_m4_test",
+  "generated_at": "2025-11-26T06:12:13Z"
+}
+```
+
+### GitHub Issue Types
+
+The plugin supports three issue types:
+
+1. **question** (default) - Community support questions
+   - "How do I interpret these sMAPE values?"
+   - "Why is AutoETS outperforming AutoTheta on my data?"
+   - "What's the best freq setting for hourly data?"
+
+2. **bug** - Suspected bugs or unexpected behavior
+   - "AutoETS crashes with my dataset"
+   - "MASE values seem incorrect"
+   - "SeasonalNaive produces NaN forecasts"
+
+3. **benchmark** - Sharing performance results
+   - "AutoETS beats AutoTheta on M4 Daily"
+   - "Comparing statsforecast models on custom data"
+   - "Reproducing Nixtla's published benchmarks"
+
+### Community vs Official Issues
+
+**Important distinction**:
+
+- This is a **community plugin** (not official Nixtla tooling)
+- When posting to Nixtla's GitHub:
+  - Mention you're using the "Nixtla Baseline Lab Claude Code plugin"
+  - Include the generated repro bundle information
+  - Be respectful of maintainer time (this isn't official support)
+- For official Nixtla support:
+  - Use Nixtla's official documentation and support channels
+  - Consider TimeGPT API support for production use cases
+
+The repro bundle helps Nixtla maintainers understand your setup quickly, making community collaboration more efficient.
+
+### Example: Complete Workflow
+
+```python
+# 1. Run baselines with demo preset
+run_baselines(demo_preset="m4_daily_small", generate_repro_bundle=True)
+
+# 2. Generate benchmark report
+generate_benchmark_report()
+
+# 3. Create issue draft for a question
+generate_github_issue_draft(issue_type="question")
+
+# 4. Review github_issue_draft.md and post to GitHub
+```
+
+The generated issue draft includes everything Nixtla maintainers need:
+- Your specific question or bug description (you fill this in)
+- Complete benchmark results
+- Exact library versions used
+- Full run configuration
+- Reproducibility information
+
+This makes it easy to:
+- Get help from the community
+- Report bugs with full context
+- Share benchmark results professionally
+- Collaborate on statsforecast improvements
+
 ## Proof It Works (Actual Results)
 
 We validated the plugin with a real test run on November 25, 2025:

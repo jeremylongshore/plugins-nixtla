@@ -149,6 +149,11 @@ class NixtlaBaselineMCP:
                             "description": "Demo preset configuration for quick GitHub-style demos. 'm4_daily_small' runs a fast demo on M4 Daily subset",
                             "enum": ["m4_daily_small", null],
                             "default": null
+                        },
+                        "generate_repro_bundle": {
+                            "type": "boolean",
+                            "description": "If true, write compat_info.json and run_manifest.json alongside metrics/summary/benchmark report for full reproducibility",
+                            "default": true
                         }
                     },
                     "required": []
@@ -186,6 +191,38 @@ class NixtlaBaselineMCP:
                     },
                     "required": []
                 }
+            },
+            {
+                "name": "generate_github_issue_draft",
+                "description": "Generate a GitHub issue draft in Markdown format with benchmark results, perfect for sharing with Nixtla maintainers",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "metrics_csv_path": {
+                            "type": "string",
+                            "description": "Path to metrics CSV file. If not provided, attempts to use most recent run."
+                        },
+                        "benchmark_report_path": {
+                            "type": "string",
+                            "description": "Path to benchmark report Markdown file. If not provided, attempts to use most recent report."
+                        },
+                        "compat_info_path": {
+                            "type": "string",
+                            "description": "Path to compat_info.json. If not provided, attempts to use most recent file."
+                        },
+                        "run_manifest_path": {
+                            "type": "string",
+                            "description": "Path to run_manifest.json. If not provided, attempts to use most recent file."
+                        },
+                        "issue_type": {
+                            "type": "string",
+                            "description": "Type of GitHub issue: 'question' (community support), 'bug' (suspected bug), or 'benchmark' (performance results)",
+                            "enum": ["question", "bug", "benchmark"],
+                            "default": "question"
+                        }
+                    },
+                    "required": []
+                }
             }
         ]
 
@@ -202,7 +239,8 @@ class NixtlaBaselineMCP:
         models: List[str] = None,
         freq: str = "D",
         season_length: int = 7,
-        demo_preset: str = None
+        demo_preset: str = None,
+        generate_repro_bundle: bool = True
     ) -> Dict[str, Any]:
         """
         Execute baseline forecasting workflow using real Nixtla libraries.
@@ -220,6 +258,7 @@ class NixtlaBaselineMCP:
             freq: Frequency string for time series (D, M, H, etc.)
             season_length: Seasonal period for models and MASE calculation
             demo_preset: Demo preset ('m4_daily_small' for GitHub-style demo)
+            generate_repro_bundle: Write compat_info.json and run_manifest.json for reproducibility
 
         Returns:
             Dict with success status, message, files, summary, and resolved parameters
@@ -492,17 +531,41 @@ class NixtlaBaselineMCP:
                 dataset_name=dataset_name
             )
 
+            # Generate repro bundle if requested
+            repro_bundle_files = []
+            if generate_repro_bundle:
+                logger.info("Generating reproducibility bundle (compat_info.json, run_manifest.json)")
+                try:
+                    compat_path = self._write_compat_info(out_path)
+                    manifest_path = self._write_run_manifest(
+                        output_dir=out_path,
+                        dataset_label=dataset_label,
+                        dataset_type=dataset_type,
+                        horizon=horizon,
+                        series_limit=series_limit,
+                        models=models,
+                        freq=freq,
+                        season_length=season_length,
+                        demo_preset=demo_preset
+                    )
+                    repro_bundle_files = [str(compat_path), str(manifest_path)]
+                    logger.info(f"Repro bundle generated: {len(repro_bundle_files)} files")
+                except Exception as e:
+                    logger.warning(f"Failed to generate repro bundle: {e}")
+
             # Build response
             response = {
                 "success": True,
                 "message": f"Baseline models completed on {dataset_name} ({len(df_train['unique_id'].unique())} series, horizon={horizon})",
-                "files": [str(metrics_file), str(summary_file)] + plot_files,
+                "files": [str(metrics_file), str(summary_file)] + plot_files + repro_bundle_files,
                 "summary": model_summaries,
                 "plots_generated": len(plot_files),
                 "resolved_models": models,
                 "resolved_freq": freq,
                 "resolved_season_length": season_length,
                 "demo_preset": demo_preset,
+                "repro_bundle_generated": len(repro_bundle_files) > 0,
+                "repro_bundle_files": repro_bundle_files,
                 "compatibility_hint": "Run get_nixtla_compatibility_info tool for detailed version info."
             }
 
@@ -736,6 +799,247 @@ class NixtlaBaselineMCP:
                 "success": False,
                 "message": error_msg
             }
+
+    def generate_github_issue_draft(
+        self,
+        metrics_csv_path: str = None,
+        benchmark_report_path: str = None,
+        compat_info_path: str = None,
+        run_manifest_path: str = None,
+        issue_type: str = "question"
+    ) -> Dict[str, Any]:
+        """
+        Generate a GitHub issue draft in Markdown format for sharing with Nixtla.
+
+        Args:
+            metrics_csv_path: Path to metrics CSV. Auto-detected if not provided.
+            benchmark_report_path: Path to benchmark report. Auto-detected if not provided.
+            compat_info_path: Path to compat_info.json. Auto-detected if not provided.
+            run_manifest_path: Path to run_manifest.json. Auto-detected if not provided.
+            issue_type: 'question', 'bug', or 'benchmark'
+
+        Returns:
+            Dict with success status and path to generated issue draft
+        """
+        try:
+            # Auto-detect output directory from any provided path
+            output_dir = None
+            if metrics_csv_path:
+                output_dir = Path(metrics_csv_path).parent
+            elif benchmark_report_path:
+                output_dir = Path(benchmark_report_path).parent
+            elif compat_info_path:
+                output_dir = Path(compat_info_path).parent
+            elif run_manifest_path:
+                output_dir = Path(run_manifest_path).parent
+            else:
+                # Try common directories
+                for dir_name in ["nixtla_baseline_m4_test", "nixtla_baseline_m4"]:
+                    dir_path = Path(dir_name)
+                    if dir_path.exists():
+                        output_dir = dir_path
+                        break
+
+            if not output_dir:
+                return {
+                    "success": False,
+                    "message": "Could not determine output directory. Please provide at least one file path."
+                }
+
+            # Auto-detect files if not provided
+            if not compat_info_path:
+                candidates = sorted(output_dir.glob("compat_info.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+                if candidates:
+                    compat_info_path = str(candidates[0])
+
+            if not run_manifest_path:
+                candidates = sorted(output_dir.glob("run_manifest.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+                if candidates:
+                    run_manifest_path = str(candidates[0])
+
+            if not benchmark_report_path:
+                candidates = sorted(output_dir.glob("benchmark_report_*.md"), key=lambda p: p.stat().st_mtime, reverse=True)
+                if candidates:
+                    benchmark_report_path = str(candidates[0])
+
+            # Read files
+            compat_info = None
+            run_manifest = None
+            benchmark_content = None
+
+            if compat_info_path and Path(compat_info_path).exists():
+                compat_info = json.loads(Path(compat_info_path).read_text())
+
+            if run_manifest_path and Path(run_manifest_path).exists():
+                run_manifest = json.loads(Path(run_manifest_path).read_text())
+
+            if benchmark_report_path and Path(benchmark_report_path).exists():
+                benchmark_content = Path(benchmark_report_path).read_text()
+
+            # Generate issue template based on type
+            issue_lines = []
+
+            if issue_type == "question":
+                issue_lines.append("## Question about statsforecast")
+                issue_lines.append("")
+                issue_lines.append("**Context**:")
+                issue_lines.append("I'm using the Nixtla Baseline Lab Claude Code plugin to experiment with statsforecast.")
+                issue_lines.append("")
+                issue_lines.append("**My Question**:")
+                issue_lines.append("[Describe your question here]")
+                issue_lines.append("")
+            elif issue_type == "bug":
+                issue_lines.append("## Potential Bug Report")
+                issue_lines.append("")
+                issue_lines.append("**Expected Behavior**:")
+                issue_lines.append("[What you expected to happen]")
+                issue_lines.append("")
+                issue_lines.append("**Actual Behavior**:")
+                issue_lines.append("[What actually happened]")
+                issue_lines.append("")
+            elif issue_type == "benchmark":
+                issue_lines.append("## Benchmark Results")
+                issue_lines.append("")
+                issue_lines.append("Sharing statsforecast benchmark results from the Nixtla Baseline Lab.")
+                issue_lines.append("")
+
+            # Add benchmark report if available
+            if benchmark_content:
+                issue_lines.append("## Results")
+                issue_lines.append("")
+                issue_lines.append(benchmark_content)
+                issue_lines.append("")
+
+            # Add reproducibility information
+            if run_manifest or compat_info:
+                issue_lines.append("## Reproducibility Information")
+                issue_lines.append("")
+
+            if run_manifest:
+                issue_lines.append("**Run Configuration**:")
+                issue_lines.append(f"- Dataset: {run_manifest.get('dataset_label', 'Unknown')}")
+                issue_lines.append(f"- Horizon: {run_manifest.get('horizon', 'Unknown')}")
+                issue_lines.append(f"- Series: {run_manifest.get('series_limit', 'Unknown')}")
+                issue_lines.append(f"- Models: {', '.join(run_manifest.get('models', []))}")
+                issue_lines.append(f"- Frequency: {run_manifest.get('freq', 'Unknown')}")
+                issue_lines.append(f"- Season Length: {run_manifest.get('season_length', 'Unknown')}")
+                issue_lines.append("")
+
+            if compat_info:
+                issue_lines.append("**Library Versions**:")
+                versions = compat_info.get('library_versions', {})
+                for lib, version in versions.items():
+                    issue_lines.append(f"- {lib}: {version}")
+                issue_lines.append("")
+
+            # Add footer
+            issue_lines.append("---")
+            issue_lines.append("")
+            issue_lines.append("_Generated by [Nixtla Baseline Lab](https://github.com/jeremylongshore/claude-code-plugins-nixtla) (Claude Code plugin)_")
+
+            # Write issue draft
+            issue_path = output_dir / "github_issue_draft.md"
+            issue_path.write_text("\n".join(issue_lines))
+
+            logger.info(f"Wrote GitHub issue draft to {issue_path}")
+
+            return {
+                "success": True,
+                "issue_path": str(issue_path),
+                "message": f"GitHub issue draft generated: {issue_path.name}",
+                "issue_type": issue_type,
+                "includes_benchmark": benchmark_content is not None,
+                "includes_repro_info": (run_manifest is not None or compat_info is not None)
+            }
+
+        except Exception as e:
+            error_msg = f"Error generating GitHub issue draft: {str(e)}"
+            logger.error(error_msg, exc_info=True)
+            return {
+                "success": False,
+                "message": error_msg
+            }
+
+    def _write_compat_info(self, output_dir: Path) -> Path:
+        """
+        Write compatibility info JSON to repro bundle.
+
+        Args:
+            output_dir: Output directory path
+
+        Returns:
+            Path to written compat_info.json file
+        """
+        from datetime import datetime, timezone
+
+        # Get library versions
+        library_versions = self._get_library_versions()
+
+        # Build compat info structure
+        compat_info = {
+            "engine": "nixtla.statsforecast",
+            "library_versions": library_versions,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+
+        # Write to file
+        compat_path = output_dir / "compat_info.json"
+        compat_path.write_text(json.dumps(compat_info, indent=2))
+        logger.info(f"Wrote compatibility info to {compat_path}")
+
+        return compat_path
+
+    def _write_run_manifest(
+        self,
+        output_dir: Path,
+        dataset_label: str,
+        dataset_type: str,
+        horizon: int,
+        series_limit: int,
+        models: List[str],
+        freq: str,
+        season_length: int,
+        demo_preset: str = None
+    ) -> Path:
+        """
+        Write run manifest JSON to repro bundle.
+
+        Args:
+            output_dir: Output directory path
+            dataset_label: Dataset name
+            dataset_type: Dataset type ('m4' or 'csv')
+            horizon: Forecast horizon
+            series_limit: Series limit
+            models: List of model names used
+            freq: Frequency string
+            season_length: Seasonal period
+            demo_preset: Demo preset name if used
+
+        Returns:
+            Path to written run_manifest.json file
+        """
+        from datetime import datetime, timezone
+
+        # Build manifest structure
+        manifest = {
+            "dataset_label": dataset_label,
+            "dataset_type": dataset_type,
+            "horizon": horizon,
+            "series_limit": series_limit,
+            "models": models,
+            "freq": freq,
+            "season_length": season_length,
+            "demo_preset": demo_preset,
+            "output_dir": str(output_dir),
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+
+        # Write to file
+        manifest_path = output_dir / "run_manifest.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2))
+        logger.info(f"Wrote run manifest to {manifest_path}")
+
+        return manifest_path
 
     def _calculate_smape(self, actual: List[float], predicted: List[float]) -> float:
         """
@@ -1152,16 +1456,23 @@ class NixtlaBaselineMCP:
 
             if tool_name == "run_baselines":
                 result = self.run_baselines(**arguments)
-                return {
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": json.dumps(result, indent=2)
-                        }
-                    ]
-                }
+            elif tool_name == "get_nixtla_compatibility_info":
+                result = self.get_nixtla_compatibility_info(**arguments)
+            elif tool_name == "generate_benchmark_report":
+                result = self.generate_benchmark_report(**arguments)
+            elif tool_name == "generate_github_issue_draft":
+                result = self.generate_github_issue_draft(**arguments)
             else:
                 return {"error": f"Unknown tool: {tool_name}"}
+
+            return {
+                "content": [
+                    {
+                        "type": "text",
+                        "text": json.dumps(result, indent=2)
+                    }
+                ]
+            }
 
         else:
             return {"error": f"Unknown method: {method}"}
