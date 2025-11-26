@@ -20,99 +20,40 @@ This repository is a **developer sandbox** for building and testing Claude Code 
 
 - **Nixtla Baseline Lab Plugin** – A Claude Code plugin that runs statsforecast baseline models (SeasonalNaive, AutoETS, AutoTheta) on M4 benchmark data or custom CSV files.
 - **Metrics & Benchmarking** – Calculates sMAPE and MASE metrics, generates reproducible benchmark reports in Markdown format.
-- **Repro Bundles** – Captures run configuration, library versions, and results for reproducibility.
-- **GitHub Issue Draft Generator** – Helper tool to create pre-filled issue drafts for posting to `nixtla/statsforecast` (community plugin, not official Nixtla template).
+- **Repro Bundles** – Captures run configuration, library versions, and results for exact reproducibility.
+- **GitHub Issue Draft Generator** – Unique productivity tool that auto-generates pre-filled issue drafts with your complete experimental context (metrics, config, library versions) ready to share with Nixtla maintainers on `nixtla/statsforecast`.
 - **Optional TimeGPT Showdown** – Opt-in comparison path for users with valid `NIXTLA_TIMEGPT_API_KEY` who want to compare baselines against Nixtla's TimeGPT foundation model on a small, controlled sample.
 
 **What this enables**:
 
 - CI-backed, reproducible statsforecast baseline experiments inside Claude Code.
-- Easy capture of metrics, library versions, and run configurations for sharing with Nixtla maintainers or collaborators.
+- One-command capture of metrics, library versions, and run configurations for sharing with Nixtla maintainers or collaborators.
 - A reference implementation showing how to integrate Nixtla OSS libraries into Claude Code plugins.
 
 ---
 
-## What This Repo Is NOT
-
-Set expectations clearly:
-
-- **Not an official Nixtla product** – This is a community integration maintained by Intent Solutions, not by Nixtla. Nixtla is an early sponsor and collaborator, but this repo is not part of Nixtla's official tooling.
-- **Not a production SLA or support commitment** – This is an experimental prototype intended for development, benchmarking, and reproducibility workflows. No guarantees about uptime, support, or maintenance timelines.
-- **Not a guarantee of optimal performance** – The plugin runs statsforecast models with sensible defaults. It does not claim that any particular model or configuration will be optimal for all workloads. For production forecasting, consult Nixtla's official documentation and best practices.
-
-**Framing**: This is a developer sandbox designed to make it easier for Nixtla users and maintainers to reproduce baseline behavior, share experiments, and collaborate on time series workflows inside Claude Code.
-
----
-
-## Key Features (Phases 1–6)
-
-The **Nixtla Baseline Lab** plugin currently supports:
-
-### 1. Offline Statsforecast Baselines (Phases 1–3)
-
-- **Models**: SeasonalNaive, AutoETS, AutoTheta from Nixtla's `statsforecast` library.
-- **Datasets**:
-  - **M4 Daily** subset (benchmark dataset via `datasetsforecast`).
-  - **Custom CSV** files with columns `unique_id`, `ds`, `y`.
-- **Metrics**: sMAPE (Symmetric Mean Absolute Percentage Error) and MASE (Mean Absolute Scaled Error).
-- **Outputs**:
-  - Metrics CSV (`results_*.csv`) with per-series, per-model metrics.
-  - Human-readable summary file (`summary_*.txt`).
-
-### 2. Benchmark Reports & Compatibility Info (Phase 4)
-
-- **Benchmark Reports**: Markdown-formatted reports suitable for GitHub issues or documentation.
-- **Compatibility Info**: Captures library versions (statsforecast, datasetsforecast, pandas, numpy) for reproducibility.
-- **Version Introspection**: Auto-detects installed library versions to help with debugging and repro.
-
-### 3. Repro Bundles & GitHub Issue Drafts (Phase 5)
-
-- **Repro Bundle**:
-  - `run_manifest.json` – Run configuration (dataset, horizon, models, freq, season_length).
-  - `compat_info.json` – Library versions and environment details.
-  - Metrics CSV, summary, and benchmark report (if generated).
-- **GitHub Issue Draft Generator**:
-  - MCP tool to create pre-filled Markdown issue drafts for `nixtla/statsforecast`.
-  - Includes repro bundle details, making it easier to report questions or issues with full context.
-  - **Note**: This is a community helper, not an official Nixtla issue template.
-
-### 4. Optional TimeGPT Showdown (Phase 6)
-
-- **Strictly Opt-In**: Disabled by default. Requires:
-  - Explicit `include_timegpt=true` flag.
-  - Valid `NIXTLA_TIMEGPT_API_KEY` environment variable.
-- **Cost Control**: Limited to a small number of series (default 5, configurable via `timegpt_max_series`).
-- **Graceful Degradation**: If TimeGPT is unavailable (missing key, SDK, or API error), the baseline run continues normally.
-- **Showdown Report**: Text summary comparing TimeGPT forecasts to best statsforecast baseline on a limited sample (indicative, not conclusive).
-- **Disclaimer**: This repo does not make any guarantees about TimeGPT availability, latency, or cost. Use Nixtla's official TimeGPT documentation as the source of truth.
-
----
-
-## Quickstart (Offline / Statsforecast-Only)
+## Quickstart: Run Your First Baseline (2 Minutes)
 
 **Safe default flow** (no API keys, no network calls, offline-only):
 
-### 1. Clone and Setup
-
 ```bash
-# Clone repo
+# 1. Clone and navigate to plugin
 git clone https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
-cd claude-code-plugins-nixtla
+cd claude-code-plugins-nixtla/plugins/nixtla-baseline-lab
 
-# Navigate to plugin
-cd plugins/nixtla-baseline-lab
-
-# Setup Python environment (creates .venv-nixtla-baseline)
+# 2. Setup Python environment (creates .venv-nixtla-baseline)
 ./scripts/setup_nixtla_env.sh --venv
 
-# Activate virtualenv
+# 3. Activate virtualenv
 source .venv-nixtla-baseline/bin/activate
 
-# Install plugin dependencies
+# 4. Install plugin dependencies
 pip install -r scripts/requirements.txt
+
+# 5. Trust the workspace in Claude Code (follow prompts)
 ```
 
-### 2. Run Baseline Experiment
+### Run Your First Experiment
 
 From Claude Code (after trusting the repo and installing the plugin):
 
@@ -125,31 +66,96 @@ From Claude Code (after trusting the repo and installing the plugin):
 - Loads M4 Daily dataset (subset of 5 series for quick demo).
 - Runs SeasonalNaive, AutoETS, AutoTheta models with horizon=7.
 - Calculates sMAPE and MASE metrics.
-- Generates:
+- Generates complete reproducibility bundle:
   - `results_M4_Daily_h7.csv` – Metrics table.
   - `summary_M4_Daily_h7.txt` – Human-readable summary.
   - `benchmark_report_M4_Daily_h7.md` – Markdown report.
-  - `run_manifest.json` – Run configuration.
-  - `compat_info.json` – Library versions.
+  - `run_manifest.json` – Run configuration (for exact reproduction).
+  - `compat_info.json` – Library versions (statsforecast, pandas, numpy).
 
 **No API keys required. No network calls. Offline-only by default.**
 
-### 3. Review Results
+### Review Your Results
 
 ```bash
-# View metrics
-cat nixtla_baseline_m4_demo/results_M4_Daily_h7.csv
-
-# View summary
+# View human-readable summary
 cat nixtla_baseline_m4_demo/summary_M4_Daily_h7.txt
 
-# View benchmark report
+# View detailed metrics
+cat nixtla_baseline_m4_demo/results_M4_Daily_h7.csv
+
+# View benchmark report (GitHub-ready)
 cat nixtla_baseline_m4_demo/benchmark_report_M4_Daily_h7.md
 ```
 
 ---
 
-## Optional: TimeGPT Showdown (Opt-In Only)
+## Core Capabilities
+
+Now that you've run your first baseline, here's what the plugin offers:
+
+### 1. Offline Statsforecast Baselines
+
+- **Models**: SeasonalNaive, AutoETS, AutoTheta from Nixtla's `statsforecast` library.
+- **Datasets**:
+  - **M4 Daily** subset (benchmark dataset via `datasetsforecast`).
+  - **Custom CSV** files with columns `unique_id`, `ds`, `y`.
+- **Metrics**: sMAPE (Symmetric Mean Absolute Percentage Error) and MASE (Mean Absolute Scaled Error).
+- **Power-User Controls**:
+  - Select specific models: `models=["AutoETS", "AutoTheta"]`
+  - Configure frequency: `freq="D"` (Daily), `"H"` (Hourly), `"W"` (Weekly), `"M"` (Monthly)
+  - Set seasonal period: `season_length=7` (for weekly patterns)
+  - Quick demos: `demo_preset=m4_daily_small` (5 series, horizon=7)
+
+### 2. Reproducibility Bundles
+
+**Problem**: Sharing time series experiments with incomplete context wastes maintainer time.
+
+**Solution**: Automatic repro bundle generation captures everything needed to reproduce your exact run:
+
+- **`run_manifest.json`** – Dataset, horizon, models, frequency, seasonal period
+- **`compat_info.json`** – Library versions (statsforecast, datasetsforecast, pandas, numpy, python)
+- **Metrics CSV + Summary** – Complete results in multiple formats
+
+**Use case**: When asking Nixtla maintainers about unexpected behavior, share your repro bundle for instant context.
+
+### 3. GitHub Issue Draft Generator
+
+**Problem**: Reporting statsforecast issues requires manually gathering metrics, versions, configurations.
+
+**Solution**: One command generates a complete, pre-filled GitHub issue draft:
+
+```
+/nixtla-generate-issue-draft issue_type=question
+```
+
+**What this generates** (`github_issue_draft.md`):
+
+- Issue template (question/bug/benchmark) with proper formatting
+- Your complete benchmark results (metrics table)
+- Run configuration (horizon, models, freq, season_length)
+- Library versions (for reproducibility)
+- Clear instructions for posting to `nixtla/statsforecast`
+
+**Workflow**:
+1. Run your baseline experiment
+2. Generate issue draft
+3. Review and customize the draft
+4. Post manually to [nixtla/statsforecast](https://github.com/Nixtla/statsforecast/issues)
+
+**Note**: This is a **community helper tool** (not an official Nixtla template) that respects maintainer time by providing complete context upfront.
+
+### 4. Benchmark Reports
+
+- **Markdown-formatted reports** suitable for GitHub issues, documentation, or internal sharing.
+- **Compatibility info**: Auto-detects installed library versions for debugging and repro.
+- **Version introspection**: Helps Nixtla maintainers identify version-specific behavior.
+
+---
+
+## Advanced: TimeGPT Comparison (Optional)
+
+**When to use this**: Useful for checking if the Foundation Model approach (zero-shot, complex patterns) outperforms traditional statistics on your specific data signature. For example, if your data has complex seasonality or trend patterns that classical models might miss, TimeGPT's learned representations could provide lift.
 
 **Requirements**:
 
@@ -176,57 +182,97 @@ export NIXTLA_TIMEGPT_API_KEY="your-api-key-here"
 - Generates `timegpt_showdown_M4_Daily_h7.txt` with comparison summary.
 - **Emphasis**: Results based on small sample (3 series) are **indicative, not conclusive**.
 
-**Important Notes**:
+**Cost control**:
+- **Strictly opt-in** (disabled by default)
+- **Series limit** (default 5, configurable via `timegpt_max_series`)
+- **Graceful degradation** (TimeGPT failure doesn't break baseline run)
 
-- TimeGPT comparison is **optional** and has no impact on the default offline behavior.
+**Important notes**:
+
 - You are responsible for monitoring your TimeGPT API usage and costs.
 - This repo makes no guarantees about TimeGPT availability, latency, or pricing.
 - For official TimeGPT documentation, visit [docs.nixtla.io](https://docs.nixtla.io/).
 
 ---
 
-## Repro Bundles & GitHub Issue Drafts
+## Context & Expectations
 
-### Repro Bundle Structure
+Now that you understand what this plugin does, here's what to expect:
 
-After running a baseline experiment, the output directory contains a **reproducibility bundle**:
+### What This Repo Is
+
+- **A developer sandbox** for prototyping reproducible baseline workflows inside Claude Code.
+- **A community helper** that makes it easier to share experimental context with Nixtla maintainers.
+- **A reference implementation** showing how Nixtla OSS libraries can integrate with Claude Code plugins.
+
+### What This Repo Is NOT
+
+Set expectations clearly:
+
+- **Not an official Nixtla product** – This is a community integration maintained by Intent Solutions, not by Nixtla. Nixtla is an early sponsor and collaborator, but this repo is not part of Nixtla's official tooling.
+- **Not a production SLA or support commitment** – This is an experimental prototype intended for development, benchmarking, and reproducibility workflows. No guarantees about uptime, support, or maintenance timelines.
+- **Not a guarantee of optimal performance** – The plugin runs statsforecast models with sensible defaults. It does not claim that any particular model or configuration will be optimal for all workloads. For production forecasting, consult Nixtla's official documentation and best practices.
+
+### Development Principles
+
+**1. Respectful Integration**
+- We build on top of Nixtla's OSS tools, not parallel to them.
+- We focus on automation and reproducibility helpers, not replacement tooling.
+
+**2. Modest Framing**
+- We avoid over-promising ("production-ready", "enterprise-grade", "guaranteed").
+- We prefer "experimental", "prototype", "developer sandbox", "intended to help".
+
+**3. Technical Accuracy**
+- We document what the plugin actually does, not what we hope it might do someday.
+- We provide clear reproducibility information (library versions, run configurations).
+
+**4. Human-Centered**
+- We help developers reproduce experiments and share context with Nixtla maintainers.
+- We require human review for all generated content (issue drafts, reports).
+
+---
+
+## Repository Structure & Documentation
 
 ```
-nixtla_baseline_m4_demo/
-├── results_M4_Daily_h7.csv          # Metrics (sMAPE, MASE per series/model)
-├── summary_M4_Daily_h7.txt          # Human-readable summary
-├── benchmark_report_M4_Daily_h7.md  # Markdown benchmark report
-├── run_manifest.json                # Run configuration (dataset, horizon, models, etc.)
-├── compat_info.json                 # Library versions (statsforecast, pandas, numpy)
-└── timegpt_showdown_*.txt           # Optional TimeGPT comparison (if enabled)
+claude-code-plugins-nixtla/
+├── plugins/
+│   └── nixtla-baseline-lab/        # Main plugin directory
+│       ├── scripts/                # MCP server, setup
+│       ├── skills/                 # AI skill for result interpretation
+│       ├── tests/                  # Golden task harness (CI validation)
+│       ├── data/                   # M4 dataset cache (auto-downloaded)
+│       └── README.md               # Complete plugin manual
+├── scripts/
+│   ├── run_nixtla_review_baseline.sh    # 2-minute offline review demo
+│   └── run_nixtla_review_timegpt.sh     # Optional TimeGPT review
+├── 000-docs/                       # Technical documentation
+│   ├── 6767-OD-*.md               # Overview, architecture, planning
+│   ├── 015-AA-AACR-*.md           # Phase implementation AARs
+│   ├── 034-AA-AACR-release-v0.7.0.md   # Release audit trail
+│   └── 035-OD-RELS-v0-7-0-nixtla-review-kit.md   # Review kit guide
+├── docs/                           # User-facing documentation
+│   ├── index.md                   # Docs home page
+│   └── nixtla-baseline-lab.md     # Complete plugin documentation
+├── CHANGELOG.md                    # Release history (0.1.0 → 0.7.0)
+├── CLAUDE.md                       # Claude Code agent guidance
+└── README.md                       # This file
 ```
 
-**Purpose**: Makes it easy for Nixtla maintainers or collaborators to reproduce your exact run.
+### Documentation Links
 
-### GitHub Issue Draft Generator
+**User-Facing**:
+- **[Plugin Manual](./plugins/nixtla-baseline-lab/README.md)** – Complete setup, usage examples, parameter reference
+- **[Docs Site](./docs/index.md)** – Docs home page
+- **[Plugin Documentation](./docs/nixtla-baseline-lab.md)** – Comprehensive plugin guide
 
-The plugin includes an MCP tool to generate pre-filled GitHub issue drafts:
-
-```
-/nixtla-generate-issue-draft issue_type=question
-```
-
-**What this does**:
-
-- Reads your repro bundle (metrics, manifest, compat info).
-- Generates a Markdown file (`github_issue_draft.md`) with:
-  - Issue template (question/bug/benchmark).
-  - Complete benchmark results.
-  - Run configuration and library versions.
-  - Reproducibility information.
-
-**How to use**:
-
-1. Review `github_issue_draft.md`.
-2. Fill in your specific question or description.
-3. Post to [nixtla/statsforecast](https://github.com/Nixtla/statsforecast/issues) (manually – this is a draft generator, not an auto-poster).
-
-**Note**: This is a **community helper tool**, not an official Nixtla issue template. Be respectful of maintainer time and include all reproducibility information from the draft.
+**Technical**:
+- **[Nixtla Review Kit](./000-docs/035-OD-RELS-v0-7-0-nixtla-review-kit.md)** – For Nixtla engineers reviewing this integration
+- **[Architecture Overview](./000-docs/6767-OD-OVRV-nixtla-baseline-lab-overview.md)** – High-level system design
+- **[Implementation Plan](./000-docs/6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md)** – Development roadmap
+- **[Test Coverage](./000-docs/023-QA-TEST-nixtla-baseline-lab-test-coverage.md)** – Comprehensive test report
+- **[CHANGELOG.md](./CHANGELOG.md)** – Complete version history
 
 ---
 
@@ -254,148 +300,27 @@ The plugin includes an MCP tool to generate pre-filled GitHub issue drafts:
 
 - [Nixtla Documentation](https://docs.nixtla.io/)
 - [statsforecast GitHub](https://github.com/Nixtla/statsforecast)
+- [TimeGPT Documentation](https://docs.nixtla.io/docs/getting-started-timegpt)
 - [Nixtla Community Slack](https://join.slack.com/t/nixtlaworkspace/shared_invite/zt-135dssye9-fWTzMpv2WBthq8NK0Yvu6A)
 
 ---
 
-## Documentation & Further Reading
-
-### Plugin Documentation
-
-- **[plugins/nixtla-baseline-lab/README.md](./plugins/nixtla-baseline-lab/README.md)** – Complete plugin manual with detailed setup, usage examples, and parameter documentation.
-
-### Docs Site
-
-- **[docs/index.md](./docs/index.md)** – Docs home page.
-- **[docs/nixtla-baseline-lab.md](./docs/nixtla-baseline-lab.md)** – Plugin-level documentation.
-
-### Architecture & Phase AARs (000-docs)
-
-**Overview**:
-
-- **[000-docs/6767-OD-OVRV-nixtla-baseline-lab-overview.md](./000-docs/6767-OD-OVRV-nixtla-baseline-lab-overview.md)** – High-level overview and phase summary.
-
-**Architecture**:
-
-- **[000-docs/6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md](./000-docs/6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md)** – Technical architecture and design decisions.
-- **[000-docs/6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md](./000-docs/6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md)** – Implementation roadmap and phase breakdown.
-
-**Phase After-Action Reports (AARs)**:
-
-- **[015-AA-AACR-phase-01-structure-and-skeleton.md](./000-docs/015-AA-AACR-phase-01-structure-and-skeleton.md)** – Plugin scaffolding, marketplace setup.
-- **[016-AA-AACR-phase-02-manifest-and-mcp.md](./000-docs/016-AA-AACR-phase-02-manifest-and-mcp.md)** – MCP server tools, JSON-RPC interface.
-- **[017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md](./000-docs/017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md)** – Statsforecast baselines (SeasonalNaive, AutoETS, AutoTheta) + M4 integration.
-- **[018-AA-AACR-phase-04-testing-and-skills.md](./000-docs/018-AA-AACR-phase-04-testing-and-skills.md)** – Golden task harness + AI skill for result interpretation.
-- **[019-AA-AACR-phase-05-setup-and-validation.md](./000-docs/019-AA-AACR-phase-05-setup-and-validation.md)** – Setup script + dependency validation.
-- **[020-AA-AACR-phase-06-ci-and-marketplace-hardening.md](./000-docs/020-AA-AACR-phase-06-ci-and-marketplace-hardening.md)** – GitHub Actions CI + marketplace finalization.
-- **[021-AA-AACR-phase-07-visualization-csv-parametrization.md](./000-docs/021-AA-AACR-phase-07-visualization-csv-parametrization.md)** – Plot generation + custom CSV support.
-- **[022-AA-AACR-phase-08-timegpt-showdown-and-evals.md](./000-docs/022-AA-AACR-phase-08-timegpt-showdown-and-evals.md)** – TimeGPT integration + showdown reports.
-- **[032-AA-STAT-phase-06-timegpt-showdown-status.md](./000-docs/032-AA-STAT-phase-06-timegpt-showdown-status.md)** – Phase 6 status verification.
-- **[033-AA-AACR-phase-06-timegpt-showdown.md](./000-docs/033-AA-AACR-phase-06-timegpt-showdown.md)** – Phase 6 AAR (optional TimeGPT showdown).
-
-**Testing**:
-
-- **[023-QA-TEST-nixtla-baseline-lab-test-coverage.md](./000-docs/023-QA-TEST-nixtla-baseline-lab-test-coverage.md)** – Comprehensive test coverage report.
-
----
-
-## Repository Structure
-
-```
-claude-code-plugins-nixtla/
-├── plugins/
-│   └── nixtla-baseline-lab/        # Main plugin directory
-│       ├── scripts/                # MCP server, TimeGPT client, setup
-│       ├── skills/                 # AI skill for result interpretation
-│       ├── tests/                  # Golden task harness
-│       ├── data/                   # M4 dataset cache (auto-downloaded)
-│       ├── README.md               # Plugin manual
-│       └── manifest.json           # Plugin manifest
-├── 000-docs/                       # Technical documentation
-│   ├── 6767-OD-*.md               # Overview, architecture, planning
-│   ├── 015-AA-AACR-*.md           # Phase AARs
-│   └── 023-QA-TEST-*.md           # Test coverage
-├── docs/                           # Docs site (MkDocs or similar)
-│   ├── index.md                   # Docs home
-│   └── nixtla-baseline-lab.md     # Plugin docs page
-├── CLAUDE.md                       # Claude Code agent guidance
-├── README.md                       # This file
-└── LICENSE                         # MIT License
-```
-
----
-
-## Development Principles
-
-**1. Respectful Integration**
-
-- We build on top of Nixtla's OSS tools, not parallel to them.
-- We focus on automation and reproducibility helpers, not replacement tooling.
-- We acknowledge Nixtla's sophisticated existing infrastructure.
-
-**2. Modest Framing**
-
-- We avoid over-promising ("production-ready", "enterprise-grade", "guaranteed").
-- We prefer "experimental", "prototype", "developer sandbox", "intended to help".
-- We make no SLAs or support commitments.
-
-**3. Technical Accuracy**
-
-- We document what the plugin actually does, not what we hope it might do someday.
-- We provide clear reproducibility information (library versions, run configurations).
-- We emphasize offline-only default behavior and opt-in network paths.
-
-**4. Human-Centered**
-
-- We help developers reproduce experiments and share context with Nixtla maintainers.
-- We provide draft templates and helpers, not automated posting bots.
-- We require human review for all generated content (issue drafts, reports).
-
----
-
-## Getting Started (Developer Setup)
-
-### Prerequisites
-
-- Python 3.12+
-- Claude Code (latest version)
-- Git
-
-### Quick Setup
-
-```bash
-# Clone repo
-git clone https://github.com/jeremylongshore/claude-code-plugins-nixtla.git
-cd claude-code-plugins-nixtla
-
-# Trust repo in Claude Code
-# (Follow Claude Code prompts to trust the workspace)
-
-# Navigate to plugin
-cd plugins/nixtla-baseline-lab
-
-# Setup environment
-./scripts/setup_nixtla_env.sh --venv
-source .venv-nixtla-baseline/bin/activate
-
-# Install dependencies
-pip install -r scripts/requirements.txt
-
-# Run golden task (validation test)
-python tests/run_baseline_m4_smoke.py
-```
-
-**Expected output**: All 5 validation checks pass (✓).
-
-### CI Status
+## CI Status & Validation
 
 The plugin includes GitHub Actions CI that runs on every push/PR:
 
-- Validates plugin manifest.
-- Runs golden task harness (offline statsforecast baselines).
-- Uploads test artifacts (7-day retention).
+- ✅ Validates plugin manifest
+- ✅ Runs golden task harness (5-step validation)
+- ✅ Uploads test artifacts (7-day retention)
 
 **CI remains offline-only** – No TimeGPT calls, no network dependencies.
+
+**Golden task validation checks**:
+1. CSV schema (columns: unique_id, model, sMAPE, MASE)
+2. Metrics ranges (sMAPE: 0-200%, MASE > 0)
+3. Summary file content (baseline names, horizon, dataset)
+4. Repro bundle completeness (manifest, compat info)
+5. Exit code (0 = success, 1 = failure)
 
 ---
 
@@ -431,4 +356,4 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 **Maintained by**: Jeremy Longshore (Intent Solutions)
 **Sponsored by**: Nixtla (Max Mergenthaler)
 **Status**: Experimental Prototype | Private Collaboration
-**Version**: 0.7.0 (Phase 7 – Docs Refresh)
+**Version**: 0.7.0
