@@ -4,436 +4,228 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Private agentic engineering workspace for Nixtla time series forecasting. Built on Bob's Brain architecture (Vertex AI Agent Engine), this project wraps Nixtla's stack (TimeGPT, StatsForecast, MLForecast, NeuralForecast) with "junior engineer" agents that automate repetitive workflows.
+**Business Showcase Repository for Nixtla CEO (Max Mergenthaler)**
 
-**Status**: Experimental private collaboration between Intent Solutions and Nixtla.
+This repository demonstrates how Claude Code plugins deliver measurable business value to Nixtla through:
+1. **Internal efficiency** - Make Nixtla's team 2-3x more productive
+2. **Business growth** - Expand market reach to Airflow, dbt, and Snowflake customers
 
-## Quick Start Commands
+**Status**: 1 working plugin (Baseline Lab v0.8.0) + 9 complete specifications ready to build
 
-### Development Setup
+**Key Documents**:
+- `README.md` - Business pitch for Max (start here)
+- `000-docs/078-PP-PROD-nixtla-plugin-business-case.md` - Detailed ROI analysis
+
+## Quick Commands
+
+### Plugin Development
 ```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Install project in editable mode
-pip install -e .
-
-# Run all validation checks
-./scripts/validate-all-plugins.sh
-./scripts/validate-marketplace.sh
-```
-
-### Testing
-```bash
-# Run all tests
-pytest
-
-# Run with coverage (must meet 60% threshold)
-pytest --cov=plugins --cov=examples --cov-report=term-missing
-
-# Run specific test categories
-pytest -m unit              # Unit tests only
-pytest -m integration       # Integration tests only
-pytest -m "not slow"        # Exclude slow tests
-
-# Run plugin-specific tests
-pytest plugins/nixtla-baseline-lab/tests/
-```
-
-### Code Quality
-```bash
-# Format code with Black (line length: 100)
-black .
-
-# Sort imports with isort
-isort .
-
-# Type checking with mypy
-mypy plugins/ examples/
-
-# Linting
-flake8 plugins/ examples/
-```
-
-## Nixtla Baseline Lab Plugin
-
-The primary working component in this repository. This plugin demonstrates all Claude Code plugin capabilities.
-
-### Installation & Setup
-```bash
-# Navigate to plugin directory
+# Try the working plugin
 cd plugins/nixtla-baseline-lab
-
-# Run automated setup (creates virtualenv and installs dependencies)
-/nixtla-baseline-setup
-
-# Or use the setup script directly
 ./scripts/setup_nixtla_env.sh --venv
+# Then in Claude Code: /nixtla-baseline-m4 demo_preset=m4_daily_small
+
+# Run tests
+pytest plugins/nixtla-baseline-lab/tests/
+
+# Validate all plugins
+./scripts/validate-all-plugins.sh
 ```
 
-### Running Baseline Forecasts
+### Documentation Management
 ```bash
-# M4 Daily benchmark with default settings (14-day horizon, 50 series)
-/nixtla-baseline-m4
+# View plugin specifications
+ls -la 000-docs/050-060-*.md  # 9 complete plugin specs
 
-# Custom parameters
-/nixtla-baseline-m4 horizon=7 series_limit=25
+# Read business case
+cat 000-docs/078-PP-PROD-nixtla-plugin-business-case.md
 
-# Custom CSV dataset
-/nixtla-baseline-m4 --dataset-type csv --csv-path /path/to/data.csv
-
-# With visualization plots
-/nixtla-baseline-m4 --enable-plots
-
-# Include TimeGPT comparison (requires NIXTLA_TIMEGPT_API_KEY)
-/nixtla-baseline-m4 --include-timegpt
+# Check release history
+cat CHANGELOG.md
 ```
 
-### Understanding Results
+## Architecture
 
-After running baselines, ask the AI Skill to interpret results:
+### Current Implementation (v0.8.0)
+
+**Nixtla Baseline Lab Plugin** - Production-ready benchmarking tool:
+- **Location**: `plugins/nixtla-baseline-lab/`
+- **Purpose**: Run statsforecast baselines on M4 data, generate reproducibility bundles
+- **Business Impact**: Faster customer issue debugging, easier issue reporting
+
+**Key Components**:
 ```
-Which baseline model performed best overall and why?
+plugins/nixtla-baseline-lab/
+├── scripts/
+│   └── mcp_server.py           # MCP server exposing baseline forecasting
+├── commands/
+│   └── nixtla-baseline-m4.md   # Slash command definition
+├── skills/
+│   └── nixtla-baseline-review/ # AI skill for metric interpretation
+└── tests/
+    └── run_baseline_m4_smoke.py # Golden task validation
 ```
 
-The Skill (`nixtla-baseline-review`) reads the generated CSV metrics and provides AI-powered interpretation of sMAPE and MASE scores.
+### Plugin Specifications (Ready to Build)
 
-## High-Level Architecture
+**9 Complete Specifications** (`000-docs/050-060-*.md`):
 
-The system follows an **orchestrator + specialist agents** pattern:
+**Internal Efficiency (33%)**:
+1. Cost Optimizer - 30-50% API cost reduction
+2. Migration Assistant - Onboarding: weeks → hours
+3. Forecast Explainer - 40% fewer support tickets
 
-```
-User → Orchestrator Agent → Specialist Agents → Nixtla Tools/GitHub
-```
+**Business Growth (67%)**:
+4. VS StatsForecast Benchmark - Increase TimeGPT adoption
+5. ROI Calculator - Shorten sales cycles 2-3 months
+6. Airflow Operator - Enterprise data platform teams
+7. dbt Package - Analytics engineering market
+8. Snowflake Adapter - Fortune 500 contracts
+9. Anomaly Streaming Monitor - Real-time monitoring market
 
-**Implemented Components**:
-- `plugins/nixtla-baseline-lab/` - Production-ready forecasting plugin (v0.6.0)
-  - Commands: `/nixtla-baseline-m4`, `/nixtla-baseline-setup`
-  - Agents: `nixtla-baseline-analyst` for result interpretation
-  - Skills: `nixtla-baseline-review` for AI-powered metric analysis
-  - MCP Server: `nixtla-baseline-mcp` with `run_baselines` tool
-- `claude-code-plugins-plus/` - Plugin marketplace with 200+ Claude Code plugins
-
-**Planned Specialist Agents**:
-- **Backtest QA** - Run backtests on benchmark datasets, compare models
-- **TimeGPT Runner** - Manage TimeGPT experiments with different configs
-- **CI Triage** - Parse CI failures, propose fixes
-- **Doc Sync** - Detect drift between code and documentation
-- **Anomaly Monitor** - Detect anomalies using TimeGPT methods
-
-## Project Structure
+## Repository Structure
 
 ```
 nixtla/
 ├── plugins/
-│   └── nixtla-baseline-lab/     # ✅ Production plugin (v0.6.0)
-│       ├── scripts/
-│       │   ├── nixtla_baseline_mcp.py    # MCP server implementation
-│       │   ├── timegpt_client.py         # TimeGPT integration
-│       │   └── setup_nixtla_env.sh       # Automated setup
-│       ├── commands/
-│       │   ├── nixtla-baseline-m4.md     # M4 baseline command
-│       │   └── nixtla-baseline-setup.md  # Setup command
-│       ├── agents/                        # Subagent definitions
-│       ├── skills/                        # AI skills for interpretation
-│       ├── tests/                         # Golden task harness
-│       └── data/                          # Benchmark datasets
-├── claude-code-plugins-plus/              # Plugin marketplace
-├── 000-docs/                              # Technical documentation
-├── scripts/                               # Automation scripts
-│   ├── setup-dev-environment.sh
-│   ├── validate-all-plugins.sh
-│   └── validate-marketplace.sh
-├── tests/                                 # Repository-level tests
-├── examples/                              # Usage examples
-├── pyproject.toml                         # Python package config
-├── pytest.ini                             # Test configuration
-└── requirements.txt / requirements-dev.txt
+│   └── nixtla-baseline-lab/     # ✅ Working plugin (v0.8.0)
+│       ├── scripts/             # MCP server, benchmarking logic
+│       ├── skills/              # AI skills for result interpretation
+│       ├── tests/               # Golden task harness
+│       └── README.md            # Plugin user manual
+│
+├── 000-docs/                    # 70 technical documents
+│   ├── 050-060-*.md            # 9 plugin specifications (COMPLETE)
+│   ├── 078-PP-PROD-nixtla-plugin-business-case.md  # Business case
+│   ├── 6767-OD-*.md            # Architecture & planning (4 canonical)
+│   └── 015-022-AA-*.md         # Phase 1-8 implementation AARs
+│
+├── scripts/
+│   ├── run_nixtla_review_baseline.sh    # 2-minute demo
+│   └── cleanup-doc-filing-v3.sh         # Doc-Filing v3.0 compliance
+│
+├── CHANGELOG.md                 # Release history (v0.1.0 → v0.8.0)
+├── VERSION                      # Current: 0.8.0
+└── README.md                    # Business showcase (for Max)
+```
+
+## Document Filing System v3.0
+
+All documentation follows: `NNN-CC-ABCD-description.md`
+
+**Category Codes**:
+- **PP** - Planning & Product requirements
+- **AT** - Architecture & Technical design
+- **AA** - Audits & After-Action Reports
+- **OD** - Overview & Documentation
+- **QA** - Quality Assurance & Testing
+
+**Key Documents**:
+- `078-PP-PROD-nixtla-plugin-business-case.md` - ROI analysis for Max
+- `050-060-AT-ARCH-plugin-*.md` - 9 plugin specifications
+- `6767-OD-OVRV-nixtla-baseline-lab-overview.md` - Product overview
+- `077-OD-RELS-v0-8-0-doc-filing-compliance.md` - Latest release AAR
+
+## Testing
+
+```bash
+# Run full test suite
+pytest
+
+# Run with coverage (minimum 65%)
+pytest --cov=plugins --cov-report=term-missing
+
+# Run specific plugin tests
+pytest plugins/nixtla-baseline-lab/tests/
+
+# Golden task validation (CI uses this)
+cd plugins/nixtla-baseline-lab/tests
+python run_baseline_m4_smoke.py
 ```
 
 ## Nixtla Integration Patterns
 
-Reference code patterns for Nixtla API usage:
-
 ```python
-# TimeGPT
-from nixtla import NixtlaClient
-client = NixtlaClient(api_key='YOUR_API_KEY')
-forecast = client.forecast(df=data, h=24, freq='H', level=[80, 90, 95])
-
-# StatsForecast
+# StatsForecast (currently implemented)
 from statsforecast import StatsForecast
-from statsforecast.models import AutoARIMA, AutoETS, SeasonalNaive
-sf = StatsForecast(models=[AutoARIMA(season_length=12)], freq='M')
+from statsforecast.models import AutoETS, AutoTheta, SeasonalNaive
+sf = StatsForecast(models=[AutoETS(), AutoTheta()], freq='D')
 sf.fit(df)
-forecasts = sf.predict(h=12)
+forecasts = sf.predict(h=14)
 
-# MLForecast
+# TimeGPT (opt-in, requires API key)
+from nixtla import NixtlaClient
+client = NixtlaClient(api_key='NIXTLA_TIMEGPT_API_KEY')
+forecast = client.forecast(df=data, h=24, freq='H')
+
+# MLForecast (future plugin)
 from mlforecast import MLForecast
 from sklearn.ensemble import RandomForestRegressor
-mlf = MLForecast(models=[RandomForestRegressor()], freq='D', lags=[1,7,14])
+mlf = MLForecast(models=[RandomForestRegressor()], freq='D', lags=[1,7])
 mlf.fit(df)
 predictions = mlf.predict(h=30)
 ```
 
-## CI/CD and Validation
+## Critical Messaging
 
-### GitHub Actions Workflows
-```bash
-# Check workflow status
-cat .github/workflows/nixtla-baseline-lab-ci.yml
+**This is a business development tool**, not a technical sandbox. Maintain this framing:
 
-# Workflows run on:
-# - Every push to main
-# - All pull requests
-# - Manual workflow_dispatch
-```
+**What This Is**:
+- Business showcase for Nixtla CEO
+- Proof of execution (1 working plugin + 9 specs)
+- ROI-focused plugin roadmap
+- Market expansion strategy
 
-### CI Guarantees (when green ✅)
-- Baseline runs produce valid CSV outputs with expected metric ranges
-- Golden task harness passes (5-step validation)
-- Setup script succeeds on Ubuntu/Linux
-- TimeGPT integration is opt-in (graceful degradation)
-- Test artifacts preserved for 7 days
-- Coverage meets 60% minimum threshold
+**What This Is NOT**:
+- Not a production SLA (experimental prototype)
+- Not official Nixtla product (community integration)
+- Not over-promising ("guaranteed ROI", "enterprise-ready")
 
-### Golden Task Validation
-The plugin includes a comprehensive test harness that validates:
-1. CSV schema correctness (columns: series_id, model, sMAPE, MASE)
-2. Metric ranges (sMAPE: 0-200%, MASE: >0)
-3. Summary content validation
-4. Model coverage (SeasonalNaive, AutoETS, AutoTheta)
-5. Error handling and graceful failures
+**Language to Use**:
+- ✅ "experimental", "prototype", "showcase", "demonstrates value"
+- ✅ "10x-100x ROI potential", "2-3x team productivity"
+- ✅ "market expansion", "business growth", "internal efficiency"
 
-## Document Organization
+**Language to Avoid**:
+- ❌ "production-ready", "enterprise-grade", "guaranteed"
+- ❌ Any implication this is official Nixtla product
+- ❌ SLAs, support commitments, performance guarantees
 
-Documentation in `000-docs/` follows the Document Filing System v3.0:
+## Version Management
 
-**Format**: `NNN-CC-ABCD-description.md`
+**Current Version**: 0.8.0 (Doc-Filing v3.0 Compliance)
 
-**Key Documents**:
-- **6767-OD-OVRV-nixtla-baseline-lab-product-overview.md** - Product overview, user journey
-- **6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md** - Technical architecture
-- **6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md** - Implementation roadmap
-- **015-022-AA-AACR-phase-NN-*.md** - Phase-by-phase After-Action Reports (AARs)
-- **023-QA-TEST-nixtla-baseline-lab-test-coverage.md** - Test coverage report
+**Release Process**:
+1. Update `VERSION` file
+2. Update `CHANGELOG.md` with release notes
+3. Create release AAR in `000-docs/0NN-OD-RELS-*.md`
+4. Update README version references
+5. Tag: `git tag -a v0.X.Y -m "Release vX.Y.Z"`
+6. Push: `git push origin main --tags`
 
-**Category Codes**:
-- **PP** - Planning & Product requirements
-- **AA** - Audits & After-Action Reports
-- **AT** - Architecture & Technical design
-- **OD** - Overview & Documentation
-- **QA** - Quality Assurance & Testing
+**Semantic Versioning**:
+- **MAJOR**: Breaking changes, major architectural shifts
+- **MINOR**: New plugins, additive features, significant improvements
+- **PATCH**: Bug fixes, documentation, CI tweaks
 
-## Environment Variables
+## Contact & Collaboration
 
-**Required for TimeGPT Integration** (optional feature):
-```bash
-NIXTLA_TIMEGPT_API_KEY=your_api_key_here
-```
+**Maintained by**: Intent Solutions (Jeremy Longshore)
+- Email: jeremy@intentsolutions.io
+- Phone: 251.213.1115
 
-**Plugin Development**:
-```bash
-# No environment variables required for baseline models
-# Baselines use public M4 data and open-source libraries
-```
+**Sponsored by**: Nixtla (Max Mergenthaler)
+- Email: max@nixtla.io
 
-## Key Dependencies
+**Purpose**: Demonstrate plugin value to Nixtla, drive plugin investment decision for Q1 2026
 
-**Baseline Lab Plugin**:
-- `statsforecast>=1.5.0` - Classical forecasting methods
-- `datasetsforecast>=0.0.8` - M4 benchmark datasets
-- `nixtla>=0.5.1` - TimeGPT client (optional)
-- `pandas>=2.0.0` - Data manipulation
-- `matplotlib>=3.7.0` - Visualization (optional)
+## Next Steps for Max
 
-**Development**:
-- `pytest>=7.4.0` - Testing framework
-- `pytest-cov>=4.1.0` - Coverage reporting
-- `black>=23.0.0` - Code formatting
-- `mypy>=1.4.0` - Type checking
-- `flake8>=6.0.0` - Linting
+When Max reviews this repo, guide him through:
 
-## Reference Architecture
+1. **Try the plugin** (5 min): `/nixtla-baseline-m4 demo_preset=m4_daily_small`
+2. **Read business case** (10 min): `000-docs/078-PP-PROD-nixtla-plugin-business-case.md`
+3. **Pick top 3 plugins** (15 min): Review `000-docs/051-059-AT-ARCH-*.md`
+4. **Schedule call**: Discuss priorities, timeline, ROI
 
-This project adapts patterns from **Bob's Brain** (https://github.com/jeremylongshore/bobs-brain):
-
-**Core Patterns**:
-- **Vertex AI Agent Engine** for orchestration
-- **A2A protocol** for agent communication
-- **Golden tasks** for validation
-- **CI-only deployments** with guardrails
-- **Human-in-the-loop** review for all changes
-- **ARV-style validation** before deployment
-
-**Specialist Agent Architecture**:
-- Orchestrator delegates to domain-specific agents
-- Each specialist has deep knowledge of one workflow
-- Agents communicate through structured interfaces
-- Comprehensive test coverage and telemetry
-
-## Common Development Workflows
-
-### Adding a New Plugin Command
-1. Create `commands/command-name.md` with YAML frontmatter
-2. Define parameters and usage examples
-3. Implement MCP tool in `scripts/` if needed
-4. Add tests in `tests/`
-5. Update plugin README
-
-### Running the Full Test Suite
-```bash
-# Run validation scripts first
-./scripts/validate-all-plugins.sh
-./scripts/validate-marketplace.sh
-
-# Then run pytest
-pytest --cov=plugins --cov=examples --cov-report=term-missing
-
-# Check coverage threshold (must be ≥60%)
-```
-
-### Debugging Plugin Issues
-```bash
-# Check MCP server logs
-cat plugins/nixtla-baseline-lab/.mcp.json
-
-# Run baseline script directly
-cd plugins/nixtla-baseline-lab
-python scripts/nixtla_baseline_mcp.py
-
-# Validate virtualenv setup
-ls -la .venv-nixtla-baseline/
-
-# Test with dry-run
-/nixtla-baseline-m4 series_limit=1 horizon=1
-```
-
-### Updating Documentation
-```bash
-# Follow Document Filing System v3.0 format
-# See: 000-docs/003-DR-META-document-standards.md
-
-# Create new doc
-# Format: NNN-CC-ABCD-description.md
-# Example: 024-AA-AUDT-new-audit-report.md
-```
-
-## Testing Philosophy
-
-**Golden Task Harness**:
-- Every plugin has a golden task that validates core functionality
-- Tests run on every CI build
-- Metrics must fall within expected ranges
-- Exit code 0 required for CI success
-
-**Test Organization**:
-- `tests/` - Repository-level tests
-- `plugins/*/tests/` - Plugin-specific tests
-- Use pytest markers: `@pytest.mark.unit`, `@pytest.mark.integration`, `@pytest.mark.slow`
-
-**Coverage Requirements**:
-- Minimum 60% coverage enforced by pytest
-- Focus on critical paths and error handling
-- Use `pytest --cov-report=html` for detailed coverage reports
-
----
-
-## Current State Snapshot (Phase 7 – v0.7.0)
-
-**Last Updated**: 2025-11-26
-
-This section helps future AI agents working in this repository understand the current state after Phases 1-6 implementation.
-
-### What Exists Now
-
-**Primary Component**:
-- **Nixtla Baseline Lab Plugin** – The ONLY fully implemented and working component in this repository.
-  - Location: `plugins/nixtla-baseline-lab/`
-  - Status: Experimental prototype (v0.7.0)
-  - Purpose: Reproducible statsforecast baseline experiments inside Claude Code.
-
-**Core Capabilities** (Phases 1-6):
-1. **Offline Statsforecast Baselines** – SeasonalNaive, AutoETS, AutoTheta models on M4/custom CSV.
-2. **Metrics & Benchmarking** – sMAPE, MASE calculation + Markdown benchmark reports.
-3. **Repro Bundles** – `run_manifest.json`, `compat_info.json` for reproducibility.
-4. **GitHub Issue Draft Generator** – Pre-filled Markdown drafts for `nixtla/statsforecast`.
-5. **Optional TimeGPT Showdown** – Opt-in comparison (disabled by default, requires API key).
-6. **CI Validation** – GitHub Actions golden task harness (offline-only).
-
-**Key Files That Must Stay Accurate**:
-- **Root README.md** – Repository overview with modest, technically accurate framing.
-- **docs/index.md** – Docs site home page aligned with plugin capabilities.
-- **docs/nixtla-baseline-lab.md** – Plugin-level documentation page.
-- **000-docs/6767-OD-OVRV-nixtla-baseline-lab-overview.md** – Compact canonical overview.
-- **plugins/nixtla-baseline-lab/README.md** – Complete plugin manual.
-- **Phase AARs (015-AA-AACR-* through 033-AA-AACR-*)** – Implementation history.
-
-### Critical Messaging Guidelines
-
-**Always maintain this framing**:
-- This is a **community integration**, not an official Nixtla product.
-- **Maintained by**: Intent Solutions (Jeremy Longshore).
-- **Sponsored by**: Nixtla (Max Mergenthaler – early/enterprise supporter).
-- Status: **Experimental prototype** / **developer sandbox**.
-
-**Language to AVOID**:
-- ❌ "production-ready", "enterprise-grade", "guaranteed", "always", "will", "promises"
-- ❌ Any implication that Nixtla has formally adopted or endorsed this as an official product
-- ❌ SLAs, support commitments, or performance guarantees
-
-**Language to PREFER**:
-- ✅ "experimental", "prototype", "developer sandbox", "integration", "helper"
-- ✅ "intended to help developers...", "designed to make it easier to..."
-- ✅ "reproducible experiments", "sharing context", "reference implementation"
-
-### What Must Not Be Broken
-
-**Offline-Only Default Behavior**:
-- Plugin must work without ANY API keys or network calls by default.
-- TimeGPT is strictly opt-in (requires `include_timegpt=true` AND `NIXTLA_TIMEGPT_API_KEY`).
-- CI remains offline-only (no network dependencies).
-
-**Backward Compatibility**:
-- Existing commands, parameters, and tool schemas must not break.
-- Golden task harness must continue to pass on every CI run.
-- File outputs (CSV, summary, benchmark report) must maintain current structure.
-
-**Documentation Accuracy**:
-- Any changes to plugin behavior must be reflected in:
-  - Root README.md
-  - Plugin README.md  
-  - Docs site pages (index.md, nixtla-baseline-lab.md)
-  - Relevant phase AARs
-
-### Future Work Reminders
-
-**What Phases 1-6 Did NOT Implement**:
-- ❌ Multi-agent orchestration system (mentioned in old README, never built)
-- ❌ Bob's Brain-style specialist agents (conceptual only, not implemented)
-- ❌ Automated PR posting or issue posting (only draft generators exist)
-- ❌ Production-grade TimeGPT integration (only experimental opt-in showdown)
-
-**If Adding New Features**:
-1. Maintain offline-only default (opt-in for network calls).
-2. Update ALL relevant docs (README, plugin README, docs site, overview).
-3. Add golden task validation if core functionality changes.
-4. Create phase AAR documenting changes.
-5. Use modest framing (experimental, prototype, helper).
-
-### Contact & Escalation
-
-**For questions about plugin architecture or implementation**:
-- Review phase AARs (000-docs/015-AA-AACR-* through 033-AA-AACR-*).
-- Check overview doc (000-docs/6767-OD-OVRV-nixtla-baseline-lab-overview.md).
-- Reference plugin README (plugins/nixtla-baseline-lab/README.md).
-
-**For questions about Nixtla collaboration or messaging**:
-- **Jeremy Longshore** (Intent Solutions): jeremy@intentsolutions.io
-- **Max Mergenthaler** (Nixtla): max@nixtla.io
-
----
-
-**End of Current State Snapshot**
-
-This snapshot reflects the state as of Phase 7 (Docs Refresh). Future agents should treat this as the baseline understanding of what exists and what must be preserved.
+**The Ask**: "Which 3 plugins deliver the most value in Q1 2026?"
