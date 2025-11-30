@@ -419,25 +419,36 @@ Set expectations clearly:
 ```
 claude-code-plugins-nixtla/
 ├── plugins/
-│   └── nixtla-baseline-lab/        # Main plugin directory
-│       ├── scripts/                # MCP server, setup
-│       ├── skills/                 # AI skill for result interpretation
-│       ├── tests/                  # Golden task harness (CI validation)
-│       ├── data/                   # M4 dataset cache (auto-downloaded)
-│       └── README.md               # Complete plugin manual
+│   ├── nixtla-baseline-lab/        # Main plugin directory
+│   │   ├── scripts/                # MCP server, setup
+│   │   ├── skills/                 # AI skill for result interpretation
+│   │   ├── tests/                  # Golden task harness (CI validation)
+│   │   ├── data/                   # M4 dataset cache (auto-downloaded)
+│   │   └── README.md               # Complete plugin manual
+│   ├── nixtla-bigquery-forecaster/ # BigQuery Cloud Functions plugin
+│   └── nixtla-search-to-slack/     # Content discovery plugin
 ├── scripts/
 │   ├── run_nixtla_review_baseline.sh    # 2-minute offline review demo
-│   └── run_nixtla_review_timegpt.sh     # Optional TimeGPT review
-├── 000-docs/                       # Technical documentation
-│   ├── 6767-OD-*.md               # Overview, architecture, planning
-│   ├── 015-AA-AACR-*.md           # Phase implementation AARs
-│   ├── 034-AA-AACR-release-v0.7.0.md   # Release audit trail
-│   └── 035-OD-RELS-v0-7-0-nixtla-review-kit.md   # Review kit guide
+│   ├── run_nixtla_review_timegpt.sh     # Optional TimeGPT review
+│   └── cleanup-doc-filing-v3.sh         # Doc-Filing v3.0 cleanup script
+├── 000-docs/                       # Technical documentation (69 files)
+│   ├── 6767-OD-*.md               # Overview, architecture, planning (4 canonical docs)
+│   ├── 015-022-AA-AACR-*.md       # Phase implementation AARs (Phases 1-8)
+│   ├── 050-060-*.md               # Plugin specification series (9 plugin specs)
+│   ├── 061-076-*.md               # Migrated documentation (guides, memos)
+│   ├── 077-OD-RELS-v0-8-0-doc-filing-compliance.md   # Latest release AAR
+│   └── README.md                  # Documentation index
 ├── docs/                           # User-facing documentation
 │   ├── index.md                   # Docs home page
-│   └── nixtla-baseline-lab.md     # Complete plugin documentation
+│   ├── nixtla-baseline-lab.md     # Complete plugin documentation
+│   └── architecture.md            # Architecture overview
+├── archive/                        # Historical backups
+│   └── backups-20251108/          # Archived plugin backups (6,517 files)
+├── claude-code-plugins-plus/       # Plugin marketplace (200+ plugins)
+├── examples/                       # Integration examples
 ├── CHANGELOG.md                    # Release history (0.1.0 → 0.8.0)
 ├── CLAUDE.md                       # Claude Code agent guidance
+├── VERSION                         # Current version: 0.8.0
 └── README.md                       # This file
 ```
 
