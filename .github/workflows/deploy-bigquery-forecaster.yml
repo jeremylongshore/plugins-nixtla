@@ -1,0 +1,141 @@
+name: Deploy Nixtla BigQuery Forecaster
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'plugins/nixtla-bigquery-forecaster/**'
+      - '.github/workflows/deploy-bigquery-forecaster.yml'
+  workflow_dispatch:  # Allow manual deployment
+
+env:
+  REGION: us-central1
+  FUNCTION_NAME: nixtla-bigquery-forecast
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  deploy-to-gcp:
+    name: Deploy Cloud Function to GCP
+    runs-on: ubuntu-latest
+
+    # Required for Workload Identity Federation
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+          cache-dependency-path: 'plugins/nixtla-bigquery-forecaster/requirements.txt'
+
+      - name: Install dependencies
+        working-directory: plugins/nixtla-bigquery-forecaster
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip list | grep -E "(statsforecast|google-cloud|pandas|numpy|nixtla)"
+
+      # Authenticate with GCP using Workload Identity Federation (keyless)
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Verify GCP authentication
+        run: |
+          gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
+          gcloud auth list
+          gcloud config list
+
+      # Deploy Cloud Function (2nd gen)
+      - name: Deploy Cloud Function
+        working-directory: plugins/nixtla-bigquery-forecaster
+        run: |
+          echo "Deploying Cloud Function to ${{ env.REGION }}..."
+
+          gcloud functions deploy ${{ env.FUNCTION_NAME }} \
+            --gen2 \
+            --runtime=python${{ env.PYTHON_VERSION }} \
+            --region=${{ env.REGION }} \
+            --source=. \
+            --entry-point=forecast_handler \
+            --trigger-http \
+            --allow-unauthenticated \
+            --set-env-vars="NIXTLA_TIMEGPT_API_KEY=${{ secrets.NIXTLA_TIMEGPT_API_KEY }}" \
+            --memory=2Gi \
+            --timeout=540s \
+            --max-instances=10 \
+            --project=${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Get Cloud Function URL
+        id: function-url
+        run: |
+          FUNCTION_URL=$(gcloud functions describe ${{ env.FUNCTION_NAME }} \
+            --region=${{ env.REGION }} \
+            --project=${{ secrets.GCP_PROJECT_ID }} \
+            --gen2 \
+            --format="value(serviceConfig.uri)")
+          echo "FUNCTION_URL=${FUNCTION_URL}" >> $GITHUB_OUTPUT
+          echo "Cloud Function URL: ${FUNCTION_URL}"
+
+      # Test the deployed function
+      - name: Test Cloud Function deployment
+        env:
+          FUNCTION_URL: ${{ steps.function-url.outputs.FUNCTION_URL }}
+        run: |
+          echo "Testing deployed Cloud Function..."
+
+          # Test with BigQuery public data (Chicago taxi trips)
+          curl -X POST "${FUNCTION_URL}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "project_id": "bigquery-public-data",
+              "dataset": "chicago_taxi_trips",
+              "table": "taxi_trips",
+              "timestamp_col": "trip_start_timestamp",
+              "value_col": "trip_total",
+              "group_by": "payment_type",
+              "horizon": 7,
+              "limit": 1000
+            }' \
+            -o deployment-test-result.json
+
+          # Check if response is valid JSON
+          cat deployment-test-result.json | python -m json.tool
+
+          echo "✅ Cloud Function deployment test successful!"
+
+      - name: Upload deployment test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-test-results
+          path: deployment-test-result.json
+          retention-days: 7
+
+      - name: Deployment summary
+        run: |
+          echo "## 🚀 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Cloud Function**: ${{ env.FUNCTION_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Region**: ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Project**: ${{ secrets.GCP_PROJECT_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "**URL**: ${{ steps.function-url.outputs.FUNCTION_URL }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Test Command" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo 'curl -X POST "${{ steps.function-url.outputs.FUNCTION_URL }}" \' >> $GITHUB_STEP_SUMMARY
+          echo '  -H "Content-Type: application/json" \' >> $GITHUB_STEP_SUMMARY
+          echo '  -d '"'"'{"project_id": "bigquery-public-data", "dataset": "chicago_taxi_trips", "table": "taxi_trips", "timestamp_col": "trip_start_timestamp", "value_col": "trip_total", "horizon": 7}'"'"'' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
