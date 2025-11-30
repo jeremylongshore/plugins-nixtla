@@ -1,6 +1,6 @@
-# Claude Code Plugins – Nixtla Baseline Lab
+# Claude Code Plugins – Nixtla Ecosystem
 
-> Private, community-built Claude Code integration around Nixtla's statsforecast and TimeGPT for repeatable time series baseline experiments.
+> Private, community-built Claude Code integrations around Nixtla's statsforecast and TimeGPT. **2 Plugins**: Baseline Lab (benchmarking) + BigQuery Forecaster (production forecasts on cloud data).
 
 [![Private Repository](https://img.shields.io/badge/Repository-Private-red)](https://github.com/jeremylongshore/claude-code-plugins-nixtla)
 [![Experimental](https://img.shields.io/badge/Status-Experimental-orange)](https://github.com/jeremylongshore/claude-code-plugins-nixtla)
@@ -37,6 +37,73 @@ This repository is a **developer sandbox** for building and testing Claude Code 
 - CI-backed, reproducible statsforecast baseline experiments inside Claude Code.
 - One-command capture of metrics, library versions, and run configurations for sharing with Nixtla maintainers or collaborators.
 - A reference implementation showing how to integrate Nixtla OSS libraries into Claude Code plugins.
+
+---
+
+## 🔌 Plugins in This Repo
+
+### Plugin 1: Nixtla Baseline Lab
+**Purpose**: Run statsforecast baselines (AutoETS, AutoTheta) on M4 benchmark data. Perfect for research and model evaluation.
+
+**Quick Demo**:
+```bash
+/nixtla-baseline-m4 demo_preset=m4_daily_small
+```
+
+**Output**: Metrics (sMAPE, MASE), repro bundles, GitHub issue drafts
+
+---
+
+### Plugin 2: Nixtla BigQuery Forecaster ⭐ NEW
+
+> **What it is**: Run Nixtla statsforecast models on BigQuery data via Cloud Functions
+> **Why it exists**: Showcase what's possible with Claude Code plugins + Nixtla + Google Cloud
+> **Who it's for**: Anyone who wants to forecast BigQuery time series data
+
+#### 2-Minute Demo
+
+Uses **PUBLIC** Chicago taxi data (200M+ rows). Zero setup on your end.
+
+**Step 1: Deploy** (GitHub Actions handles everything)
+
+**Step 2: Test**
+```bash
+curl -X POST "FUNCTION_URL" -d '{
+  "project_id": "bigquery-public-data",
+  "dataset": "chicago_taxi_trips",
+  "table": "taxi_trips",
+  "timestamp_col": "trip_start_timestamp",
+  "value_col": "trip_total",
+  "group_by": "payment_type",
+  "horizon": 7,
+  "source_project": "bigquery-public-data"
+}'
+```
+
+**Step 3: Get Results**
+- Forecasts for next 7 days
+- AutoETS + AutoTheta models (official Nixtla statsforecast)
+- Payment types: Cash, Credit Card, Mobile, etc.
+
+#### What This Shows
+
+✅ **Nixtla OSS works great on massive datasets** (we tested with 100K+ rows)
+✅ **Serverless deployment is easy** (Cloud Functions auto-scale)
+✅ **Real-world data, real-world use case** (not toy examples)
+
+#### Ideas for Max
+
+Could this become:
+- Customer demo for "Nixtla + BigQuery"?
+- Internal tool for testing statsforecast at scale?
+- Template for building Nixtla integrations?
+- Proof point for Google Cloud partnerships?
+
+**We don't know. Just sharing what we built.**
+
+**Setup**: See `plugins/nixtla-bigquery-forecaster/` and `GCP-SETUP-COMPLETE.md`
+
+**Built with**: Nixtla statsforecast, Google Cloud, Claude Code | **Time to build**: 48 hours | **Status**: Working demo, tested with real data
 
 ---
 
