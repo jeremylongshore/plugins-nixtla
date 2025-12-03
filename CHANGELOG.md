@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-12-03
+
+### Summary
+Skills Pack release - Added 8 Claude Skills achieving 95%+ compliance, created DeFi Sentinel technical exploration, and provided CEO quickstart guide.
+
+### Added
+- **Claude Skills Pack**: 8 AI agent skills with 95%+ compliance
+  - `nixtla-timegpt-lab` - Mode skill (transforms Claude into Nixtla expert)
+  - `nixtla-experiment-architect` - Scaffold experiments
+  - `nixtla-schema-mapper` - Map data to Nixtla formats
+  - `nixtla-timegpt-finetune-lab` - Fine-tuning guidance
+  - `nixtla-prod-pipeline-generator` - Production pipelines
+  - `nixtla-usage-optimizer` - Cost optimization
+  - `nixtla-skills-bootstrap` - Install/update skills
+  - `nixtla-skills-index` - List skills
+  - Skills location: `skills-pack/.claude/skills/`
+  - Documented: Phase 0-2 compliance work (015-022-AA-*.md)
+
+- **DeFi Sentinel Concept**: Technical exploration (6 documents)
+  - Location: `000-docs/plugins/nixtla-defi-sentinel/`
+  - Business case, PRD, architecture, user journeys, technical spec, status
+  - Explores TimeGPT application to blockchain anomaly detection
+  - Reference implementation (not a product proposal)
+  - Context: Anthropic's SCONE-bench research on AI security
+
+- **CEO Quickstart Guide**: `FOR-MAX-QUICKSTART.md`
+  - 10-minute plugin demo instructions
+  - Step-by-step installation (2 options: terminal or Claude Code)
+  - Safe offline statsforecast demo
+  - Optional TimeGPT comparison (opt-in)
+  - Overview of repo contents (1 working plugin, 9 specs, 8 skills)
+
+### Changed
+- Updated README with Skills Pack section (95%+ compliance achievement)
+- Refined DeFi Sentinel documentation tone (technical exploration vs sales pitch)
+
+### Fixed
+- Removed marketing language from DeFi Sentinel docs (factual technical info only)
+
 ## [1.1.0] - 2025-11-30
 
 ### Summary

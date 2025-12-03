@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "claude-code-plugins-nixtla"
-version = "0.7.0"
+version = "1.2.0"
 description = "Claude Code plugins for Nixtla time series forecasting ecosystem"
 readme = "README.md"
 requires-python = ">=3.9"
