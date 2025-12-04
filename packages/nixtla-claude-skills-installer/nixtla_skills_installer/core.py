@@ -6,12 +6,14 @@ This module handles:
 - Ensuring target directories exist
 - Copying skills to user projects
 - Listing installed skills
+- Extracting version information from SKILL.md files
 """
 
 import os
+import re
 import shutil
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Dict
 
 
 def locate_skills_source() -> Path:
@@ -101,6 +103,55 @@ def list_nixtla_skills(directory: Path) -> List[str]:
     return sorted(nixtla_skills)
 
 
+def extract_skill_version(skill_dir: Path) -> Optional[str]:
+    """
+    Extract version from a skill's SKILL.md frontmatter.
+
+    Args:
+        skill_dir: Path to skill directory (e.g., .claude/skills/nixtla-timegpt-lab)
+
+    Returns:
+        Version string if found (e.g., "0.3.0"), None otherwise
+    """
+    skill_md = skill_dir / "SKILL.md"
+
+    if not skill_md.exists():
+        return None
+
+    try:
+        with open(skill_md, 'r', encoding='utf-8') as f:
+            content = f.read(1000)  # Read first 1000 chars (frontmatter should be near top)
+
+        # Look for version: in YAML frontmatter
+        # Matches: version: "0.3.0" or version: 0.3.0
+        match = re.search(r'version:\s*["\']?([0-9]+\.[0-9]+\.[0-9]+)["\']?', content)
+        if match:
+            return match.group(1)
+
+    except Exception:
+        pass  # Silently fail if can't read file
+
+    return None
+
+
+def get_skill_versions(skills_dir: Path, skill_names: List[str]) -> Dict[str, Optional[str]]:
+    """
+    Get versions for multiple skills.
+
+    Args:
+        skills_dir: Directory containing skills
+        skill_names: List of skill names
+
+    Returns:
+        Dict mapping skill name to version (or None if not found)
+    """
+    versions = {}
+    for skill in skill_names:
+        skill_path = skills_dir / skill
+        versions[skill] = extract_skill_version(skill_path)
+    return versions
+
+
 def preview_install(source_dir: Path, target_dir: Path) -> Tuple[List[str], List[str], List[str]]:
     """
     Preview what will happen during install/update.
@@ -180,17 +231,30 @@ def copy_skills_to_project(
         print("⚠️  No Nixtla skills found in source directory!")
         return 0
 
+    # Get version information
+    source_versions = get_skill_versions(source_dir, all_skills)
+    target_versions = get_skill_versions(target_dir, existing_skills) if existing_skills else {}
+
     # Show preview
     print(f"\n📊 Install Preview:")
     print(f"   Total skills in source: {len(all_skills)}")
     if new_skills:
         print(f"   New skills: {len(new_skills)}")
         for skill in new_skills:
-            print(f"      + {skill}")
+            version = source_versions.get(skill)
+            version_str = f" (v{version})" if version else ""
+            print(f"      + {skill}{version_str}")
     if existing_skills:
         print(f"   Existing skills (will overwrite): {len(existing_skills)}")
         for skill in existing_skills:
-            print(f"      ↻ {skill}")
+            old_version = target_versions.get(skill)
+            new_version = source_versions.get(skill)
+            if old_version and new_version and old_version != new_version:
+                print(f"      ↻ {skill} (v{old_version} → v{new_version})")
+            elif new_version:
+                print(f"      ↻ {skill} (→ v{new_version})")
+            else:
+                print(f"      ↻ {skill}")
 
     # Confirm if overwriting existing skills (unless force flag)
     if not force and existing_skills:
@@ -245,7 +309,7 @@ def list_installed_skills(project_dir: Path) -> List[str]:
 
 def print_installed_skills_summary(project_dir: Path) -> None:
     """
-    Print a summary of installed Nixtla skills.
+    Print a summary of installed Nixtla skills with version information.
 
     Args:
         project_dir: Path to project root
@@ -257,10 +321,15 @@ def print_installed_skills_summary(project_dir: Path) -> None:
         print("   Run 'nixtla-skills init' to install.")
         return
 
+    # Get versions
+    skills_dir = project_dir / ".claude" / "skills"
+    versions = get_skill_versions(skills_dir, skills)
+
     print(f"\n✅ Installed Nixtla Skills ({len(skills)}):")
     for skill in skills:
-        skill_path = project_dir / ".claude" / "skills" / skill
-        print(f"   - {skill}")
+        version = versions.get(skill)
+        version_str = f" v{version}" if version else ""
+        print(f"   - {skill}{version_str}")
         print(f"     Location: .claude/skills/{skill}")
 
     print(f"\nℹ️  These skills are installed locally in this project.")
