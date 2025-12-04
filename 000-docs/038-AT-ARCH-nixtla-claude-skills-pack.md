@@ -247,21 +247,48 @@ Bootstrap Skill:
 
 ---
 
-## Skills Universe (9 Implemented)
+## Skills Universe (8 Implemented)
 
-### Implemented Skills (9 Skills)
+### Core Skills (Phase 4 - v0.4.0)
 
-**Status**: All implemented and compliant with Nixtla SKILL Standard
+**Status**: Production-ready with full pack implementation
+
+These seven skills comprise the complete Nixtla Skills Pack v0.4.0:
+
+**Foundational Skills** (Phases 2-3):
+| Skill | Type | Pattern | Description |
+|-------|------|---------|-------------|
+| `nixtla-timegpt-lab` | Mode | Wizard | Transforms Claude into Nixtla forecasting expert with environment detection and Nixtla-first bias |
+| `nixtla-experiment-architect` | Utility | Script Automation + Read-Process-Write | Scaffolds complete forecasting experiments with config files, experiment harness, and multi-model comparison |
+| `nixtla-schema-mapper` | Utility | Read-Process-Write + Schema Contract | Infers data schema and generates Nixtla-compatible transformations with comprehensive documentation |
+
+**Advanced Skills** (Phase 4 - NEW):
+| Skill | Type | Pattern | Description |
+|-------|------|---------|-------------|
+| `nixtla-timegpt-finetune-lab` | Utility | Wizard + Script Automation | Guides TimeGPT fine-tuning workflows from dataset prep to comparison experiments (942 lines) |
+| `nixtla-prod-pipeline-generator` | Utility | Script Automation + Read-Process-Write | Transforms experiments into production-ready Airflow/Prefect/cron pipelines with monitoring (1146 lines) |
+| `nixtla-usage-optimizer` | Utility | Read-Process-Write + Audit | Analyzes Nixtla library usage patterns and recommends cost/performance routing strategies (583 lines) |
+
+**Infrastructure Skills**:
+| Skill | Type | Pattern | Description |
+|-------|------|---------|-------------|
+| `nixtla-skills-bootstrap` | Infra | Wizard + Bash | Installs and updates Nixtla skills via nixtla-skills CLI with guided wizard interface |
+
+**Key Characteristics (Phase 4 Implementation)**:
+- **Version**: 0.4.0 (advanced skills, demo project, DevOps guide)
+- **Installer**: `nixtla-skills` CLI (v0.4.0) for per-project installation
+- **Version Tracking**: Skills display version in frontmatter, installer shows old → new during updates
+- **Frontmatter Compliance**: All fields present (name, description, version, model, allowed-tools, mode, disable-model-invocation, license)
+- **Body Structure**: All standard sections (Purpose, Overview, Prerequisites, Instructions, Output, Error Handling, Examples, Resources)
+- **Tool Permissions**: Tight, minimal permissions per skill pattern
+- **Content Quality**: 403-1146 lines each with comprehensive examples, troubleshooting, and best practices
+- **Demo Project**: End-to-end workflow demonstration in `demo-project/`
+- **DevOps Guide**: Comprehensive operations guide in `000-docs/046-OD-DEVOPS-nixtla-skills-operations-guide.md`
+
+### Additional Skills (Phase 1 - Reference Only)
 
 | Skill | Type | Description |
 |-------|------|-------------|
-| `nixtla-timegpt-lab` | Mode | Transforms Claude into Nixtla forecasting expert |
-| `nixtla-experiment-architect` | Utility | Design and scaffold complete forecasting experiments |
-| `nixtla-schema-mapper` | Utility | Infer schema, generate Nixtla-compatible transformations |
-| `nixtla-prod-pipeline-generator` | Utility | Generate production-ready inference pipelines |
-| `nixtla-timegpt-finetune-lab` | Utility | Guide TimeGPT fine-tuning workflows |
-| `nixtla-usage-optimizer` | Utility | Analyze usage, suggest cost/performance optimizations |
-| `nixtla-skills-bootstrap` | Infra | Install/update skills via nixtla-skills CLI |
 | `nixtla-skills-index` | Utility | List all installed Nixtla skills and usage guidance |
 
 ### Future Skills (Planned)
@@ -438,33 +465,119 @@ Skills serve 3 audiences (from strategy doc):
 
 ---
 
-## Versioning Strategy
+## Versioning Strategy (Phase 3)
 
-### Skill Versions
+### Skills Pack Versioning Model
 
-Each skill tracks version independently:
+**Current Pack Version**: `0.3.0` (Phase 3 - Installer + Versioning Hooks)
+
+The Nixtla Skills Pack uses **synchronized versioning** across core components:
+
+| Component | Version | Location |
+|-----------|---------|----------|
+| **Skills Pack** | 0.3.0 | Repo-wide release version |
+| **Installer CLI** | 0.3.0 | `packages/nixtla-claude-skills-installer` |
+| **Core Skills** | 0.3.0 | `nixtla-timegpt-lab`, `nixtla-experiment-architect`, `nixtla-schema-mapper`, `nixtla-skills-bootstrap` |
+| **Stub Skills** | varies | Other skills remain at Phase 1 versions until implemented |
+
+### Semantic Versioning
+
+All components follow **semver** (MAJOR.MINOR.PATCH):
+
+```
+0.3.0
+│ │ │
+│ │ └─ PATCH: Bug fixes, clarifications, doc updates
+│ └─── MINOR: New features, new skills, additive changes
+└───── MAJOR: Breaking changes, architectural shifts
+```
+
+**Version Bump Rules**:
+- **PATCH (0.3.1)**: Bug fix in skill content, installer fix, doc typo
+- **MINOR (0.4.0)**: New skill implemented, new installer feature, additive API change
+- **MAJOR (1.0.0)**: Breaking changes to installer API, skill interface changes, architectural redesign
+
+### Skill Version Tracking (Phase 3 Feature)
+
+Each skill's `SKILL.md` frontmatter includes version:
 
 ```yaml
 ---
 name: nixtla-timegpt-lab
-version: "1.2.0"  # Semantic versioning
+version: "0.3.0"  # Updated with each pack release
 ---
 ```
 
-**Version Bumps**:
-- **MAJOR (2.0.0)**: Breaking changes to skill interface
-- **MINOR (1.1.0)**: New features, additive changes
-- **PATCH (1.0.1)**: Bug fixes, clarifications
+**Installer Version Display** (Phase 3):
+- During install: Shows version for each skill (e.g., `nixtla-timegpt-lab (v0.3.0)`)
+- During update: Shows old → new version (e.g., `nixtla-timegpt-lab (v0.2.0 → v0.3.0)`)
+- After install: Lists all skills with versions
 
-### Skills Pack Version
+**How to Extract Skill Version** (for tooling):
+```python
+import re
+from pathlib import Path
 
-The entire pack has unified release version:
+def get_skill_version(skill_dir: Path) -> str:
+    skill_md = skill_dir / "SKILL.md"
+    content = skill_md.read_text()
+    match = re.search(r'version:\s*["\']?([0-9]+\.[0-9]+\.[0-9]+)["\']?', content)
+    return match.group(1) if match else "unknown"
+```
 
-- **Phase 1**: v0.1.0 (skeleton only)
-- **Phase 2**: v0.5.0 (core skills implemented)
-- **Phase 3**: v1.0.0 (installer + all 11 skills)
+### Pack Version History
 
-Tracked in: `skills-pack/VERSION`
+| Version | Phase | Date | Description |
+|---------|-------|------|-------------|
+| **0.3.0** | Phase 3 | 2025-12-03 | Installer CLI + versioning hooks + bootstrap skill |
+| **0.2.0** | Phase 2 | 2025-12-03 | Core skills to standard (timegpt-lab, experiment-architect, schema-mapper) |
+| **0.1.0** | Phase 1 | 2025-11-30 | Skeleton + SKILL standard + compliance |
+
+**Upcoming Versions**:
+- **0.4.0**: Phase 4 - Advanced skills (prod-pipeline-generator, timegpt-finetune-lab, usage-optimizer)
+- **0.5.0**: Demo project + DevOps guide
+- **1.0.0**: PyPI distribution ready (all features complete)
+
+### Installer Behavior with Versions
+
+**Per-Project Persistence** (Phase 3):
+- Skills are copied to `.claude/skills/nixtla-*` in current project
+- Skills **persist** until explicitly updated (no auto-upgrade)
+- Different projects can have different skill versions
+
+**Update Workflow**:
+1. User runs: `nixtla-skills update`
+2. Installer reads source skill versions (from `skills-pack/.claude/skills/`)
+3. Installer reads target skill versions (from `.claude/skills/`)
+4. Installer shows preview with old → new versions
+5. User confirms update
+6. Skills updated to latest pack version
+
+**Version Conflict Handling** (TODO - Future):
+- Currently: All skills overwritten to latest pack version
+- Future: Selective update (update only specific skills)
+- Future: Version pinning (stay on specific skill version)
+- Future: Rollback (revert to previous skill version)
+
+### Versioning Best Practices
+
+**For Skill Authors**:
+1. Bump skill version when content changes significantly
+2. Align skill version with pack version for major releases
+3. Document breaking changes in AAR for that phase
+4. Test installer before releasing new pack version
+
+**For Users**:
+1. Run `nixtla-skills update` to get latest versions
+2. Check installed versions: `nixtla-skills list` (TODO - not yet implemented)
+3. Pin to specific pack version if stability critical
+4. Review AAR before updating to understand changes
+
+**For DevOps**:
+1. Skills pack version tracks overall release maturity
+2. Installer CLI version should match skills pack version
+3. Individual skill versions may lag behind pack version (stubs)
+4. Use version tags in git: `v0.3.0`, `v0.4.0`, etc.
 
 ---
 
@@ -654,39 +767,56 @@ All skills are **open source** in this repo:
 
 ### Phase 2 (Core Implementation) - ✅ COMPLETE
 - ✅ 3 core skills fully implemented (500+ word prompts each)
-  - `nixtla-timegpt-lab` (670 lines)
+  - `nixtla-timegpt-lab` (668 lines)
   - `nixtla-experiment-architect` (877 lines)
   - `nixtla-schema-mapper` (750 lines)
 - ✅ 15+ examples across the 3 implemented skills
-- ✅ Phase 2 AAR documented
+- ✅ Phase 2 AAR documented (044-AA-REPT)
 
-### Phase 3 (Installer CLI + Bootstrap) - ✅ COMPLETE
-- ✅ Installer CLI implemented (`nixtla-skills` Python package)
-  - `nixtla-skills init` command working
-  - `nixtla-skills update` command working
-  - Preview and confirmation workflow implemented
-  - Per-project persistence model working
-- ✅ Bootstrap skill implemented (`nixtla-skills-bootstrap`)
-  - Conversational interface to installer CLI
-  - Error handling and troubleshooting guidance
-  - Activation triggers defined
-- ✅ Architecture docs updated with Phase 3 details
-- ✅ README for installer package created
+### Phase 3 (Installer CLI + Versioning Hooks) - ✅ COMPLETE
+- ✅ Installer CLI enhanced (`nixtla-skills` v0.3.0)
+  - Version tracking: reads version from SKILL.md frontmatter
+  - Update preview: shows old → new versions (e.g., v0.2.0 → v0.3.0)
+  - Install summary: lists all skills with versions
+  - version.py: single source of truth for package version
+- ✅ Bootstrap skill updated (`nixtla-skills-bootstrap` v0.3.0)
+  - Frontmatter compliance with all Phase 3 fields
+  - Version bumped from 1.0.0 → 0.3.0 to align with pack
+- ✅ Core skills version sync (v0.3.0)
+  - timegpt-lab: 0.2.0 → 0.3.0
+  - experiment-architect: 0.2.0 → 0.3.0
+  - schema-mapper: 0.2.0 → 0.3.0
+  - skills-bootstrap: 1.0.0 → 0.3.0
+- ✅ Versioning documentation
+  - Comprehensive versioning strategy in architecture doc
+  - Pack version history table
+  - Installer behavior with versions documented
+  - Best practices for skill authors, users, DevOps
 
-### Phase 4 (Advanced Skills + DevOps) - ✅ COMPLETE
-- ✅ 3 advanced skills implemented:
-  - `nixtla-timegpt-finetune-lab` (945 lines)
-  - `nixtla-prod-pipeline-generator` (1,149 lines)
-  - `nixtla-usage-optimizer` (586 lines)
-- ✅ Demo project with end-to-end walkthrough (`demo-project/`)
-  - Sample data: 3 synthetic time series (365 days each)
-  - Comprehensive README with step-by-step guide
-  - Project structure ready for skills usage
-- ✅ DevOps education guide created (`000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md`)
-  - Conversational, video-script style
-  - Lifecycle, security, best practices
-  - Troubleshooting and operations guide
-- 🔲 User testing with 5+ Nixtla community members (TODO: post-delivery)
+### Phase 4 (Advanced Skills + Demo + DevOps) - ✅ COMPLETE
+- ✅ 3 advanced skills implemented to Nixtla SKILL standard:
+  - `nixtla-timegpt-finetune-lab` (942 lines) - Fine-tuning workflows with dataset prep and comparison experiments
+  - `nixtla-prod-pipeline-generator` (1146 lines) - Production Airflow/Prefect/cron pipeline generation
+  - `nixtla-usage-optimizer` (583 lines) - Cost/performance optimization and routing strategies
+  - All with Phase 4 frontmatter (mode, model, disable-model-invocation, license, version 0.4.0)
+- ✅ Demo project with end-to-end workflow (`demo-project/`)
+  - M4 Daily sample data (5 series, 90 days history)
+  - Experiment configuration (config.yml) with TimeGPT + StatsForecast
+  - Run script (forecasting/run_experiment.py) demonstrating library usage
+  - Comprehensive README showing skills value proposition
+- ✅ DevOps operations guide (`000-docs/046-OD-DEVOPS-nixtla-skills-operations-guide.md`)
+  - Installation, updates, versioning, rollback procedures
+  - CI/CD integration (GitHub Actions, GitLab CI, Docker)
+  - Version conflict resolution
+  - Troubleshooting and best practices
+  - Production-ready operations documentation
+- ✅ Version bump to 0.4.0:
+  - Installer CLI: 0.3.0 → 0.4.0
+  - Core skills: 0.3.0 → 0.4.0
+  - Advanced skills: 1.0.0 → 0.4.0 (synchronized)
+  - Infrastructure skills: 0.3.0 → 0.4.0
+- ✅ Architecture doc updated with Phase 4 summary
+- ✅ Phase 4 AAR created (046-AA-REPT-nixtla-skills-phase-04.md)
 
 ### Future (Post-Phase 4) - 🔲 NOT STARTED
 - 🔲 PyPI distribution of installer (`pip install nixtla-claude-skills-installer`)

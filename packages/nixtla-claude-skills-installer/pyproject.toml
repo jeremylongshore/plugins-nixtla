@@ -1,6 +1,6 @@
 [project]
 name = "nixtla-claude-skills-installer"
-version = "0.1.0"
+version = "0.4.0"
 description = "CLI tool to install and update Nixtla Claude Skills in your projects"
 readme = "README.md"
 requires-python = ">=3.8"
