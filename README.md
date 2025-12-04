@@ -1,11 +1,11 @@
 # Nixtla Plugin Showcase
 
-> Open playground for Claude Code plugins and AI skills that accelerate Nixtla's internal operations, enhance open-source tools, serve current customers, and unlock new markets
+> Experimental Claude Code plugins and AI skills for Nixtla time-series forecasting workflows
 
 **Sponsor:** Nixtla (Max Mergenthaler)
 **Prepared by:** Intent Solutions (jeremy@intentsolutions.io)
-**Version:** 1.2.0 | **Last Updated:** 2025-12-01
-**Status:** 3 plugins working · 9 specified · 8 skills (95%+ compliant)
+**Version:** 1.2.0 | **Last Updated:** 2025-12-04
+**Status:** 3 plugins working · 9 specified · 8 skills (100% compliant)
 
 ---
 
@@ -99,19 +99,18 @@ skills-pack/.claude/skills/
 | | |
 |---|---|
 | **Status** | ✅ Working (v1.1.0) |
-| **Category** | Efficiency |
-| **Impact** | 95% time reduction in customer issue reproduction |
+| **Category** | Benchmarking |
 
 **What It Does**
 
 Runs statsforecast baseline models (AutoETS, AutoTheta, SeasonalNaive) on M4 benchmark data, generates human-readable metric summaries (sMAPE, MASE), creates complete reproducibility bundles (library versions, configs, data), and produces GitHub-ready issue drafts with full context. Optionally compares against TimeGPT for benchmarking.
 
-**Business Value**
+**Use Cases**
 
-- **95% time reduction**: Customer issue reproduction from 2-4 hours → 5 minutes
-- **20% productivity gain**: Engineers save 7-9 hours per week
-- **50% faster resolution**: Issue cycle time from 2-3 days → 1 day
-- **Improved standardization**: Consistent benchmark workflow eliminates back-and-forth
+- Reproduce customer-reported forecasting issues with consistent baseline comparisons
+- Generate standardized benchmark reports for GitHub issues
+- Validate statsforecast model behavior on M4 datasets
+- Compare baseline models against TimeGPT (optional)
 
 **Try It Now**
 
@@ -147,18 +146,17 @@ pip install -r scripts/requirements.txt
 |---|---|
 | **Status** | ✅ Working Demo |
 | **Category** | Integration |
-| **Impact** | Demonstrates Nixtla + Google Cloud at 200M+ row scale |
 
 **What It Does**
 
 Runs Nixtla statsforecast models (AutoETS, AutoTheta, SeasonalNaive) on BigQuery data via serverless Cloud Functions. Tested with Chicago taxi public dataset (200M+ rows). Supports optional TimeGPT comparison when API key provided.
 
-**Business Value**
+**Use Cases**
 
-- **Demonstrates scalability**: Nixtla OSS handles 100K+ rows easily
-- **Serverless deployment**: Cloud Functions auto-scale with zero server management
-- **Real-world proof point**: Not toy examples - real data, real use case
-- **Partnership potential**: Template for Nixtla + Google Cloud integrations
+- Run forecasting models on BigQuery datasets without moving data
+- Deploy serverless forecasting with Cloud Functions auto-scaling
+- Test Nixtla models on large-scale public datasets
+- Template for Google Cloud + Nixtla integrations
 
 **Try It Now**
 
@@ -186,18 +184,17 @@ curl -X POST "https://YOUR-FUNCTION-URL" \
 |---|---|
 | **Status** | ✅ Working MVP (v0.1.0) |
 | **Category** | Content Automation |
-| **Impact** | Automated content discovery for time-series/forecasting |
 
 **What It Does**
 
 Automated content discovery and curation pipeline: searches web (SerpAPI) and GitHub for Nixtla/time-series content, uses AI (OpenAI/Anthropic) to summarize and curate, posts formatted digests to Slack with Block Kit formatting. Construction kit / reference implementation.
 
-**Business Value**
+**Use Cases**
 
-- **Automated monitoring**: Stay on top of Nixtla mentions, time-series discussions
-- **Content curation**: AI-filtered, AI-summarized content saves reading time
-- **Reference implementation**: Patterns for search → AI → Slack workflows
-- **Educational**: Comprehensive setup guide (24KB) and 6 test files
+- Monitor web and GitHub for Nixtla mentions and time-series discussions
+- Automate content curation with AI-powered summarization
+- Reference patterns for search → AI → Slack workflows
+- Learn integration patterns (comprehensive setup guide with 6 test files)
 
 **Try It Now**
 
@@ -220,7 +217,7 @@ pytest tests/
 
 ## 📋 Specified Plugins (Ready to Build)
 
-**Internal Efficiency** (Make Your Team Faster)
+**Internal Efficiency Plugins**
 
 ---
 
@@ -230,20 +227,18 @@ pytest tests/
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Efficiency |
-| **Impact** | 30-50% reduction in TimeGPT API costs |
 | **Build Time** | 4-6 weeks |
-| **Priority** | 🥇 Recommended Quick Win (Score: 4.6/5) |
 
 **What It Does**
 
-Analyzes Nixtla API usage patterns, detects redundant forecasts, implements intelligent caching, and provides actionable cost-saving recommendations. Prevents bill shock scenarios where misconfigured cron jobs or inefficient batching cause massive unexpected API costs.
+Analyzes Nixtla API usage patterns, detects redundant forecasts, implements intelligent caching, and provides actionable cost-saving recommendations. Detects scenarios where misconfigured cron jobs or inefficient batching cause unexpected API costs.
 
-**Business Value**
+**Use Cases**
 
-- **30-50% direct cost reduction** through redundancy detection and caching
-- **Prevents customer churn** from bill shock (massive unexpected costs)
-- **Clear ROI metric** with before/after API spend comparison
-- **Enterprise risk management** with cost projection and alerts
+- Analyze TimeGPT API usage patterns and identify optimization opportunities
+- Detect redundant forecast requests that could be cached
+- Monitor API spend trends and provide cost projections
+- Alert on usage anomalies that may indicate misconfiguration
 
 **Documentation**
 
@@ -266,20 +261,18 @@ Analyzes Nixtla API usage patterns, detects redundant forecasts, implements inte
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Efficiency |
-| **Impact** | Customer onboarding from weeks to hours |
 | **Build Time** | 4-6 weeks |
-| **Priority** | 🥈 High Value (Score: 3.8/5) |
 
 **What It Does**
 
-Automated migration tool that analyzes existing StatsForecast/MLForecast code and generates equivalent TimeGPT API calls, with side-by-side A/B testing, rollback safety, and accuracy validation. Reduces the "switching cost" friction that prevents TimeGPT adoption.
+Automated migration tool that analyzes existing StatsForecast/MLForecast code and generates equivalent TimeGPT API calls, with side-by-side A/B testing, rollback safety, and accuracy validation.
 
-**Business Value**
+**Use Cases**
 
-- **Dramatically faster onboarding** (weeks → hours for customer migrations)
-- **Reduces technical barrier** to switching from OSS to TimeGPT
-- **Competitive displacement** against Prophet/ARIMA/StatsForecast
-- **Risk mitigation** with automatic validation and rollback
+- Convert existing StatsForecast/MLForecast code to TimeGPT API calls
+- Run side-by-side comparisons between OSS models and TimeGPT
+- Validate accuracy before switching to TimeGPT in production
+- Generate migration reports with accuracy metrics and recommendations
 
 **Documentation**
 
@@ -302,20 +295,18 @@ Automated migration tool that analyzes existing StatsForecast/MLForecast code an
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Efficiency |
-| **Impact** | 40% reduction in support tickets |
 | **Build Time** | 4-6 weeks |
-| **Priority** | 🥈 High Value (Score: 3.8/5) |
 
 **What It Does**
 
-Post-hoc explainability tool that transforms TimeGPT's "black box" forecasts into transparent, stakeholder-friendly narratives with visual decomposition, SHAP values, confidence bounds, and plain-English explanations.
+Post-hoc explainability tool that transforms TimeGPT forecasts into transparent explanations with visual decomposition, SHAP values, confidence bounds, and plain-English narratives.
 
-**Business Value**
+**Use Cases**
 
-- **40% fewer support tickets** through self-serve explanations
-- **Enterprise sales enabler** (overcomes "black box" objections)
-- **Builds trust** in forecasts with stakeholders
-- **Risk committee approval** for regulated industries
+- Generate explainability reports for TimeGPT forecasts
+- Decompose forecasts into trend, seasonal, and residual components
+- Calculate SHAP values to explain feature importance
+- Create stakeholder-friendly narrative explanations
 
 **Documentation**
 
@@ -332,7 +323,7 @@ Post-hoc explainability tool that transforms TimeGPT's "black box" forecasts int
 
 ---
 
-**Business Growth** (Expand Your Market)
+**Market Expansion Plugins**
 
 ---
 
@@ -342,20 +333,18 @@ Post-hoc explainability tool that transforms TimeGPT's "black box" forecasts int
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Growth |
-| **Impact** | Increase TimeGPT adoption through demonstrated superiority |
 | **Build Time** | 3-4 weeks |
-| **Priority** | 🥈 High Value (Score: 4.2/5) |
 
 **What It Does**
 
-Side-by-side comparison tool that benchmarks TimeGPT API against local StatsForecast OSS models, providing accuracy metrics (MAPE, RMSE, sMAPE) and comprehensive ROI calculations to justify the upgrade from free to paid forecasting.
+Side-by-side comparison tool that benchmarks TimeGPT API against local StatsForecast OSS models, providing accuracy metrics (MAPE, RMSE, sMAPE) and comparative analysis.
 
-**Business Value**
+**Use Cases**
 
-- **Data-driven sales conversations** with concrete accuracy comparisons
-- **Demonstrates TimeGPT value** beyond "it's more accurate"
-- **Content for marketing** (case studies, benchmarks, blog posts)
-- **Natural extension** of existing Baseline Lab plugin
+- Run head-to-head accuracy comparisons between TimeGPT and StatsForecast
+- Generate benchmark reports with multiple accuracy metrics
+- Test on standard datasets (M4, M5) or custom data
+- Extension of existing Baseline Lab plugin
 
 **Documentation**
 
@@ -378,20 +367,18 @@ Side-by-side comparison tool that benchmarks TimeGPT API against local StatsFore
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Growth |
-| **Impact** | Shorten sales cycles by 2-3 months |
 | **Build Time** | 3-4 weeks |
-| **Priority** | 🥇 Quick Win (Score: 4.4/5) |
 
 **What It Does**
 
-Interactive ROI calculator that compares total cost of ownership (TCO) for internal forecasting builds vs Nixtla TimeGPT API, generating executive-ready business cases for procurement approval.
+Interactive ROI calculator that compares total cost of ownership (TCO) for internal forecasting builds vs Nixtla TimeGPT API, generating executive-ready business case reports.
 
-**Business Value**
+**Use Cases**
 
-- **Accelerates sales** with concrete cost justification
-- **Enables customer self-service** business case creation
-- **Differentiates** from competitors who can't quantify value
-- **Easiest to build** (low complexity, high impact)
+- Calculate TCO for internal forecasting vs TimeGPT API
+- Generate business case reports with cost breakdowns
+- Compare build vs buy scenarios with customizable inputs
+- Export executive summaries for procurement approval
 
 **Documentation**
 
@@ -414,20 +401,18 @@ Interactive ROI calculator that compares total cost of ownership (TCO) for inter
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Growth |
-| **Impact** | Opens enterprise data platform market |
 | **Build Time** | 6-8 weeks |
-| **Priority** | 🥈 Strategic (Score: 4.2/5) |
 
 **What It Does**
 
-Production-grade Apache Airflow operator (`NixtlaForecastOperator`) that natively integrates Nixtla TimeGPT forecasting into DAGs with automatic retry logic, authentication handling, and dependency management.
+Apache Airflow operator (`NixtlaForecastOperator`) that integrates Nixtla TimeGPT forecasting into DAGs with automatic retry logic, authentication handling, and dependency management.
 
-**Business Value**
+**Use Cases**
 
-- **Reaches enterprise data teams** (huge addressable market)
-- **Fits existing workflows** (no rip-and-replace)
-- **Reduces integration friction** (eliminates "glue code tax")
-- **Production-grade reliability** with Airflow's retry/monitoring
+- Integrate TimeGPT forecasting into existing Airflow DAGs
+- Schedule forecasting jobs with Airflow's orchestration
+- Leverage Airflow's retry logic and monitoring
+- Deploy production forecasting pipelines with minimal glue code
 
 **Documentation**
 
@@ -450,20 +435,18 @@ Production-grade Apache Airflow operator (`NixtlaForecastOperator`) that nativel
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Growth |
-| **Impact** | Expand into analytics engineering market |
 | **Build Time** | 6-8 weeks |
-| **Priority** | 🥉 Strategic (Score: 3.6/5) |
 
 **What It Does**
 
 Native dbt package that treats forecasting as a data transformation step, allowing SQL analysts to generate Nixtla forecasts using `{{ nixtla_forecast(...) }}` macros directly in dbt models.
 
-**Business Value**
+**Use Cases**
 
-- **Reaches analytics engineers** (large, underserved market)
-- **SQL-native interface** (no Python required)
-- **Forecasting in transformation layer** (fits modern data stack)
-- **Self-serve enablement** for analysts
+- Generate forecasts within dbt transformation workflows
+- SQL-native interface (no Python required)
+- Integrate forecasting into existing dbt projects
+- Enable self-serve forecasting for analytics engineers
 
 **Documentation**
 
@@ -486,20 +469,18 @@ Native dbt package that treats forecasting as a data transformation step, allowi
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Growth |
-| **Impact** | 10x larger enterprise contracts (Fortune 500) |
 | **Build Time** | 8-10 weeks |
-| **Priority** | 🥉 Strategic (Score: 3.8/5) |
 
 **What It Does**
 
 Claude Code plugin that wraps Nixtla's existing Snowflake Native App integration, providing one-command SQL-native forecasting with automatic setup and error handling directly in Snowflake.
 
-**Business Value**
+**Use Cases**
 
-- **Unlocks Fortune 500** with Snowflake-first strategies
-- **Data never leaves customer's Snowflake** (compliance win)
-- **Premium pricing justified** by enterprise features
-- **Makes existing integration discoverable** and easy
+- Run TimeGPT forecasts on data in Snowflake without moving it
+- SQL-native interface for Snowflake users
+- Leverage Snowflake's security and compliance features
+- Simplify setup of Nixtla's Snowflake Native App
 
 **Documentation**
 
@@ -522,20 +503,18 @@ Claude Code plugin that wraps Nixtla's existing Snowflake Native App integration
 |---|---|
 | **Status** | 📋 Specified |
 | **Category** | Growth |
-| **Impact** | Opens real-time monitoring market |
 | **Build Time** | 8-10 weeks |
-| **Priority** | 🥉 Strategic (Score: 3.5/5) |
 
 **What It Does**
 
 Real-time streaming anomaly detection plugin that processes Kafka/Kinesis streams with sub-second latency, using Nixtla's TimeGPT for anomaly detection with automatic alerting and dashboard visualization.
 
-**Business Value**
+**Use Cases**
 
-- **Opens real-time use cases** (fraud, IoT, operations)
-- **Differentiation from batch-only** competitors
-- **Premium pricing** for streaming capabilities
-- **Builds production trust** in TimeGPT
+- Monitor streaming data for anomalies in real-time
+- Process Kafka/Kinesis streams with TimeGPT anomaly detection
+- Configure automatic alerts for detected anomalies
+- Visualize anomalies in real-time dashboards
 
 **Documentation**
 
@@ -653,21 +632,11 @@ Every specified plugin includes standardized documentation:
 
 ## Engagement Options
 
-| Option | Scope | Timeline | Risk |
-|--------|-------|----------|------|
-| 🧪 **Evaluate** | Use working demos for 30 days | No commitment | None |
-| 🎯 **Pilot** | 1 plugin to production | 4-6 weeks | Low |
-| 🚀 **Platform** | 3+ plugins | 12-16 weeks | Medium |
-
-### Recommended Quick Wins
-
-**For Pilot** (Choose 1):
-- **Cost Optimizer** (Score: 4.6/5) - Immediate ROI, low risk
-- **ROI Calculator** (Score: 4.4/5) - Easiest to build, enables sales
-
-**For Platform** (Choose 3):
-- **Bundle A**: Cost Optimizer + ROI Calculator + Airflow Operator (quick wins + market expansion)
-- **Bundle B**: Cost Optimizer + Nixtla vs Benchmark + Migration Assistant (strategic differentiation)
+| Option | Scope | Timeline |
+|--------|-------|----------|
+| 🧪 **Evaluate** | Use working demos for 30 days | No commitment |
+| 🎯 **Pilot** | 1 plugin to production | 4-6 weeks |
+| 🚀 **Platform** | 3+ plugins | 12-16 weeks |
 
 **Details:** [Engagement Options](000-docs/global/001-ENGAGEMENT-OPTIONS.md) | [Decision Matrix](000-docs/global/002-DECISION-MATRIX.md)
 
@@ -774,12 +743,12 @@ nixtla-plugin-showcase/
 
 ---
 
-## What Intent Solutions Brings
+## Development History
 
-- **Speed**: 1 working plugin in 8 weeks (Baseline Lab)
-- **Quality**: 70+ technical documents, full CI/CD, test coverage
-- **Business Thinking**: Plugins designed for ROI, not just tech demos
-- **Claude Code Expertise**: Deep integration with Claude ecosystem (253+ plugins in marketplace)
+- **Timeline**: First working plugin (Baseline Lab) completed in 8 weeks
+- **Documentation**: 70+ technical documents following Doc-Filing v3.0 standard
+- **Infrastructure**: Full CI/CD pipeline with GitHub Actions validation
+- **Testing**: Golden task harness with 67% test coverage
 
 ---
 
