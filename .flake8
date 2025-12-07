@@ -1,0 +1,14 @@
+[flake8]
+max-line-length = 100
+extend-ignore = E501
+exclude =
+    .git,
+    .venv,
+    .venv-*,
+    build,
+    dist,
+    __pycache__
+
+# Template files have intentional undefined names (placeholders for users)
+per-file-ignores =
+    skills-pack/.claude/skills/*/resources/TEMPLATES/*.py:F821
