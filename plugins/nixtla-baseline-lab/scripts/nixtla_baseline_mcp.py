@@ -151,18 +151,18 @@ class NixtlaBaselineMCP:
                         "demo_preset": {
                             "type": ["string", "null"],
                             "description": "Demo preset configuration for quick GitHub-style demos. 'm4_daily_small' runs a fast demo on M4 Daily subset",
-                            "enum": ["m4_daily_small", null],
-                            "default": null,
+                            "enum": ["m4_daily_small", None],
+                            "default": None,
                         },
                         "generate_repro_bundle": {
                             "type": "boolean",
                             "description": "If true, write compat_info.json and run_manifest.json alongside metrics/summary/benchmark report for full reproducibility",
-                            "default": true,
+                            "default": True,
                         },
                         "include_timegpt": {
                             "type": "boolean",
                             "description": "If true, and a valid NIXTLA_TIMEGPT_API_KEY is set, run a limited TimeGPT comparison against the statsforecast baselines",
-                            "default": false,
+                            "default": False,
                         },
                         "timegpt_max_series": {
                             "type": "integer",
