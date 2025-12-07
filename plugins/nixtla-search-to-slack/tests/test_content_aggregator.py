@@ -2,10 +2,10 @@
 Unit tests for content aggregator.
 """
 
-import pytest
 from datetime import datetime
 
-from nixtla_search_to_slack.content_aggregator import ContentAggregator, Content
+import pytest
+from nixtla_search_to_slack.content_aggregator import Content, ContentAggregator
 from nixtla_search_to_slack.search_orchestrator import SearchResult
 
 
@@ -23,7 +23,7 @@ class TestContentAggregator:
             description="Different description",
             source="web",
             timestamp=datetime.now(),
-            metadata={}
+            metadata={},
         )
         results = sample_search_results + [duplicate]
 
@@ -45,7 +45,7 @@ class TestContentAggregator:
                 description="Description",
                 source="web",
                 timestamp=datetime.now(),
-                metadata={}
+                metadata={},
             ),
             SearchResult(
                 url="https://example.com/article?id=123&utm_source=twitter&utm_campaign=social",
@@ -53,8 +53,8 @@ class TestContentAggregator:
                 description="Description",
                 source="web",
                 timestamp=datetime.now(),
-                metadata={}
-            )
+                metadata={},
+            ),
         ]
 
         content = aggregator.aggregate(results)
@@ -74,7 +74,7 @@ class TestContentAggregator:
                 description="Description 1",
                 source="web",
                 timestamp=datetime.now(),
-                metadata={}
+                metadata={},
             ),
             SearchResult(
                 url="https://example.com/article2",
@@ -82,8 +82,8 @@ class TestContentAggregator:
                 description="Description 2",
                 source="web",
                 timestamp=datetime.now(),
-                metadata={}
-            )
+                metadata={},
+            ),
         ]
 
         content = aggregator.aggregate(results)
@@ -102,7 +102,7 @@ class TestContentAggregator:
                 description="Description 1",
                 source="web",
                 timestamp=datetime.now(),
-                metadata={}
+                metadata={},
             ),
             SearchResult(
                 url="https://example2.com/news",
@@ -110,8 +110,8 @@ class TestContentAggregator:
                 description="Description 2",
                 source="web",
                 timestamp=datetime.now(),
-                metadata={}
-            )
+                metadata={},
+            ),
         ]
 
         content = aggregator.aggregate(results)
@@ -170,7 +170,7 @@ class TestContentAggregator:
                 description="Old",
                 source="web",
                 timestamp=now - timedelta(days=7),
-                metadata={}
+                metadata={},
             ),
             SearchResult(
                 url="https://example.com/new",
@@ -178,7 +178,7 @@ class TestContentAggregator:
                 description="New",
                 source="web",
                 timestamp=now,
-                metadata={}
+                metadata={},
             ),
             SearchResult(
                 url="https://example.com/middle",
@@ -186,8 +186,8 @@ class TestContentAggregator:
                 description="Middle",
                 source="web",
                 timestamp=now - timedelta(days=3),
-                metadata={}
-            )
+                metadata={},
+            ),
         ]
 
         content = aggregator.aggregate(results)

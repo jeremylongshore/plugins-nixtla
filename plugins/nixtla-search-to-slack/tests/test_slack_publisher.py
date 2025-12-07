@@ -3,41 +3,37 @@ Unit tests for Slack publisher.
 """
 
 import os
-import pytest
 from datetime import datetime
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
-from nixtla_search_to_slack.slack_publisher import SlackPublisher, PublishResult
+import pytest
+from nixtla_search_to_slack.slack_publisher import PublishResult, SlackPublisher
 
 
 class TestSlackPublisher:
     """Test Slack publishing functionality."""
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
     def test_publish_success(self, mock_webclient, mock_env_config, sample_curated_content):
         """Test successful publishing to Slack."""
         # Mock Slack client
         mock_client = Mock()
-        mock_client.chat_postMessage.return_value = {
-            "ok": True,
-            "ts": "1234567890.123456"
-        }
+        mock_client.chat_postMessage.return_value = {"ok": True, "ts": "1234567890.123456"}
         mock_webclient.return_value = mock_client
 
         publisher = SlackPublisher(mock_env_config)
         result = publisher.publish(
-            items=sample_curated_content,
-            channel="#test-channel",
-            topic_name="Test Topic"
+            items=sample_curated_content, channel="#test-channel", topic_name="Test Topic"
         )
 
         assert result.success is True
         assert result.channel == "#test-channel"
         assert result.message_ts is not None
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
-    def test_publish_dry_run(self, mock_webclient, mock_env_config, sample_curated_content,
-                            monkeypatch):
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
+    def test_publish_dry_run(
+        self, mock_webclient, mock_env_config, sample_curated_content, monkeypatch
+    ):
         """Test dry run mode doesn't post to Slack."""
         monkeypatch.setenv("DRY_RUN", "true")
 
@@ -47,9 +43,7 @@ class TestSlackPublisher:
 
         publisher = SlackPublisher(mock_env_config)
         result = publisher.publish(
-            items=sample_curated_content,
-            channel="#test-channel",
-            topic_name="Test Topic"
+            items=sample_curated_content, channel="#test-channel", topic_name="Test Topic"
         )
 
         assert result.success is True
@@ -57,10 +51,11 @@ class TestSlackPublisher:
         # Slack client should not be called
         mock_client.chat_postMessage.assert_not_called()
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
-    @patch('nixtla_search_to_slack.slack_publisher.SlackApiError')
-    def test_publish_slack_error(self, mock_error, mock_webclient, mock_env_config,
-                                 sample_curated_content):
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
+    @patch("nixtla_search_to_slack.slack_publisher.SlackApiError")
+    def test_publish_slack_error(
+        self, mock_error, mock_webclient, mock_env_config, sample_curated_content
+    ):
         """Test handling of Slack API errors."""
         # Mock Slack error
         mock_client = Mock()
@@ -71,9 +66,7 @@ class TestSlackPublisher:
 
         publisher = SlackPublisher(mock_env_config)
         result = publisher.publish(
-            items=sample_curated_content,
-            channel="#nonexistent",
-            topic_name="Test Topic"
+            items=sample_curated_content, channel="#nonexistent", topic_name="Test Topic"
         )
 
         assert result.success is False
@@ -84,7 +77,7 @@ class TestSlackPublisher:
         with pytest.raises(ValueError, match="SLACK_BOT_TOKEN not configured"):
             SlackPublisher({})
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
     def test_build_message_blocks(self, mock_webclient, mock_env_config, sample_curated_content):
         """Test Slack Block Kit message building."""
         mock_client = Mock()
@@ -92,9 +85,7 @@ class TestSlackPublisher:
 
         publisher = SlackPublisher(mock_env_config)
         blocks = publisher._build_message_blocks(
-            sample_curated_content,
-            "Test Topic",
-            datetime.now()
+            sample_curated_content, "Test Topic", datetime.now()
         )
 
         # Check header block
@@ -116,7 +107,7 @@ class TestSlackPublisher:
         action_blocks = [b for b in blocks if b.get("type") == "actions"]
         assert len(action_blocks) == len(sample_curated_content)
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
     def test_build_item_blocks(self, mock_webclient, mock_env_config, sample_curated_content):
         """Test building blocks for individual items."""
         mock_client = Mock()
@@ -143,7 +134,7 @@ class TestSlackPublisher:
         assert len(action_blocks) == 1
         assert action_blocks[0]["elements"][0]["text"]["text"] == "View Source →"
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
     def test_truncate_text(self, mock_webclient, mock_env_config):
         """Test text truncation."""
         mock_client = Mock()
@@ -161,20 +152,17 @@ class TestSlackPublisher:
         assert len(truncated) == 20
         assert truncated.endswith("...")
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
     def test_test_connection_success(self, mock_webclient, mock_env_config):
         """Test successful Slack connection test."""
         mock_client = Mock()
-        mock_client.auth_test.return_value = {
-            "ok": True,
-            "bot_id": "B12345"
-        }
+        mock_client.auth_test.return_value = {"ok": True, "bot_id": "B12345"}
         mock_webclient.return_value = mock_client
 
         publisher = SlackPublisher(mock_env_config)
         assert publisher.test_connection() is True
 
-    @patch('nixtla_search_to_slack.slack_publisher.WebClient')
+    @patch("nixtla_search_to_slack.slack_publisher.WebClient")
     def test_test_connection_failure(self, mock_webclient, mock_env_config):
         """Test failed Slack connection test."""
         mock_client = Mock()

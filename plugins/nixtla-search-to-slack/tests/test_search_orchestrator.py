@@ -2,16 +2,16 @@
 Unit tests for search orchestrator.
 """
 
-import pytest
 from datetime import datetime, timedelta
-from unittest.mock import Mock, patch, MagicMock
-import requests
+from unittest.mock import MagicMock, Mock, patch
 
+import pytest
+import requests
 from nixtla_search_to_slack.search_orchestrator import (
+    GitHubSearchAdapter,
     SearchOrchestrator,
     SearchResult,
     WebSearchAdapter,
-    GitHubSearchAdapter
 )
 
 
@@ -27,7 +27,7 @@ class TestSearchOrchestrator:
         assert isinstance(orchestrator.adapters["web"], WebSearchAdapter)
         assert isinstance(orchestrator.adapters["github"], GitHubSearchAdapter)
 
-    @patch('nixtla_search_to_slack.search_orchestrator.requests.get')
+    @patch("nixtla_search_to_slack.search_orchestrator.requests.get")
     def test_search_multiple_sources(self, mock_get, mock_env_config, sample_sources_config):
         """Test searching across multiple sources."""
         # Mock web search response
@@ -39,7 +39,7 @@ class TestSearchOrchestrator:
                     "link": "https://example.com/article",
                     "title": "Test Article",
                     "snippet": "Test description",
-                    "position": 1
+                    "position": 1,
                 }
             ]
         }
@@ -56,7 +56,7 @@ class TestSearchOrchestrator:
                     "created_at": "2024-01-01T00:00:00Z",
                     "state": "open",
                     "user": {"login": "testuser"},
-                    "labels": []
+                    "labels": [],
                 }
             ]
         }
@@ -69,7 +69,7 @@ class TestSearchOrchestrator:
         topic = {
             "name": "Test Topic",
             "keywords": ["test", "keyword"],
-            "sources": ["web", "github"]
+            "sources": ["web", "github"],
         }
 
         results = orchestrator.search(topic)
@@ -80,23 +80,20 @@ class TestSearchOrchestrator:
         assert "web" in sources
         assert "github" in sources
 
-    @patch('nixtla_search_to_slack.search_orchestrator.requests.get')
-    def test_search_continues_on_source_failure(self, mock_get, mock_env_config,
-                                               sample_sources_config):
+    @patch("nixtla_search_to_slack.search_orchestrator.requests.get")
+    def test_search_continues_on_source_failure(
+        self, mock_get, mock_env_config, sample_sources_config
+    ):
         """Test that search continues even if one source fails."""
         # First call (web) fails
         mock_get.side_effect = [
             Exception("Web search failed"),
-            Mock(status_code=200, json=lambda: {"items": []})
+            Mock(status_code=200, json=lambda: {"items": []}),
         ]
 
         orchestrator = SearchOrchestrator(sample_sources_config, mock_env_config)
 
-        topic = {
-            "name": "Test Topic",
-            "keywords": ["test"],
-            "sources": ["web", "github"]
-        }
+        topic = {"name": "Test Topic", "keywords": ["test"], "sources": ["web", "github"]}
 
         results = orchestrator.search(topic)
 
@@ -107,11 +104,7 @@ class TestSearchOrchestrator:
         """Test handling of unknown source in topic."""
         orchestrator = SearchOrchestrator(sample_sources_config, mock_env_config)
 
-        topic = {
-            "name": "Test Topic",
-            "keywords": ["test"],
-            "sources": ["unknown_source"]
-        }
+        topic = {"name": "Test Topic", "keywords": ["test"], "sources": ["unknown_source"]}
 
         results = orchestrator.search(topic)
 
@@ -122,7 +115,7 @@ class TestSearchOrchestrator:
 class TestWebSearchAdapter:
     """Test web search adapter functionality."""
 
-    @patch('nixtla_search_to_slack.search_orchestrator.requests.get')
+    @patch("nixtla_search_to_slack.search_orchestrator.requests.get")
     def test_web_search_success(self, mock_get, mock_env_config, sample_sources_config):
         """Test successful web search."""
         mock_response = Mock()
@@ -134,15 +127,15 @@ class TestWebSearchAdapter:
                     "title": "Article 1",
                     "snippet": "Description 1",
                     "position": 1,
-                    "displayed_link": "example.com"
+                    "displayed_link": "example.com",
                 },
                 {
                     "link": "https://example.com/article2",
                     "title": "Article 2",
                     "snippet": "Description 2",
                     "position": 2,
-                    "displayed_link": "example.com"
-                }
+                    "displayed_link": "example.com",
+                },
             ]
         }
         mock_get.return_value = mock_response
@@ -150,7 +143,7 @@ class TestWebSearchAdapter:
         adapter = WebSearchAdapter(
             api_key=mock_env_config["SERP_API_KEY"],
             config=sample_sources_config["sources"]["web"],
-            provider_config=sample_sources_config.get("api_providers", {}).get("serpapi", {})
+            provider_config=sample_sources_config.get("api_providers", {}).get("serpapi", {}),
         )
 
         results = adapter.search("test query", "7d")
@@ -160,7 +153,7 @@ class TestWebSearchAdapter:
         assert results[0].url == "https://example.com/article1"
         assert results[0].source == "web"
 
-    @patch('nixtla_search_to_slack.search_orchestrator.requests.get')
+    @patch("nixtla_search_to_slack.search_orchestrator.requests.get")
     def test_web_search_excludes_domains(self, mock_get, mock_env_config, sample_sources_config):
         """Test that excluded domains are filtered out."""
         mock_response = Mock()
@@ -171,14 +164,14 @@ class TestWebSearchAdapter:
                     "link": "https://example.com/article",
                     "title": "Good Article",
                     "snippet": "Good content",
-                    "position": 1
+                    "position": 1,
                 },
                 {
                     "link": "https://pinterest.com/pin/123",
                     "title": "Pinterest Pin",
                     "snippet": "Should be excluded",
-                    "position": 2
-                }
+                    "position": 2,
+                },
             ]
         }
         mock_get.return_value = mock_response
@@ -186,7 +179,7 @@ class TestWebSearchAdapter:
         adapter = WebSearchAdapter(
             api_key=mock_env_config["SERP_API_KEY"],
             config=sample_sources_config["sources"]["web"],
-            provider_config={}
+            provider_config={},
         )
 
         results = adapter.search("test", "7d")
@@ -200,7 +193,7 @@ class TestWebSearchAdapter:
         adapter = WebSearchAdapter(
             api_key=mock_env_config["SERP_API_KEY"],
             config=sample_sources_config["sources"]["web"],
-            provider_config={}
+            provider_config={},
         )
 
         assert adapter._parse_time_range("1d") == "d"
@@ -213,7 +206,7 @@ class TestWebSearchAdapter:
 class TestGitHubSearchAdapter:
     """Test GitHub search adapter functionality."""
 
-    @patch('nixtla_search_to_slack.search_orchestrator.requests.get')
+    @patch("nixtla_search_to_slack.search_orchestrator.requests.get")
     def test_github_search_issues(self, mock_get, mock_env_config, sample_sources_config):
         """Test GitHub issue search."""
         mock_response = Mock()
@@ -228,15 +221,14 @@ class TestGitHubSearchAdapter:
                     "state": "open",
                     "user": {"login": "user1"},
                     "labels": [{"name": "bug"}],
-                    "repository_url": "https://api.github.com/repos/Nixtla/TimeGPT"
+                    "repository_url": "https://api.github.com/repos/Nixtla/TimeGPT",
                 }
             ]
         }
         mock_get.return_value = mock_response
 
         adapter = GitHubSearchAdapter(
-            token=mock_env_config["GITHUB_TOKEN"],
-            config=sample_sources_config["sources"]["github"]
+            token=mock_env_config["GITHUB_TOKEN"], config=sample_sources_config["sources"]["github"]
         )
 
         results = adapter._search_issues("bug", ["org:Nixtla"], "created:>=2024-01-01", "issues")
@@ -247,7 +239,7 @@ class TestGitHubSearchAdapter:
         assert results[0].metadata["state"] == "open"
         assert "bug" in results[0].metadata["labels"]
 
-    @patch('nixtla_search_to_slack.search_orchestrator.requests.get')
+    @patch("nixtla_search_to_slack.search_orchestrator.requests.get")
     def test_github_search_releases(self, mock_get, mock_env_config, sample_sources_config):
         """Test GitHub release search."""
         mock_response = Mock()
@@ -259,14 +251,13 @@ class TestGitHubSearchAdapter:
                 "tag_name": "v2.0.0",
                 "body": "Major release with TimeGPT improvements",
                 "published_at": "2024-01-15T00:00:00Z",
-                "prerelease": False
+                "prerelease": False,
             }
         ]
         mock_get.return_value = mock_response
 
         adapter = GitHubSearchAdapter(
-            token=mock_env_config["GITHUB_TOKEN"],
-            config=sample_sources_config["sources"]["github"]
+            token=mock_env_config["GITHUB_TOKEN"], config=sample_sources_config["sources"]["github"]
         )
 
         # Note: In the real implementation, this would be called from search()
@@ -280,8 +271,7 @@ class TestGitHubSearchAdapter:
     def test_calculate_date_filter(self, mock_env_config, sample_sources_config):
         """Test GitHub date filter calculation."""
         adapter = GitHubSearchAdapter(
-            token=mock_env_config["GITHUB_TOKEN"],
-            config=sample_sources_config["sources"]["github"]
+            token=mock_env_config["GITHUB_TOKEN"], config=sample_sources_config["sources"]["github"]
         )
 
         # Test date filter generation

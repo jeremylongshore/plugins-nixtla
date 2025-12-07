@@ -12,9 +12,10 @@ This module handles API authentication, request formatting, and error
 handling to provide a clean interface for the MCP server.
 """
 
-import os
 import logging
-from typing import Dict, Any, Optional, List
+import os
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -38,11 +39,7 @@ class TimeGPTClient:
         return self.api_available
 
     def forecast(
-        self,
-        df: pd.DataFrame,
-        horizon: int,
-        freq: str = "D",
-        level: Optional[List[int]] = None
+        self, df: pd.DataFrame, horizon: int, freq: str = "D", level: Optional[List[int]] = None
     ) -> Dict[str, Any]:
         """
         Generate forecast using TimeGPT API.
@@ -60,10 +57,7 @@ class TimeGPTClient:
             - error: str if failed
         """
         if not self.is_available():
-            return {
-                "success": False,
-                "error": "TimeGPT API key not available"
-            }
+            return {"success": False, "error": "TimeGPT API key not available"}
 
         try:
             # Import nixtla SDK (only when needed)
@@ -73,53 +67,42 @@ class TimeGPTClient:
             client = NixtlaClient(api_key=self.api_key)
 
             # Validate input DataFrame
-            required_cols = {'unique_id', 'ds', 'y'}
+            required_cols = {"unique_id", "ds", "y"}
             if not required_cols.issubset(set(df.columns)):
                 return {
                     "success": False,
-                    "error": f"DataFrame missing required columns. Need: {required_cols}"
+                    "error": f"DataFrame missing required columns. Need: {required_cols}",
                 }
 
             # Generate forecast
-            logger.info(f"Calling TimeGPT API for {len(df['unique_id'].unique())} series, horizon={horizon}")
+            logger.info(
+                f"Calling TimeGPT API for {len(df['unique_id'].unique())} series, horizon={horizon}"
+            )
 
             forecast_df = client.forecast(
-                df=df,
-                h=horizon,
-                freq=freq,
-                level=level or [80, 90]  # Default confidence levels
+                df=df, h=horizon, freq=freq, level=level or [80, 90]  # Default confidence levels
             )
 
             # Rename TimeGPT column for consistency
-            if 'TimeGPT' not in forecast_df.columns:
-                logger.warning(f"TimeGPT column not found in forecast. Columns: {forecast_df.columns.tolist()}")
-                return {
-                    "success": False,
-                    "error": "TimeGPT API returned unexpected format"
-                }
+            if "TimeGPT" not in forecast_df.columns:
+                logger.warning(
+                    f"TimeGPT column not found in forecast. Columns: {forecast_df.columns.tolist()}"
+                )
+                return {"success": False, "error": "TimeGPT API returned unexpected format"}
 
             logger.info(f"TimeGPT forecast successful: {len(forecast_df)} predictions")
 
-            return {
-                "success": True,
-                "forecast": forecast_df
-            }
+            return {"success": True, "forecast": forecast_df}
 
         except ImportError as e:
             error_msg = f"nixtla SDK not installed: {e}. Install with: pip install nixtla"
             logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg
-            }
+            return {"success": False, "error": error_msg}
 
         except Exception as e:
             error_msg = f"TimeGPT API error: {str(e)}"
             logger.error(error_msg, exc_info=True)
-            return {
-                "success": False,
-                "error": error_msg
-            }
+            return {"success": False, "error": error_msg}
 
     def get_status(self) -> Dict[str, Any]:
         """
@@ -128,14 +111,12 @@ class TimeGPTClient:
         Returns:
             Dict with status information
         """
-        status = {
-            "api_key_present": self.api_key is not None,
-            "available": self.is_available()
-        }
+        status = {"api_key_present": self.api_key is not None, "available": self.is_available()}
 
         # Check if nixtla SDK is importable
         try:
             import nixtla
+
             status["sdk_installed"] = True
             status["sdk_version"] = getattr(nixtla, "__version__", "unknown")
         except ImportError:
@@ -156,10 +137,7 @@ def create_timegpt_client() -> TimeGPTClient:
 
 
 def run_timegpt_forecast(
-    series_df: pd.DataFrame,
-    horizon: int,
-    freq: str,
-    max_series: int
+    series_df: pd.DataFrame, horizon: int, freq: str, max_series: int
 ) -> Dict[str, Any]:
     """
     Run TimeGPT forecast for showdown comparison (top-level entry point).
@@ -192,26 +170,22 @@ def run_timegpt_forecast(
             "success": False,
             "reason": "missing_api_key",
             "details": "NIXTLA_TIMEGPT_API_KEY environment variable not set",
-            "series_count": 0
+            "series_count": 0,
         }
 
     # Limit series for cost control
-    all_series = series_df['unique_id'].unique()
+    all_series = series_df["unique_id"].unique()
     if len(all_series) > max_series:
         logger.info(f"Limiting TimeGPT to first {max_series} of {len(all_series)} series")
         series_to_use = all_series[:max_series]
-        limited_df = series_df[series_df['unique_id'].isin(series_to_use)].copy()
+        limited_df = series_df[series_df["unique_id"].isin(series_to_use)].copy()
     else:
         limited_df = series_df.copy()
 
-    series_count = len(limited_df['unique_id'].unique())
+    series_count = len(limited_df["unique_id"].unique())
 
     # Call TimeGPT
-    result = client.forecast(
-        df=limited_df,
-        horizon=horizon,
-        freq=freq
-    )
+    result = client.forecast(df=limited_df, horizon=horizon, freq=freq)
 
     if not result["success"]:
         # Determine reason from error message
@@ -223,12 +197,7 @@ def run_timegpt_forecast(
         else:
             reason = "api_error"
 
-        return {
-            "success": False,
-            "reason": reason,
-            "details": error,
-            "series_count": 0
-        }
+        return {"success": False, "reason": reason, "details": error, "series_count": 0}
 
     # Success
     return {
@@ -236,5 +205,5 @@ def run_timegpt_forecast(
         "reason": "ok",
         "forecast": result["forecast"],
         "series_count": series_count,
-        "details": f"TimeGPT forecast successful for {series_count} series"
+        "details": f"TimeGPT forecast successful for {series_count} series",
     }

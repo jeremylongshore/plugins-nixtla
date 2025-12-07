@@ -6,15 +6,15 @@ Commands:
     nixtla-skills update  - Update existing skills in current project
 """
 
-import sys
 import argparse
+import sys
 from pathlib import Path
 
 from .core import (
-    locate_skills_source,
-    ensure_skills_directory,
     copy_skills_to_project,
-    print_installed_skills_summary
+    ensure_skills_directory,
+    locate_skills_source,
+    print_installed_skills_summary,
 )
 
 
@@ -51,11 +51,7 @@ def cmd_init(args):
         print()
 
         # Copy skills
-        copied_count = copy_skills_to_project(
-            source_dir,
-            target_dir,
-            force=args.force
-        )
+        copied_count = copy_skills_to_project(source_dir, target_dir, force=args.force)
 
         if copied_count > 0:
             print(f"\n✅ Successfully installed {copied_count} Nixtla skills!")
@@ -122,11 +118,7 @@ def cmd_update(args):
         print()
 
         # Copy/update skills
-        copied_count = copy_skills_to_project(
-            source_dir,
-            target_dir,
-            force=args.force
-        )
+        copied_count = copy_skills_to_project(source_dir, target_dir, force=args.force)
 
         if copied_count > 0:
             print(f"\n✅ Successfully updated {copied_count} Nixtla skills!")
@@ -165,8 +157,8 @@ def create_parser() -> argparse.ArgumentParser:
         Configured ArgumentParser
     """
     parser = argparse.ArgumentParser(
-        prog='nixtla-skills',
-        description='Install and update Nixtla Claude Skills in your projects',
+        prog="nixtla-skills",
+        description="Install and update Nixtla Claude Skills in your projects",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -186,39 +178,36 @@ Per-Project Persistence:
   This allows different projects to have different skill versions if needed.
 
 For more info: https://github.com/intent-solutions-io/plugins-nixtla
-        """
+        """,
     )
 
     subparsers = parser.add_subparsers(
-        title='commands',
-        description='Available commands',
-        dest='command',
-        required=True
+        title="commands", description="Available commands", dest="command", required=True
     )
 
     # Init command
     parser_init = subparsers.add_parser(
-        'init',
-        help='Install Nixtla skills in current project (first-time setup)',
-        description='Install Nixtla Claude Skills in the current project.'
+        "init",
+        help="Install Nixtla skills in current project (first-time setup)",
+        description="Install Nixtla Claude Skills in the current project.",
     )
     parser_init.add_argument(
-        '--force',
-        action='store_true',
-        help='Skip confirmation prompts (overwrite existing skills without asking)'
+        "--force",
+        action="store_true",
+        help="Skip confirmation prompts (overwrite existing skills without asking)",
     )
     parser_init.set_defaults(func=cmd_init)
 
     # Update command
     parser_update = subparsers.add_parser(
-        'update',
-        help='Update existing Nixtla skills in current project',
-        description='Update Nixtla Claude Skills to latest versions.'
+        "update",
+        help="Update existing Nixtla skills in current project",
+        description="Update Nixtla Claude Skills to latest versions.",
     )
     parser_update.add_argument(
-        '--force',
-        action='store_true',
-        help='Skip confirmation prompts (overwrite existing skills without asking)'
+        "--force",
+        action="store_true",
+        help="Skip confirmation prompts (overwrite existing skills without asking)",
     )
     parser_update.set_defaults(func=cmd_update)
 

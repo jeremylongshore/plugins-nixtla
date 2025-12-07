@@ -25,13 +25,12 @@ Exit codes:
 Created: 2025-12-03 (Phase 02)
 """
 
-import sys
-import subprocess
-import tempfile
 import shutil
+import subprocess
+import sys
+import tempfile
 from pathlib import Path
 from typing import List, Tuple
-
 
 # Expected skills that should be installed
 EXPECTED_SKILLS = [
@@ -48,6 +47,7 @@ EXPECTED_SKILLS = [
 
 class TestFailure(Exception):
     """Raised when a test assertion fails."""
+
     pass
 
 
@@ -87,7 +87,7 @@ def install_package_editable() -> bool:
             ["pip", "show", "nixtla-claude-skills-installer"],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
         )
         return result.returncode == 0
     except Exception:
@@ -112,7 +112,7 @@ def run_installer_in_temp_dir(temp_dir: Path) -> Tuple[bool, str]:
             capture_output=True,
             text=True,
             check=False,
-            timeout=30  # 30 second timeout
+            timeout=30,  # 30 second timeout
         )
 
         output = result.stdout + result.stderr
@@ -168,8 +168,7 @@ def validate_skills_structure(temp_dir: Path) -> List[str]:
 
     # Find all nixtla-* skill directories
     installed_skills = [
-        d.name for d in skills_dir.iterdir()
-        if d.is_dir() and d.name.startswith("nixtla-")
+        d.name for d in skills_dir.iterdir() if d.is_dir() and d.name.startswith("nixtla-")
     ]
 
     # Check count
@@ -187,9 +186,7 @@ def validate_skills_structure(temp_dir: Path) -> List[str]:
     # Check that all expected skills are present
     missing_skills = [s for s in EXPECTED_SKILLS if s not in installed_skills]
     if missing_skills:
-        errors.append(
-            f"Missing expected skills: {', '.join(missing_skills)}"
-        )
+        errors.append(f"Missing expected skills: {', '.join(missing_skills)}")
 
     # Check that each installed skill has SKILL.md
     for skill_name in installed_skills:
@@ -278,10 +275,9 @@ def run_e2e_test() -> bool:
 
         # Find installed skills
         skills_dir = temp_dir / ".claude" / "skills"
-        installed_skills = sorted([
-            d.name for d in skills_dir.iterdir()
-            if d.is_dir() and d.name.startswith("nixtla-")
-        ])
+        installed_skills = sorted(
+            [d.name for d in skills_dir.iterdir() if d.is_dir() and d.name.startswith("nixtla-")]
+        )
 
         if len(installed_skills) == len(EXPECTED_SKILLS):
             print(f"✓ Found {len(installed_skills)} Nixtla skills:")
@@ -356,6 +352,7 @@ def main():
         print(f"Unexpected error: {e}")
         print()
         import traceback
+
         traceback.print_exc()
         print()
         sys.exit(2)

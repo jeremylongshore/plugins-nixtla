@@ -3,9 +3,9 @@ Pytest configuration and fixtures for Nixtla Search-to-Slack tests.
 """
 
 import os
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 
 import pytest
 import yaml
@@ -29,7 +29,7 @@ def sample_sources_config():
         "api_providers": {
             "serpapi": {
                 "base_url": "https://serpapi.com/search",
-                "default_params": {"gl": "us", "hl": "en"}
+                "default_params": {"gl": "us", "hl": "en"},
             }
         },
         "sources": {
@@ -38,7 +38,7 @@ def sample_sources_config():
                 "max_results": 5,
                 "time_range": "7d",
                 "base_queries": ["Nixtla TimeGPT"],
-                "exclude_domains": ["pinterest.com"]
+                "exclude_domains": ["pinterest.com"],
             },
             "github": {
                 "api_base": "https://api.github.com",
@@ -46,9 +46,9 @@ def sample_sources_config():
                 "additional_repos": ["facebook/prophet"],
                 "content_types": ["issues", "releases"],
                 "max_results": 10,
-                "time_range": "7d"
-            }
-        }
+                "time_range": "7d",
+            },
+        },
     }
 
 
@@ -63,10 +63,10 @@ def sample_topics_config():
                 "keywords": ["TimeGPT", "forecasting"],
                 "sources": ["web", "github"],
                 "filters": {"min_relevance": 50},
-                "slack_channel": "#test-channel"
+                "slack_channel": "#test-channel",
             }
         },
-        "default_topic": "test-topic"
+        "default_topic": "test-topic",
     }
 
 
@@ -82,7 +82,7 @@ def sample_search_results():
             description="New version with multivariate support",
             source="web",
             timestamp=datetime.now(),
-            metadata={"position": 1}
+            metadata={"position": 1},
         ),
         SearchResult(
             url="https://github.com/Nixtla/TimeGPT/releases/v2.0",
@@ -90,7 +90,7 @@ def sample_search_results():
             description="Major update with new features",
             source="github",
             timestamp=datetime.now(),
-            metadata={"type": "release"}
+            metadata={"type": "release"},
         ),
         SearchResult(
             url="https://example.com/article1?utm_source=twitter",  # Duplicate with tracking
@@ -98,8 +98,8 @@ def sample_search_results():
             description="New version with multivariate support",
             source="web",
             timestamp=datetime.now(),
-            metadata={"position": 2}
-        )
+            metadata={"position": 2},
+        ),
     ]
 
 
@@ -115,7 +115,7 @@ def sample_content():
             description="New version with multivariate support for time series forecasting",
             source="web",
             timestamp=datetime.now(),
-            metadata={"position": 1}
+            metadata={"position": 1},
         ),
         Content(
             url="https://github.com/Nixtla/TimeGPT/releases/v2.0",
@@ -123,8 +123,8 @@ def sample_content():
             description="Major update with new features including async support",
             source="github",
             timestamp=datetime.now(),
-            metadata={"type": "release"}
-        )
+            metadata={"type": "release"},
+        ),
     ]
 
 
@@ -140,22 +140,18 @@ def sample_curated_content(sample_content):
             key_points=[
                 "Supports up to 100 variables",
                 "15% accuracy improvement",
-                "New async Python SDK"
+                "New async Python SDK",
             ],
             why_it_matters="Enables enterprise-scale forecasting previously requiring custom solutions.",
-            relevance_score=95
+            relevance_score=95,
         ),
         CuratedContent(
             content=sample_content[1],
             summary="Major release of TimeGPT with breaking changes and new features.",
-            key_points=[
-                "Async support added",
-                "Performance improvements",
-                "New API endpoints"
-            ],
+            key_points=["Async support added", "Performance improvements", "New API endpoints"],
             why_it_matters="Critical update for production TimeGPT deployments.",
-            relevance_score=90
-        )
+            relevance_score=90,
+        ),
     ]
 
 

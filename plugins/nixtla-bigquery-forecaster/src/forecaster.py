@@ -4,9 +4,10 @@ Nixtla Forecaster
 Handles statsforecast and TimeGPT forecasting for time series data.
 """
 
-import pandas as pd
-from typing import List, Optional
 import logging
+from typing import List, Optional
+
+import pandas as pd
 
 # Nixtla open-source models
 from statsforecast import StatsForecast
@@ -31,6 +32,7 @@ class NixtlaForecaster:
         if timegpt_api_key:
             try:
                 from nixtla import NixtlaClient
+
                 self.timegpt_client = NixtlaClient(api_key=timegpt_api_key)
                 logger.info("TimeGPT client initialized")
             except ImportError:
@@ -44,7 +46,7 @@ class NixtlaForecaster:
         horizon: int,
         models: List[str] = None,
         include_timegpt: bool = False,
-        freq: str = "D"
+        freq: str = "D",
     ) -> pd.DataFrame:
         """
         Generate forecasts for time series data.
@@ -68,7 +70,7 @@ class NixtlaForecaster:
         model_map = {
             "AutoETS": AutoETS(season_length=7),
             "AutoTheta": AutoTheta(season_length=7),
-            "SeasonalNaive": SeasonalNaive(season_length=7)
+            "SeasonalNaive": SeasonalNaive(season_length=7),
         }
 
         # Select requested models
@@ -83,11 +85,7 @@ class NixtlaForecaster:
             raise ValueError(f"No valid models specified. Available: {list(model_map.keys())}")
 
         # Run statsforecast
-        sf = StatsForecast(
-            models=selected_models,
-            freq=freq,
-            n_jobs=-1  # Use all available cores
-        )
+        sf = StatsForecast(models=selected_models, freq=freq, n_jobs=-1)  # Use all available cores
 
         try:
             forecasts = sf.forecast(df=df, h=horizon)
@@ -101,17 +99,13 @@ class NixtlaForecaster:
             try:
                 logger.info("Running TimeGPT forecasts...")
                 timegpt_forecast = self.timegpt_client.forecast(
-                    df=df,
-                    h=horizon,
-                    freq=freq,
-                    time_col='ds',
-                    target_col='y'
+                    df=df, h=horizon, freq=freq, time_col="ds", target_col="y"
                 )
                 # Merge TimeGPT results
                 forecasts = forecasts.merge(
-                    timegpt_forecast[['unique_id', 'ds', 'TimeGPT']],
-                    on=['unique_id', 'ds'],
-                    how='left'
+                    timegpt_forecast[["unique_id", "ds", "TimeGPT"]],
+                    on=["unique_id", "ds"],
+                    how="left",
                 )
                 logger.info("TimeGPT forecasts added")
             except Exception as e:
@@ -125,7 +119,7 @@ class NixtlaForecaster:
         horizon: int,
         n_windows: int = 3,
         models: List[str] = None,
-        freq: str = "D"
+        freq: str = "D",
     ) -> pd.DataFrame:
         """
         Run backtesting for model evaluation.
@@ -148,23 +142,16 @@ class NixtlaForecaster:
         model_map = {
             "AutoETS": AutoETS(season_length=7),
             "AutoTheta": AutoTheta(season_length=7),
-            "SeasonalNaive": SeasonalNaive(season_length=7)
+            "SeasonalNaive": SeasonalNaive(season_length=7),
         }
 
         selected_models = [model_map[m] for m in models if m in model_map]
 
-        sf = StatsForecast(
-            models=selected_models,
-            freq=freq,
-            n_jobs=-1
-        )
+        sf = StatsForecast(models=selected_models, freq=freq, n_jobs=-1)
 
         try:
             cv_results = sf.cross_validation(
-                df=df,
-                h=horizon,
-                step_size=horizon,
-                n_windows=n_windows
+                df=df, h=horizon, step_size=horizon, n_windows=n_windows
             )
             logger.info(f"Backtest complete: {len(cv_results)} results")
             return cv_results

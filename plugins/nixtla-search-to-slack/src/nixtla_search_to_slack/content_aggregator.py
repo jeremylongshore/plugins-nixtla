@@ -5,10 +5,10 @@ MVP implementation with simple URL and title-based deduplication.
 
 import logging
 import re
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from difflib import SequenceMatcher
+from typing import Any, Dict, List, Optional
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from .search_orchestrator import SearchResult
 
@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class Content:
     """Represents a deduplicated content item."""
+
     url: str
     title: str
     description: str
@@ -78,7 +79,7 @@ class ContentAggregator:
                 description=result.description,
                 source=result.source,
                 timestamp=result.timestamp,
-                metadata=result.metadata
+                metadata=result.metadata,
             )
 
             # Track for deduplication
@@ -88,7 +89,9 @@ class ContentAggregator:
 
             unique_content.append(content)
 
-        logger.info(f"Deduplicated {duplicate_count} items from {len(search_results)} total results")
+        logger.info(
+            f"Deduplicated {duplicate_count} items from {len(search_results)} total results"
+        )
         return unique_content
 
     def _normalize_url(self, url: str) -> str:
@@ -110,14 +113,23 @@ class ContentAggregator:
                 params = parse_qs(parsed.query)
                 # Remove common tracking parameters
                 tracking_params = {
-                    'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
-                    'ref', 'referer', 'source', 'fbclid', 'gclid', 'msclkid',
-                    's', 'sr_share', 'attribution_id', 'amp'
+                    "utm_source",
+                    "utm_medium",
+                    "utm_campaign",
+                    "utm_term",
+                    "utm_content",
+                    "ref",
+                    "referer",
+                    "source",
+                    "fbclid",
+                    "gclid",
+                    "msclkid",
+                    "s",
+                    "sr_share",
+                    "attribution_id",
+                    "amp",
                 }
-                clean_params = {
-                    k: v for k, v in params.items()
-                    if k.lower() not in tracking_params
-                }
+                clean_params = {k: v for k, v in params.items() if k.lower() not in tracking_params}
                 clean_query = urlencode(clean_params, doseq=True)
             else:
                 clean_query = ""
@@ -127,14 +139,16 @@ class ContentAggregator:
 
             # Remove fragment (hash)
             # Rebuild URL without fragment and with clean params
-            normalized = urlunparse((
-                parsed.scheme,
-                parsed.netloc,
-                clean_path,
-                "",  # params
-                clean_query,
-                ""   # fragment
-            ))
+            normalized = urlunparse(
+                (
+                    parsed.scheme,
+                    parsed.netloc,
+                    clean_path,
+                    "",  # params
+                    clean_query,
+                    "",  # fragment
+                )
+            )
 
             return normalized
 
@@ -156,8 +170,8 @@ class ContentAggregator:
         normalized = title.lower()
 
         # Remove special characters and extra whitespace
-        normalized = re.sub(r'[^\w\s]', ' ', normalized)
-        normalized = re.sub(r'\s+', ' ', normalized)
+        normalized = re.sub(r"[^\w\s]", " ", normalized)
+        normalized = re.sub(r"\s+", " ", normalized)
 
         # Strip whitespace
         normalized = normalized.strip()
@@ -212,5 +226,5 @@ class ContentAggregator:
         return {
             "unique_urls": len(self.seen_urls),
             "unique_titles": len(self.seen_titles),
-            "total_content": len(self.content_map)
+            "total_content": len(self.content_map),
         }

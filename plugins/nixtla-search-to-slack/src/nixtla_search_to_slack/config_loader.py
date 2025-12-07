@@ -5,7 +5,7 @@ Handles YAML configuration files with validation.
 
 import logging
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
 
 import yaml
 
@@ -73,15 +73,15 @@ class ConfigLoader:
             required_fields = ["max_results", "time_range"]
             for field in required_fields:
                 if field not in source_config:
-                    raise ValueError(
-                        f"Source '{source_id}' missing required field: {field}"
-                    )
+                    raise ValueError(f"Source '{source_id}' missing required field: {field}")
 
             # Validate source-specific requirements
             if source_id == "web" and "provider" not in source_config:
                 raise ValueError("Web source requires 'provider' field")
             elif source_id == "github":
-                if not source_config.get("organizations") and not source_config.get("additional_repos"):
+                if not source_config.get("organizations") and not source_config.get(
+                    "additional_repos"
+                ):
                     raise ValueError(
                         "GitHub source requires either 'organizations' or 'additional_repos'"
                     )
@@ -107,9 +107,7 @@ class ConfigLoader:
             required_fields = ["name", "keywords", "sources"]
             for field in required_fields:
                 if field not in topic_config:
-                    raise ValueError(
-                        f"Topic '{topic_id}' missing required field: {field}"
-                    )
+                    raise ValueError(f"Topic '{topic_id}' missing required field: {field}")
 
             # Validate keywords is a list
             if not isinstance(topic_config["keywords"], list):
@@ -123,9 +121,7 @@ class ConfigLoader:
             available_sources = self.load_sources()["sources"].keys()
             for source in topic_config["sources"]:
                 if source not in available_sources:
-                    raise ValueError(
-                        f"Topic '{topic_id}' references unknown source: {source}"
-                    )
+                    raise ValueError(f"Topic '{topic_id}' references unknown source: {source}")
 
         logger.info(f"Loaded {len(config['topics'])} topics")
         return config

@@ -4,10 +4,11 @@ Cloud Function Entry Point for Nixtla BigQuery Forecaster
 Handles HTTP requests to forecast time series data from BigQuery using Nixtla models.
 """
 
-import os
 import json
 import logging
+import os
 from typing import Any, Dict
+
 import functions_framework
 from flask import Request, jsonify
 
@@ -72,9 +73,7 @@ def forecast_handler(request: Request) -> tuple[Dict[str, Any], int]:
             missing_fields.append("horizon")
 
         if missing_fields:
-            return jsonify({
-                "error": f"Missing required fields: {', '.join(missing_fields)}"
-            }), 400
+            return jsonify({"error": f"Missing required fields: {', '.join(missing_fields)}"}), 400
 
         # Extract optional parameters
         group_by = request_json.get("group_by")
@@ -103,29 +102,20 @@ def forecast_handler(request: Request) -> tuple[Dict[str, Any], int]:
             group_by=group_by,
             where_clause=where_clause,
             limit=limit,
-            source_project=source_project
+            source_project=source_project,
         )
 
         if df.empty:
-            return jsonify({
-                "error": "No data found with specified filters"
-            }), 404
+            return jsonify({"error": "No data found with specified filters"}), 404
 
-        logger.info(
-            f"Read {len(df)} rows, {df['unique_id'].nunique()} unique time series"
-        )
+        logger.info(f"Read {len(df)} rows, {df['unique_id'].nunique()} unique time series")
 
         # Step 2: Run Nixtla forecasts
         logger.info("Step 2: Running Nixtla forecasts...")
-        forecaster = NixtlaForecaster(
-            timegpt_api_key=os.environ.get("NIXTLA_TIMEGPT_API_KEY")
-        )
+        forecaster = NixtlaForecaster(timegpt_api_key=os.environ.get("NIXTLA_TIMEGPT_API_KEY"))
 
         forecast_results = forecaster.forecast(
-            df=df,
-            horizon=horizon,
-            models=models,
-            include_timegpt=include_timegpt
+            df=df, horizon=horizon, models=models, include_timegpt=include_timegpt
         )
 
         logger.info(f"Generated {len(forecast_results)} forecast points")
@@ -135,10 +125,7 @@ def forecast_handler(request: Request) -> tuple[Dict[str, Any], int]:
         if output_dataset and output_table:
             logger.info("Step 3: Writing forecasts to BigQuery...")
             output_table_id = bq_connector.write_forecasts(
-                df=forecast_results,
-                dataset=output_dataset,
-                table=output_table,
-                if_exists="replace"
+                df=forecast_results, dataset=output_dataset, table=output_table, if_exists="replace"
             )
             logger.info(f"Wrote forecasts to {output_table_id}")
 
@@ -148,13 +135,13 @@ def forecast_handler(request: Request) -> tuple[Dict[str, Any], int]:
             "metadata": {
                 "source_table": f"{project_id}.{dataset}.{table}",
                 "rows_read": len(df),
-                "unique_series": df['unique_id'].nunique(),
+                "unique_series": df["unique_id"].nunique(),
                 "horizon": horizon,
                 "models_used": models,
                 "timegpt_included": include_timegpt,
-                "forecast_points_generated": len(forecast_results)
+                "forecast_points_generated": len(forecast_results),
             },
-            "forecasts": forecast_results.to_dict(orient="records")
+            "forecasts": forecast_results.to_dict(orient="records"),
         }
 
         if output_table_id:
@@ -165,21 +152,20 @@ def forecast_handler(request: Request) -> tuple[Dict[str, Any], int]:
 
     except Exception as e:
         logger.error(f"Error in forecast_handler: {str(e)}", exc_info=True)
-        return jsonify({
-            "error": str(e),
-            "type": type(e).__name__
-        }), 500
+        return jsonify({"error": str(e), "type": type(e).__name__}), 500
 
 
 # Local testing entry point
 if __name__ == "__main__":
     from flask import Flask
+
     app = Flask(__name__)
 
-    @app.route('/', methods=['POST'])
+    @app.route("/", methods=["POST"])
     def local_test():
         from flask import request
+
         return forecast_handler(request)
 
     print("Starting local test server on http://localhost:8080")
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
