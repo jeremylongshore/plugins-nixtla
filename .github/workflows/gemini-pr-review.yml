@@ -7,13 +7,12 @@ on:
 jobs:
   gemini_review:
     runs-on: ubuntu-latest
-    timeout-minutes: 7
+    timeout-minutes: 5
 
     permissions:
       contents: read
       id-token: write
       pull-requests: write
-      issues: write
 
     steps:
       - name: Authenticate to Google Cloud (WIF)
@@ -22,40 +21,74 @@ jobs:
           workload_identity_provider: projects/859338910722/locations/global/workloadIdentityPools/github-pool/providers/github-provider
           service_account: nixtla-github-deployer@nixtla-playground-01.iam.gserviceaccount.com
 
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
 
-      - name: Run Gemini CLI for PR Review
-        uses: google-github-actions/run-gemini-cli@v0.1.16
-        with:
-          gcp_project_id: nixtla-playground-01
-          gcp_location: us-central1
-          gcp_workload_identity_provider: projects/859338910722/locations/global/workloadIdentityPools/github-pool/providers/github-provider
-          gcp_service_account: nixtla-github-deployer@nixtla-playground-01.iam.gserviceaccount.com
-          use_vertex_ai: true
-          gemini_model: gemini-2.0-flash-001
-          settings: '{"thinkingEnabled": false}'
-          prompt: |
-            You are a Senior Time-Series ML Engineer and Cloud Integration Specialist.
-            Review this Pull Request and provide clear, actionable inline comments.
+      - name: Get PR diff
+        id: diff
+        run: |
+          gh pr diff ${{ github.event.pull_request.number }} > /tmp/diff.txt
+          # Truncate for API limits
+          head -c 25000 /tmp/diff.txt > /tmp/diff_truncated.txt
+        env:
+          GH_TOKEN: ${{ github.token }}
 
-            ## Nixtla Ecosystem Review (Critical)
-            - Data Format: Check for Nixtla long format (unique_id, ds, y columns)
-            - Split Strategy: Verify time-series-aware splitting, NOT random CV
-            - Model Selection: Assess if chosen model fits data characteristics
-            - Evaluation: Ensure correct metrics (MAE, RMSE, SMAPE)
+      - name: Review with Gemini
+        id: review
+        run: |
+          DIFF=$(cat /tmp/diff_truncated.txt | jq -Rs .)
 
-            ## Claude API & Plugin Integration
-            - Credentials: API keys via environment variables, NOT hardcoded
-            - Error Handling: Try/except for API calls, rate limits, network errors
-            - Plugin Security: Sanitize inputs to prevent injection
-            - Response Parsing: Resilient to unexpected formatting
+          PROMPT="You are a code reviewer for the Nixtla Claude Code Plugins project (time-series forecasting). Review this PR diff.
 
-            ## Performance & Cloud Best Practices
-            - Vectorization: Flag non-vectorized loops, use NumPy/Pandas
-            - Resource Usage: Check memory usage and data duplication
-            - Cloud Cost: Recommend efficiency for BigQuery/Cloud Storage
+          Check for:
+          - Security issues (hardcoded secrets, injection risks)
+          - Python quality (PEP-8, error handling)
+          - Nixtla patterns (unique_id/ds/y format)
 
-            Approve if code is good. Request changes with specific fixes if issues found.
+          Respond with APPROVE on the first line if the code is good.
+          Respond with CHANGES_REQUESTED on the first line if there are issues.
+          Then provide a brief explanation.
+
+          PR Diff:
+          ${DIFF}"
+
+          RESPONSE=$(curl -s "https://us-central1-aiplatform.googleapis.com/v1/projects/nixtla-playground-01/locations/us-central1/publishers/google/models/gemini-2.0-flash-001:generateContent" \
+            -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"contents\": [{
+                \"parts\": [{\"text\": $(echo "$PROMPT" | jq -Rs .)}]
+              }],
+              \"generationConfig\": {
+                \"temperature\": 0.2,
+                \"maxOutputTokens\": 2048
+              }
+            }")
+
+          REVIEW=$(echo "$RESPONSE" | jq -r '.candidates[0].content.parts[0].text // "ERROR: Could not parse response"')
+          FIRST_LINE=$(echo "$REVIEW" | head -1)
+
+          echo "First line: $FIRST_LINE"
+          echo "review<<EOF" >> $GITHUB_OUTPUT
+          echo "$REVIEW" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          if [[ "$FIRST_LINE" == *"APPROVE"* ]]; then
+            echo "decision=approve" >> $GITHUB_OUTPUT
+          else
+            echo "decision=comment" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post Review
+        run: |
+          if [[ "${{ steps.review.outputs.decision }}" == "approve" ]]; then
+            gh pr review ${{ github.event.pull_request.number }} --approve --body "✅ **Gemini Auto-Review: Approved**
+
+          ${{ steps.review.outputs.review }}"
+          else
+            gh pr review ${{ github.event.pull_request.number }} --comment --body "🔍 **Gemini Auto-Review**
+
+          ${{ steps.review.outputs.review }}"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
