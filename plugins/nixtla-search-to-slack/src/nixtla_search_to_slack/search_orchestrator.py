@@ -5,14 +5,14 @@ Supports multiple web search providers (FREE and PAID options).
 
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import List, Dict, Any
 from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
 from urllib.parse import urlencode
 
 import requests
 
-from .web_search_providers import create_web_search_provider, WebSearchResult
+from .web_search_providers import WebSearchResult, create_web_search_provider
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class SearchResult:
     """Represents a single search result."""
+
     url: str
     title: str
     description: str
@@ -50,15 +51,14 @@ class SearchOrchestrator:
         # Initialize web search adapter if configured
         if "web" in self.sources_config["sources"]:
             adapters["web"] = WebSearchAdapter(
-                env_config=self.env_config,
-                config=self.sources_config["sources"]["web"]
+                env_config=self.env_config, config=self.sources_config["sources"]["web"]
             )
 
         # Initialize GitHub search adapter if configured
         if "github" in self.sources_config["sources"]:
             adapters["github"] = GitHubSearchAdapter(
                 token=self.env_config.get("GITHUB_TOKEN"),
-                config=self.sources_config["sources"]["github"]
+                config=self.sources_config["sources"]["github"],
             )
 
         logger.info(f"Initialized {len(adapters)} search adapters")
@@ -87,7 +87,7 @@ class SearchOrchestrator:
                 adapter = self.adapters[source_name]
                 source_results = adapter.search(
                     query=query,
-                    time_range=self.sources_config["sources"][source_name].get("time_range", "7d")
+                    time_range=self.sources_config["sources"][source_name].get("time_range", "7d"),
                 )
                 results.extend(source_results)
                 logger.info(f"Found {len(source_results)} results from {source_name}")
@@ -147,21 +147,21 @@ class WebSearchAdapter:
         try:
             # Call the provider's search method
             web_results = self.provider.search(
-                query=query,
-                max_results=self.config.get("max_results", 10),
-                time_range=time_range
+                query=query, max_results=self.config.get("max_results", 10), time_range=time_range
             )
 
             # Convert WebSearchResult to SearchResult format
             for web_result in web_results:
-                results.append(SearchResult(
-                    url=web_result.url,
-                    title=web_result.title,
-                    description=web_result.description,
-                    source="web",
-                    timestamp=web_result.timestamp,
-                    metadata=web_result.metadata
-                ))
+                results.append(
+                    SearchResult(
+                        url=web_result.url,
+                        title=web_result.title,
+                        description=web_result.description,
+                        source="web",
+                        timestamp=web_result.timestamp,
+                        metadata=web_result.metadata,
+                    )
+                )
 
         except Exception as e:
             logger.error(f"Web search failed: {e}")
@@ -184,7 +184,7 @@ class GitHubSearchAdapter:
         self.config = config
         self.headers = {
             "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3+json"
+            "Accept": "application/vnd.github.v3+json",
         }
 
     def search(self, query: str, time_range: str) -> List[SearchResult]:
@@ -217,7 +217,9 @@ class GitHubSearchAdapter:
         for content_type in content_types:
             try:
                 if content_type in ["issues", "pull_requests"]:
-                    results.extend(self._search_issues(query, org_filters, date_filter, content_type))
+                    results.extend(
+                        self._search_issues(query, org_filters, date_filter, content_type)
+                    )
                 elif content_type == "releases":
                     results.extend(self._search_releases(query, org_filters, date_filter))
                 # Note: GitHub API doesn't have direct discussion search in MVP
@@ -225,10 +227,11 @@ class GitHubSearchAdapter:
             except Exception as e:
                 logger.error(f"GitHub {content_type} search failed: {e}")
 
-        return results[:self.config.get("max_results", 20)]
+        return results[: self.config.get("max_results", 20)]
 
-    def _search_issues(self, query: str, org_filters: List[str], date_filter: str,
-                      content_type: str) -> List[SearchResult]:
+    def _search_issues(
+        self, query: str, org_filters: List[str], date_filter: str, content_type: str
+    ) -> List[SearchResult]:
         """Search GitHub issues and pull requests."""
         results = []
 
@@ -242,7 +245,7 @@ class GitHubSearchAdapter:
             "q": full_query,
             "sort": "created",
             "order": "desc",
-            "per_page": min(self.config.get("max_results", 20), 30)
+            "per_page": min(self.config.get("max_results", 20), 30),
         }
 
         try:
@@ -251,34 +254,46 @@ class GitHubSearchAdapter:
             data = response.json()
 
             for item in data.get("items", []):
-                results.append(SearchResult(
-                    url=item.get("html_url", ""),
-                    title=item.get("title", ""),
-                    description=item.get("body", "")[:300] if item.get("body") else "",
-                    source="github",
-                    timestamp=datetime.fromisoformat(item.get("created_at", "").replace("Z", "+00:00")),
-                    metadata={
-                        "type": content_type,
-                        "state": item.get("state", ""),
-                        "repository": item.get("repository_url", "").split("/")[-1] if item.get("repository_url") else "",
-                        "author": item.get("user", {}).get("login", ""),
-                        "labels": [label["name"] for label in item.get("labels", [])]
-                    }
-                ))
+                results.append(
+                    SearchResult(
+                        url=item.get("html_url", ""),
+                        title=item.get("title", ""),
+                        description=item.get("body", "")[:300] if item.get("body") else "",
+                        source="github",
+                        timestamp=datetime.fromisoformat(
+                            item.get("created_at", "").replace("Z", "+00:00")
+                        ),
+                        metadata={
+                            "type": content_type,
+                            "state": item.get("state", ""),
+                            "repository": (
+                                item.get("repository_url", "").split("/")[-1]
+                                if item.get("repository_url")
+                                else ""
+                            ),
+                            "author": item.get("user", {}).get("login", ""),
+                            "labels": [label["name"] for label in item.get("labels", [])],
+                        },
+                    )
+                )
 
         except Exception as e:
             logger.error(f"GitHub issues search error: {e}")
 
         return results
 
-    def _search_releases(self, query: str, org_filters: List[str], date_filter: str) -> List[SearchResult]:
+    def _search_releases(
+        self, query: str, org_filters: List[str], date_filter: str
+    ) -> List[SearchResult]:
         """Search GitHub releases (simplified for MVP)."""
         results = []
 
         # For MVP, we'll check releases for specific repos
         for repo in self.config.get("additional_repos", []):
             try:
-                url = f"{self.config.get('api_base', 'https://api.github.com')}/repos/{repo}/releases"
+                url = (
+                    f"{self.config.get('api_base', 'https://api.github.com')}/repos/{repo}/releases"
+                )
                 params = {"per_page": 10}
 
                 response = requests.get(url, headers=self.headers, params=params, timeout=30)
@@ -287,21 +302,30 @@ class GitHubSearchAdapter:
 
                 for release in data:
                     # Simple keyword matching in release name/body
-                    if any(keyword.lower() in (release.get("name", "") + release.get("body", "")).lower()
-                          for keyword in query.split()):
-                        results.append(SearchResult(
-                            url=release.get("html_url", ""),
-                            title=f"{repo}: {release.get('name', release.get('tag_name', ''))}",
-                            description=release.get("body", "")[:300] if release.get("body") else "",
-                            source="github",
-                            timestamp=datetime.fromisoformat(release.get("published_at", "").replace("Z", "+00:00")),
-                            metadata={
-                                "type": "release",
-                                "tag": release.get("tag_name", ""),
-                                "repository": repo,
-                                "prerelease": release.get("prerelease", False)
-                            }
-                        ))
+                    if any(
+                        keyword.lower()
+                        in (release.get("name", "") + release.get("body", "")).lower()
+                        for keyword in query.split()
+                    ):
+                        results.append(
+                            SearchResult(
+                                url=release.get("html_url", ""),
+                                title=f"{repo}: {release.get('name', release.get('tag_name', ''))}",
+                                description=(
+                                    release.get("body", "")[:300] if release.get("body") else ""
+                                ),
+                                source="github",
+                                timestamp=datetime.fromisoformat(
+                                    release.get("published_at", "").replace("Z", "+00:00")
+                                ),
+                                metadata={
+                                    "type": "release",
+                                    "tag": release.get("tag_name", ""),
+                                    "repository": repo,
+                                    "prerelease": release.get("prerelease", False),
+                                },
+                            )
+                        )
 
             except Exception as e:
                 logger.debug(f"Could not fetch releases for {repo}: {e}")

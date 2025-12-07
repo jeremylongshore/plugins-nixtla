@@ -32,6 +32,7 @@ from typing import List, Tuple
 
 class ValidationError(Exception):
     """Raised when validation fails."""
+
     pass
 
 
@@ -77,7 +78,8 @@ def check_plugin_directories(repo_root: Path) -> Tuple[bool, str]:
 
     # Get all plugin directories (exclude __pycache__, __init__.py, README.md)
     plugin_dirs = [
-        d.name for d in plugins_dir.iterdir()
+        d.name
+        for d in plugins_dir.iterdir()
         if d.is_dir() and not d.name.startswith("__") and not d.name.startswith(".")
     ]
 
@@ -97,8 +99,7 @@ def check_claude_skills(repo_root: Path) -> Tuple[bool, str]:
 
     # Get all skill directories (expect names like nixtla-*)
     skill_dirs = [
-        d.name for d in skills_dir.iterdir()
-        if d.is_dir() and d.name.startswith("nixtla-")
+        d.name for d in skills_dir.iterdir() if d.is_dir() and d.name.startswith("nixtla-")
     ]
 
     if len(skill_dirs) == 0:
@@ -122,8 +123,7 @@ def check_canonical_docs(repo_root: Path) -> Tuple[bool, str]:
 
     # Find all files starting with "6767-"
     canonical_docs = [
-        f.name for f in docs_dir.iterdir()
-        if f.is_file() and f.name.startswith("6767-")
+        f.name for f in docs_dir.iterdir() if f.is_file() and f.name.startswith("6767-")
     ]
 
     if len(canonical_docs) == 0:
@@ -132,10 +132,16 @@ def check_canonical_docs(repo_root: Path) -> Tuple[bool, str]:
     # Expected at least 9 canonical docs
     expected_min = 9
     if len(canonical_docs) < expected_min:
-        return False, f"Expected at least {expected_min} canonical docs, found {len(canonical_docs)}"
+        return (
+            False,
+            f"Expected at least {expected_min} canonical docs, found {len(canonical_docs)}",
+        )
 
     docs_list = "\n       - ".join(sorted(canonical_docs))
-    return True, f"Canonical 6767 reference docs found ({len(canonical_docs)}):\n       - {docs_list}"
+    return (
+        True,
+        f"Canonical 6767 reference docs found ({len(canonical_docs)}):\n       - {docs_list}",
+    )
 
 
 def check_ci_workflows(repo_root: Path) -> Tuple[bool, str]:
@@ -147,8 +153,7 @@ def check_ci_workflows(repo_root: Path) -> Tuple[bool, str]:
 
     # Get all .yml workflow files
     workflow_files = [
-        f.name for f in workflows_dir.iterdir()
-        if f.is_file() and f.suffix in [".yml", ".yaml"]
+        f.name for f in workflows_dir.iterdir() if f.is_file() and f.suffix in [".yml", ".yaml"]
     ]
 
     if len(workflow_files) == 0:
@@ -231,6 +236,7 @@ def main():
     except Exception as e:
         print(f"\n[FATAL ERROR] Unexpected error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(2)
 

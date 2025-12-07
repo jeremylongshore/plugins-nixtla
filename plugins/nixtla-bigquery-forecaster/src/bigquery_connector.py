@@ -4,10 +4,11 @@ BigQuery Connector for Nixtla Forecasting
 Handles reading time series data from BigQuery and writing forecasts back.
 """
 
+import logging
+from typing import List, Optional
+
 import pandas as pd
 from google.cloud import bigquery
-from typing import Optional, List
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ class BigQueryConnector:
         group_by: Optional[str] = None,
         where_clause: Optional[str] = None,
         limit: Optional[int] = None,
-        source_project: Optional[str] = None
+        source_project: Optional[str] = None,
     ) -> pd.DataFrame:
         """
         Read time series data from BigQuery.
@@ -88,18 +89,14 @@ class BigQueryConnector:
         df = self.client.query(query).to_dataframe()
 
         # Convert ds to datetime for statsforecast compatibility
-        df['ds'] = pd.to_datetime(df['ds'])
+        df["ds"] = pd.to_datetime(df["ds"])
 
         logger.info(f"Read {len(df)} rows, {df['unique_id'].nunique()} unique time series")
 
         return df
 
     def write_forecasts(
-        self,
-        df: pd.DataFrame,
-        dataset: str,
-        table: str,
-        if_exists: str = "replace"
+        self, df: pd.DataFrame, dataset: str, table: str, if_exists: str = "replace"
     ) -> str:
         """
         Write forecast results to BigQuery.
@@ -119,20 +116,15 @@ class BigQueryConnector:
         write_disposition = {
             "replace": bigquery.WriteDisposition.WRITE_TRUNCATE,
             "append": bigquery.WriteDisposition.WRITE_APPEND,
-            "fail": bigquery.WriteDisposition.WRITE_EMPTY
+            "fail": bigquery.WriteDisposition.WRITE_EMPTY,
         }[if_exists]
 
-        job_config = bigquery.LoadJobConfig(
-            write_disposition=write_disposition,
-            autodetect=True
-        )
+        job_config = bigquery.LoadJobConfig(write_disposition=write_disposition, autodetect=True)
 
         logger.info(f"Writing {len(df)} forecast rows to {table_id}")
 
         # Write to BigQuery
-        job = self.client.load_table_from_dataframe(
-            df, table_id, job_config=job_config
-        )
+        job = self.client.load_table_from_dataframe(df, table_id, job_config=job_config)
         job.result()  # Wait for completion
 
         logger.info(f"Successfully wrote forecasts to {table_id}")
@@ -159,7 +151,9 @@ class BigQueryConnector:
             "num_bytes": table_obj.num_bytes,
             "created": table_obj.created,
             "modified": table_obj.modified,
-            "schema": [{"name": field.name, "type": field.field_type} for field in table_obj.schema]
+            "schema": [
+                {"name": field.name, "type": field.field_type} for field in table_obj.schema
+            ],
         }
 
 
@@ -177,7 +171,7 @@ if __name__ == "__main__":
         value_col="trip_total",
         group_by="payment_type",
         where_clause="trip_start_timestamp >= '2024-01-01'",
-        limit=10000
+        limit=10000,
     )
 
     print(df.head())

@@ -86,6 +86,7 @@ exclude = '''
 /(
     \.git
   | \.venv
+  | \.venv-.*
   | build
   | dist
   | __pycache__

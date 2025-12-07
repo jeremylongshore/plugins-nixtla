@@ -11,14 +11,14 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 from dotenv import load_dotenv
 
-from .config_loader import ConfigLoader
-from .search_orchestrator import SearchOrchestrator
-from .content_aggregator import ContentAggregator
 from .ai_curator import AICurator
+from .config_loader import ConfigLoader
+from .content_aggregator import ContentAggregator
+from .search_orchestrator import SearchOrchestrator
 from .slack_publisher import SlackPublisher
 
 # Load environment variables
@@ -27,7 +27,7 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(
     level=logging.DEBUG if os.getenv("DEBUG", "false").lower() == "true" else logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -106,7 +106,7 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
             "success": False,
             "error": f"Topic not found. Available: {available}",
             "topic": topic_id,
-            "timestamp": start_time.isoformat()
+            "timestamp": start_time.isoformat(),
         }
 
     topic = topics_config["topics"][topic_id]
@@ -128,7 +128,7 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
                 "items_sent": 0,
                 "message": "No new content found",
                 "timestamp": start_time.isoformat(),
-                "duration": (datetime.now() - start_time).total_seconds()
+                "duration": (datetime.now() - start_time).total_seconds(),
             }
 
         # 2. Aggregate and deduplicate
@@ -144,11 +144,10 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
 
         # Filter by relevance
         min_relevance = topic.get("filters", {}).get("min_relevance", 50)
-        relevant_items = [
-            item for item in curated_items
-            if item.relevance_score >= min_relevance
-        ]
-        logger.info(f"Filtered to {len(relevant_items)} relevant items (min score: {min_relevance})")
+        relevant_items = [item for item in curated_items if item.relevance_score >= min_relevance]
+        logger.info(
+            f"Filtered to {len(relevant_items)} relevant items (min score: {min_relevance})"
+        )
 
         if not relevant_items:
             logger.info("No items met relevance threshold")
@@ -161,16 +160,14 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
                 "items_sent": 0,
                 "message": f"No items met relevance threshold ({min_relevance})",
                 "timestamp": start_time.isoformat(),
-                "duration": (datetime.now() - start_time).total_seconds()
+                "duration": (datetime.now() - start_time).total_seconds(),
             }
 
         # Limit to max items
         max_items = int(os.getenv("MAX_ITEMS_PER_DIGEST", 10))
-        final_items = sorted(
-            relevant_items,
-            key=lambda x: x.relevance_score,
-            reverse=True
-        )[:max_items]
+        final_items = sorted(relevant_items, key=lambda x: x.relevance_score, reverse=True)[
+            :max_items
+        ]
 
         # 4. Publish to Slack
         logger.info(f"Phase 4: Publishing {len(final_items)} items to Slack...")
@@ -180,9 +177,7 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
         channel = topic.get("slack_channel", os.getenv("SLACK_CHANNEL", "#general"))
 
         publish_result = publisher.publish(
-            items=final_items,
-            channel=channel,
-            topic_name=topic["name"]
+            items=final_items, channel=channel, topic_name=topic["name"]
         )
 
         # Prepare result summary
@@ -198,7 +193,7 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
             "slack_channel": channel,
             "slack_timestamp": publish_result.message_ts,
             "timestamp": start_time.isoformat(),
-            "duration": (datetime.now() - start_time).total_seconds()
+            "duration": (datetime.now() - start_time).total_seconds(),
         }
 
         if not publish_result.success:
@@ -216,7 +211,7 @@ def run_digest(topic_id: str = "nixtla-core") -> Dict[str, Any]:
             "topic": topic_id,
             "error": str(e),
             "timestamp": start_time.isoformat(),
-            "duration": (datetime.now() - start_time).total_seconds()
+            "duration": (datetime.now() - start_time).total_seconds(),
         }
 
 
@@ -224,32 +219,21 @@ def main():
     """Command-line interface for the digest."""
     parser = argparse.ArgumentParser(
         description="Nixtla Search-to-Slack Digest - MVP Construction Kit",
-        epilog="This is an example implementation, not a production service."
+        epilog="This is an example implementation, not a production service.",
     )
 
     parser.add_argument(
-        "--topic",
-        default="nixtla-core",
-        help="Topic ID to search for (default: nixtla-core)"
+        "--topic", default="nixtla-core", help="Topic ID to search for (default: nixtla-core)"
+    )
+
+    parser.add_argument("--list-topics", action="store_true", help="List available topics and exit")
+
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Run search and curation but don't post to Slack"
     )
 
     parser.add_argument(
-        "--list-topics",
-        action="store_true",
-        help="List available topics and exit"
-    )
-
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Run search and curation but don't post to Slack"
-    )
-
-    parser.add_argument(
-        "--output",
-        choices=["json", "text"],
-        default="json",
-        help="Output format (default: json)"
+        "--output", choices=["json", "text"], default="json", help="Output format (default: json)"
     )
 
     args = parser.parse_args()

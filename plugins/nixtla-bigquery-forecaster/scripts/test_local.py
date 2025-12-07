@@ -1,12 +1,14 @@
 """
 Local test of BigQuery connector and Nixtla forecaster
 """
-import sys
-sys.path.insert(0, 'src')
 
+import sys
+
+sys.path.insert(0, "src")
+
+import pandas as pd
 from bigquery_connector import BigQueryConnector
 from forecaster import NixtlaForecaster
-import pandas as pd
 
 print("=" * 60)
 print("Testing Nixtla BigQuery Forecaster")
@@ -28,13 +30,13 @@ print("   Billing: nixtla-playground-01")
 try:
     df = connector.read_timeseries(
         dataset="chicago_taxi_trips",
-        table="taxi_trips", 
+        table="taxi_trips",
         timestamp_col="trip_start_timestamp",
         value_col="trip_total",
         group_by="payment_type",
         where_clause="trip_start_timestamp BETWEEN '2023-01-01' AND '2023-01-31' AND trip_total > 0",
         limit=1000,
-        source_project="bigquery-public-data"
+        source_project="bigquery-public-data",
     )
     print(f"✅ Read {len(df)} rows")
     print(f"✅ Unique series: {df['unique_id'].nunique()}")
@@ -43,9 +45,9 @@ try:
         print(f"\nData types:\n{df.dtypes}")
         print(f"\nSample:")
         print(df.head())
-        
+
         # Ensure ds is datetime
-        df['ds'] = pd.to_datetime(df['ds'])
+        df["ds"] = pd.to_datetime(df["ds"])
         print(f"\n✅ Converted 'ds' to datetime")
     else:
         print("❌ No data returned, check query")
@@ -53,6 +55,7 @@ try:
 except Exception as e:
     print(f"❌ Failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 
@@ -60,12 +63,7 @@ except Exception as e:
 print("\n3. Running Nixtla statsforecast...")
 try:
     forecaster = NixtlaForecaster()
-    forecasts = forecaster.forecast(
-        df=df,
-        horizon=7,
-        models=["AutoETS", "AutoTheta"],
-        freq="D"
-    )
+    forecasts = forecaster.forecast(df=df, horizon=7, models=["AutoETS", "AutoTheta"], freq="D")
     print(f"✅ Generated {len(forecasts)} forecast points")
     print(f"\nColumns: {forecasts.columns.tolist()}")
     print(f"\nSample forecasts:")
@@ -73,6 +71,7 @@ try:
 except Exception as e:
     print(f"❌ Failed: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)
 

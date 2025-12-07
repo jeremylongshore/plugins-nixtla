@@ -11,9 +11,10 @@ def test_placeholder():
 def test_import_requirements():
     """Test that core requirements can be imported."""
     try:
-        import pandas  # noqa: F401
         import numpy  # noqa: F401
+        import pandas  # noqa: F401
         import pydantic  # noqa: F401
+
         assert True
     except ImportError:
         pytest.skip("Optional dependencies not installed")

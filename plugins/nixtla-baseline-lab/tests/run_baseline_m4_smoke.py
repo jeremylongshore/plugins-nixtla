@@ -29,54 +29,47 @@ Requirements:
 - Dependencies installed (statsforecast, datasetsforecast, pandas, numpy)
 """
 
+import argparse
+import csv
+import json
+import os
 import subprocess
 import sys
-import os
-import json
 from pathlib import Path
-import csv
-import argparse
 
 
 def parse_args():
     """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Run Nixtla Baseline Lab golden task smoke test"
-    )
+    parser = argparse.ArgumentParser(description="Run Nixtla Baseline Lab golden task smoke test")
     parser.add_argument(
-        "--horizon",
-        type=int,
-        default=7,
-        help="Forecast horizon in days (default: 7)"
+        "--horizon", type=int, default=7, help="Forecast horizon in days (default: 7)"
     )
     parser.add_argument(
         "--series-limit",
         type=int,
         default=5,
-        help="Maximum number of series to process (default: 5)"
+        help="Maximum number of series to process (default: 5)",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
         default="nixtla_baseline_m4_test",
-        help="Output directory name (default: nixtla_baseline_m4_test)"
+        help="Output directory name (default: nixtla_baseline_m4_test)",
     )
     parser.add_argument(
         "--dataset-type",
         type=str,
         default="m4",
         choices=["m4", "csv"],
-        help="Dataset type: 'm4' or 'csv' (default: m4)"
+        help="Dataset type: 'm4' or 'csv' (default: m4)",
     )
     parser.add_argument(
-        "--csv-path",
-        type=str,
-        help="Path to custom CSV file (required when dataset-type=csv)"
+        "--csv-path", type=str, help="Path to custom CSV file (required when dataset-type=csv)"
     )
     parser.add_argument(
         "--include-timegpt",
         action="store_true",
-        help="Include TimeGPT comparison (requires NIXTLA_TIMEGPT_API_KEY)"
+        help="Include TimeGPT comparison (requires NIXTLA_TIMEGPT_API_KEY)",
     )
     return parser.parse_args()
 
@@ -94,6 +87,7 @@ def main():
     timegpt_skip_reason = None
     if args.include_timegpt:
         import os
+
         if not os.environ.get("NIXTLA_TIMEGPT_API_KEY"):
             timegpt_skip_reason = "NIXTLA_TIMEGPT_API_KEY not set"
             print("⚠️  TimeGPT requested but API key not found - will skip TimeGPT checks")
@@ -191,7 +185,7 @@ print(json.dumps(result, indent=2))
         try:
             # Find the first '{' and extract until matching '}'
             stdout = result.stdout
-            start = stdout.find('{')
+            start = stdout.find("{")
             if start == -1:
                 print(f"FAIL: No JSON found in MCP output")
                 print(f"Output: {stdout[:500]}")
@@ -201,9 +195,9 @@ print(json.dumps(result, indent=2))
             brace_count = 0
             end = start
             for i, char in enumerate(stdout[start:], start=start):
-                if char == '{':
+                if char == "{":
                     brace_count += 1
-                elif char == '}':
+                elif char == "}":
                     brace_count -= 1
                     if brace_count == 0:
                         end = i + 1
@@ -250,11 +244,11 @@ def validate_csv(csv_file, series_limit):
 
     # Parse and validate CSV
     try:
-        with open(csv_file, 'r') as f:
+        with open(csv_file, "r") as f:
             reader = csv.DictReader(f)
 
             # Validate header
-            expected_columns = {'series_id', 'model', 'sMAPE', 'MASE'}
+            expected_columns = {"series_id", "model", "sMAPE", "MASE"}
             actual_columns = set(reader.fieldnames or [])
             if actual_columns != expected_columns:
                 print(f"FAIL: CSV columns mismatch")
@@ -277,9 +271,9 @@ def validate_csv(csv_file, series_limit):
             # Validate model names
             models_found = set()
             for row in rows:
-                models_found.add(row['model'])
+                models_found.add(row["model"])
 
-            expected_models = {'SeasonalNaive', 'AutoETS', 'AutoTheta'}
+            expected_models = {"SeasonalNaive", "AutoETS", "AutoTheta"}
             if not expected_models.issubset(models_found):
                 print(f"FAIL: Missing models")
                 print(f"  Expected: {expected_models}")
@@ -289,19 +283,21 @@ def validate_csv(csv_file, series_limit):
 
             # Validate metrics
             for row in rows:
-                series_id = row['series_id']
-                model = row['model']
+                series_id = row["series_id"]
+                model = row["model"]
 
                 try:
-                    smape = float(row['sMAPE'])
-                    mase = float(row['MASE'])
+                    smape = float(row["sMAPE"])
+                    mase = float(row["MASE"])
                 except ValueError as e:
                     print(f"FAIL: Invalid metric value for {series_id}/{model}: {e}")
                     return False
 
                 # sMAPE should be in (0, 200)
                 if not (0 < smape < 200):
-                    print(f"FAIL: Invalid sMAPE for {series_id}/{model}: {smape} (should be 0 < sMAPE < 200)")
+                    print(
+                        f"FAIL: Invalid sMAPE for {series_id}/{model}: {smape} (should be 0 < sMAPE < 200)"
+                    )
                     return False
 
                 # MASE should be > 0
@@ -336,7 +332,7 @@ def validate_summary(summary_file):
             "AutoETS",
             "AutoTheta",
             "sMAPE",
-            "MASE"
+            "MASE",
         ]
 
         missing = []

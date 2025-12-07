@@ -6,8 +6,8 @@ MVP implementation with support for OpenAI and Anthropic.
 import json
 import logging
 import os
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 from .content_aggregator import Content
 
@@ -42,6 +42,7 @@ except ImportError:
 @dataclass
 class CuratedContent:
     """Represents AI-curated content with summary and insights."""
+
     content: Content
     summary: str
     key_points: List[str]
@@ -101,7 +102,7 @@ Be concise but informative. Avoid marketing language."""
                     "Run: pip install google-generativeai"
                 )
             genai.configure(api_key=self.env_config["GEMINI_API_KEY"])
-            return genai.GenerativeModel('gemini-pro')
+            return genai.GenerativeModel("gemini-pro")
         elif self.llm_provider == "groq":
             if not Groq:
                 raise ImportError("Groq library not installed. Run: pip install groq")
@@ -174,7 +175,9 @@ Be concise but informative. Avoid marketing language."""
             key_points = []
         key_points = key_points[:3]  # Limit to 3 points
 
-        why_it_matters = response_data.get("why_it_matters", "Relevant to time-series forecasting practitioners.")
+        why_it_matters = response_data.get(
+            "why_it_matters", "Relevant to time-series forecasting practitioners."
+        )
         relevance_score = response_data.get("relevance_score", 50)
 
         # Ensure relevance score is in range
@@ -188,7 +191,7 @@ Be concise but informative. Avoid marketing language."""
             summary=summary,
             key_points=key_points,
             why_it_matters=why_it_matters,
-            relevance_score=relevance_score
+            relevance_score=relevance_score,
         )
 
     def _build_prompt(self, content: Content) -> str:
@@ -249,10 +252,10 @@ Respond ONLY with valid JSON in this exact format:
                 model=model,
                 messages=[
                     {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,  # Lower temperature for more consistent output
-                max_tokens=500
+                max_tokens=500,
             )
             return response.choices[0].message.content
 
@@ -270,9 +273,7 @@ Respond ONLY with valid JSON in this exact format:
                 max_tokens=500,
                 temperature=0.3,
                 system=self.SYSTEM_PROMPT,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ]
+                messages=[{"role": "user", "content": prompt}],
             )
             return response.content[0].text
 
@@ -292,7 +293,7 @@ Respond ONLY with valid JSON in this exact format:
                     "temperature": 0.3,
                     "max_output_tokens": 500,
                     "response_mime_type": "application/json",
-                }
+                },
             )
             return response.text
 
@@ -309,11 +310,11 @@ Respond ONLY with valid JSON in this exact format:
                 model=model,
                 messages=[
                     {"role": "system", "content": self.SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt},
                 ],
                 temperature=0.3,
                 max_tokens=500,
-                response_format={"type": "json_object"}  # Ensure JSON output
+                response_format={"type": "json_object"},  # Ensure JSON output
             )
             return response.choices[0].message.content
 
@@ -341,10 +342,21 @@ Respond ONLY with valid JSON in this exact format:
             key_points = [s.strip() for s in sentences if len(s.strip()) > 10][:2]
 
         # Simple heuristic for relevance based on keywords
-        nixtla_keywords = ["timegpt", "statsforecast", "mlforecast", "neuralforecast", "nixtla",
-                          "time series", "forecasting", "prediction", "arima", "lstm"]
+        nixtla_keywords = [
+            "timegpt",
+            "statsforecast",
+            "mlforecast",
+            "neuralforecast",
+            "nixtla",
+            "time series",
+            "forecasting",
+            "prediction",
+            "arima",
+            "lstm",
+        ]
         keyword_count = sum(
-            1 for keyword in nixtla_keywords
+            1
+            for keyword in nixtla_keywords
             if keyword in (content.title + " " + content.description).lower()
         )
         relevance_score = min(100, 40 + (keyword_count * 10))
@@ -354,5 +366,5 @@ Respond ONLY with valid JSON in this exact format:
             summary=summary,
             key_points=key_points if key_points else ["Information available at the source"],
             why_it_matters="Potentially relevant to time-series forecasting practitioners.",
-            relevance_score=relevance_score
+            relevance_score=relevance_score,
         )

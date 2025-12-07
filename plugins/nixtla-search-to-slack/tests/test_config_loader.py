@@ -2,11 +2,11 @@
 Unit tests for configuration loader.
 """
 
-import pytest
-from pathlib import Path
 import tempfile
-import yaml
+from pathlib import Path
 
+import pytest
+import yaml
 from nixtla_search_to_slack.config_loader import ConfigLoader
 
 
@@ -147,7 +147,7 @@ class TestConfigLoader:
                 "test-topic": {
                     "name": "Test Topic",
                     "keywords": ["test"],
-                    "sources": ["web", "unknown_source"]  # unknown_source doesn't exist
+                    "sources": ["web", "unknown_source"],  # unknown_source doesn't exist
                 }
             }
         }

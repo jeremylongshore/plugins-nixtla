@@ -13,7 +13,7 @@ import os
 import re
 import shutil
 from pathlib import Path
-from typing import List, Tuple, Optional, Dict
+from typing import Dict, List, Optional, Tuple
 
 
 def locate_skills_source() -> Path:
@@ -119,7 +119,7 @@ def extract_skill_version(skill_dir: Path) -> Optional[str]:
         return None
 
     try:
-        with open(skill_md, 'r', encoding='utf-8') as f:
+        with open(skill_md, "r", encoding="utf-8") as f:
             content = f.read(1000)  # Read first 1000 chars (frontmatter should be near top)
 
         # Look for version: in YAML frontmatter
@@ -195,14 +195,10 @@ def confirm_overwrite(existing_skills: List[str]) -> bool:
     print(f"\nℹ️  Existing files will be replaced with newer versions from source.")
     response = input("\nContinue? (yes/no): ").strip().lower()
 
-    return response in ['yes', 'y']
+    return response in ["yes", "y"]
 
 
-def copy_skills_to_project(
-    source_dir: Path,
-    target_dir: Path,
-    force: bool = False
-) -> int:
+def copy_skills_to_project(source_dir: Path, target_dir: Path, force: bool = False) -> int:
     """
     Copy Nixtla skills from source to target directory.
 
