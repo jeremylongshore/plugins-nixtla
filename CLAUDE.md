@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Business showcase for Nixtla CEO** demonstrating Claude Code plugins and AI skills for time-series forecasting workflows.
 
-**Version**: 1.4.1 | **Status**: 3 working plugins + 8 Claude Skills
+**Version**: 1.6.0 | **Status**: 3 working plugins + 21 Claude Skills
 
 ## Quick Commands
 

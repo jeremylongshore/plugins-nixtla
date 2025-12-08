@@ -2,57 +2,187 @@
 
 Claude Code plugins and AI skills for time-series forecasting with Nixtla's statsforecast and TimeGPT.
 
-**Status:** 3 working plugins | 8 skills | Experimental
+**Version**: 1.6.0 | **Status**: Experimental | **Plugins**: 3 | **Skills**: 21
 
 ---
 
-## Install
+## TL;DR (30 Seconds)
 
-### Option 1: Marketplace (Recommended)
+| Question | Answer |
+|----------|--------|
+| **What** | Claude Code plugins + AI skills for time-series forecasting |
+| **Who** | Business showcase for Nixtla CEO |
+| **Status** | Experimental (not production) |
+| **Stack** | Python 3.10+, statsforecast, TimeGPT API |
+| **Entry Point** | `plugins/nixtla-baseline-lab/` |
 
-Add to `~/.claude/settings.json`:
+---
 
-```json
-{
-  "extraKnownMarketplaces": [
-    {
-      "name": "nixtla-plugins",
-      "url": "https://raw.githubusercontent.com/intent-solutions-io/plugins-nixtla/main/.claude-plugin/marketplace.json"
-    }
-  ]
-}
+## Health Check (Run First)
+
+```bash
+# 1. Python version OK?
+python3 --version  # Need 3.10+
+
+# 2. Clone and install
+git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+cd plugins-nixtla
+pip install -e . && pip install -r requirements-dev.txt
+
+# 3. Tests pass?
+pytest -v --tb=short
+
+# 4. Baseline lab smoke test (90 sec, offline, no API key needed)
+cd plugins/nixtla-baseline-lab
+./scripts/setup_nixtla_env.sh --venv
+source .venv-nixtla-baseline/bin/activate
+python tests/run_baseline_m4_smoke.py
 ```
 
-Then install:
+All pass? You're ready. Something failed? See [Troubleshooting](#troubleshooting).
+
+---
+
+## Directory Map
 
 ```
-/plugin install nixtla-baseline-lab@nixtla-plugins
+nixtla/
+├── 000-docs/                    # ALL documentation (Doc-Filing v3.0)
+│   ├── global/                  #   Executive summaries, DevOps guide
+│   ├── planned-skills/          #   Generated skill specs (21 skills)
+│   └── archive/                 #   Historical docs
+│
+├── plugins/                     # WORKING PLUGINS (start here)
+│   ├── nixtla-baseline-lab/     #   Main showcase - M4 benchmarks
+│   ├── nixtla-bigquery-forecaster/   BigQuery integration
+│   └── nixtla-search-to-slack/  #   Slack notifications
+│
+├── skills-pack/                 # Claude Skills (AI behavior mods)
+│   └── .claude/skills/          #   8 production skills
+│
+├── packages/                    # Installable packages
+│   └── nixtla-claude-skills-installer/  # CLI: nixtla-skills
+│
+├── scripts/                     # Repo-level automation
+├── tests/                       # Integration tests
+├── .github/workflows/           # CI/CD pipelines (7 workflows)
+│
+├── CLAUDE.md                    # AI assistant instructions
+├── README.md                    # You are here
+├── CHANGELOG.md                 # Release history
+└── VERSION                      # Current version: 1.4.1
 ```
 
-### Option 2: Direct from GitHub
+### Entry Points by Role
 
+| Role | Start Here |
+|------|------------|
+| **DevOps/SRE** | [000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md](000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md) |
+| **Developer** | [plugins/nixtla-baseline-lab/](plugins/nixtla-baseline-lab/) |
+| **Stakeholder** | [000-docs/global/000-EXECUTIVE-SUMMARY.md](000-docs/global/000-EXECUTIVE-SUMMARY.md) |
+| **Skill Author** | [000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md](000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md) |
+
+---
+
+## Environment Variables
+
+| Variable | Required | Purpose | Where Used |
+|----------|----------|---------|------------|
+| `NIXTLA_TIMEGPT_API_KEY` | For TimeGPT only | Nixtla API access | TimeGPT skills/plugins |
+| `PROJECT_ID` | For GCP | Google Cloud project | BigQuery forecaster |
+| `LOCATION` | For GCP | GCP region (default: us-central1) | BigQuery forecaster |
+
+**Quick Setup**:
+
+```bash
+# Minimal (baseline lab - no API key needed)
+# statsforecast runs fully offline
+
+# Full setup (TimeGPT features)
+export NIXTLA_TIMEGPT_API_KEY='your-key-here'
+
+# GCP features
+export PROJECT_ID='your-gcp-project'
+export LOCATION='us-central1'
 ```
-/plugin install github:intent-solutions-io/plugins-nixtla/plugins/nixtla-baseline-lab
+
+---
+
+## Quick Commands
+
+### Install & Setup
+
+```bash
+# Clone
+git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+cd plugins-nixtla
+
+# Install (editable + dev deps)
+pip install -e .
+pip install -r requirements-dev.txt
 ```
+
+### Run Tests
+
+```bash
+pytest -v                          # All tests
+pytest plugins/ -v                 # Plugin tests only
+pytest --cov=plugins -v            # With coverage
+python tests/run_baseline_m4_smoke.py  # Baseline lab smoke test
+```
+
+### Lint & Format
+
+```bash
+black --check .                    # Check formatting
+black .                            # Fix formatting
+isort --check-only .               # Check imports
+isort .                            # Fix imports
+flake8 .                           # Lint check
+```
+
+### Skills Installer
+
+```bash
+pip install -e packages/nixtla-claude-skills-installer
+cd /path/to/your/project
+nixtla-skills init                 # Install all skills
+nixtla-skills update               # Update to latest
+nixtla-skills --version            # Check version
+```
+
+---
+
+## CI/CD Reference
+
+| Workflow | File | Trigger | Purpose |
+|----------|------|---------|---------|
+| **Main CI** | `ci.yml` | PR, push | Lint, format, test |
+| **Baseline Lab** | `nixtla-baseline-lab-ci.yml` | PR, push | Plugin tests |
+| **Skills Installer** | `skills-installer-ci.yml` | PR, push | Installer tests |
+| **BigQuery Deploy** | `deploy-bigquery-forecaster.yml` | Manual | Cloud Functions |
+| **Plugin Validator** | `plugin-validator.yml` | PR | Schema validation |
+| **Gemini PR Review** | `gemini-pr-review.yml` | PR | AI code review |
+| **Gemini Daily Audit** | `gemini-daily-audit.yml` | Schedule | Daily audit |
+
+**Location**: `.github/workflows/`
+
+**Required to Merge**: `ci.yml` must pass
 
 ---
 
 ## Plugins
 
-| Plugin | Description | Status |
-|--------|-------------|--------|
-| `nixtla-baseline-lab` | Run statsforecast baselines on M4 data, generate benchmark reports | Working |
-| `nixtla-bigquery-forecaster` | Forecast BigQuery data with Cloud Functions | Working |
-| `nixtla-search-to-slack` | Search web/GitHub for Nixtla content, post to Slack | MVP |
+| Plugin | Purpose | Status | API Key |
+|--------|---------|--------|---------|
+| `nixtla-baseline-lab` | Run statsforecast baselines on M4 data | Working | No |
+| `nixtla-bigquery-forecaster` | Forecast BigQuery data via Cloud Functions | Working | Yes |
+| `nixtla-search-to-slack` | Search web/GitHub, post to Slack | MVP | Yes |
 
----
-
-## Quick Start (Baseline Lab)
+### Quick Start (Baseline Lab)
 
 ```bash
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
-cd plugins-nixtla/plugins/nixtla-baseline-lab
-
+cd plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt
@@ -65,52 +195,36 @@ Runs in ~90 seconds, fully offline, zero API costs.
 
 ---
 
-## Prerequisites
-
-- Python 3.10+
-- Claude Code CLI
-- Git
-
----
-
-## Repository Structure
-
-```
-plugins/                    # Working plugins
-  nixtla-baseline-lab/      # Benchmarking
-  nixtla-bigquery-forecaster/
-  nixtla-search-to-slack/
-skills-pack/                # Claude Skills (8 skills)
-packages/                   # Skills CLI installer
-000-docs/                   # All documentation
-```
-
 ## Documentation
 
-All docs live in `000-docs/` using Doc-Filing v3.0 naming: `NNN-CC-ABCD-description.md`
+| Document | Audience | Link |
+|----------|----------|------|
+| DevOps Operations Guide | DevOps/SRE | [003-GUIDE-devops-nixtla-skills-operations.md](000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md) |
+| Executive Summary | Stakeholders | [000-EXECUTIVE-SUMMARY.md](000-docs/global/000-EXECUTIVE-SUMMARY.md) |
+| Plugin Implementation | Developers | [6767-f-OD-GUIDE-enterprise-plugin-implementation.md](000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md) |
+| Skill Frontmatter Schema | Skill Authors | [6767-m-DR-STND-claude-skills-frontmatter-schema.md](000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md) |
+| Skill Authoring Guide | Skill Authors | [6767-n-DR-GUID-claude-skills-authoring-guide.md](000-docs/6767-n-DR-GUID-claude-skills-authoring-guide.md) |
+| Engagement Options | Business | [001-ENGAGEMENT-OPTIONS.md](000-docs/global/001-ENGAGEMENT-OPTIONS.md) |
 
-| Guide | Audience |
-|-------|----------|
-| [DevOps Skills Guide](000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md) | DevOps / Contributors |
-| [Plugin Implementation](000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md) | Plugin developers |
-| [Executive Summary](000-docs/global/000-EXECUTIVE-SUMMARY.md) | Stakeholders |
-
-Category codes: `PP` Planning, `AT` Architecture, `OD` Overview, `QA` Quality, `AA` Audits
+**Doc-Filing System**: `NNN-CC-ABCD-description.md`
+- `PP` = Planning, `AT` = Architecture, `AA` = Audits, `OD` = Overview, `DR` = Reference
 
 ---
 
-## Development
+## Troubleshooting
 
-```bash
-# Run tests (baseline lab)
-cd plugins/nixtla-baseline-lab
-pytest tests/
+| Problem | Solution |
+|---------|----------|
+| `ModuleNotFoundError: statsforecast` | `pip install -r scripts/requirements.txt` |
+| `ModuleNotFoundError` (general) | `pip install -e . && pip install -r requirements-dev.txt` |
+| Tests fail with import error | `export PYTHONPATH=$PWD` |
+| Permission denied on script | `chmod +x scripts/*.sh` |
+| Plugin not found after install | Restart Claude Code |
+| Smoke test timeout | First run downloads M4 data (~30MB) |
+| `NIXTLA_TIMEGPT_API_KEY not set` | Only needed for TimeGPT features, not baseline lab |
+| Python version error | Need Python 3.10+ (`python3 --version`) |
 
-# Smoke test
-python tests/run_baseline_m4_smoke.py
-```
-
-CI runs on every PR. Tests must pass before merge.
+**Still stuck?** Open an issue or email jeremy@intentsolutions.io
 
 ---
 
@@ -119,18 +233,10 @@ CI runs on every PR. Tests must pass before merge.
 1. Fork the repo
 2. Create feature branch: `git checkout -b feature/my-feature`
 3. Make changes, add tests
-4. Run `pytest` locally
+4. Run `pytest` and `black .` locally
 5. Open PR against `main`
 
----
-
-## Troubleshooting
-
-| Problem | Solution |
-|---------|----------|
-| `ModuleNotFoundError: statsforecast` | Run `pip install -r scripts/requirements.txt` |
-| Plugin not found after install | Restart Claude Code |
-| Permission denied on setup script | Run `chmod +x scripts/setup_nixtla_env.sh` |
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ---
 
