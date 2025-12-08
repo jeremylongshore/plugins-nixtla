@@ -86,7 +86,7 @@
 
 ## Links
 
-- **Code:** `plugins/[plugin-slug]/`
-- **Docs:** `000-docs/plugins/[plugin-slug]/`
+- **Code:** `005-plugins/[plugin-slug]/`
+- **Docs:** `000-docs/005-plugins/[plugin-slug]/`
 - **Issues:** [Link to issues if applicable]
 - **PR:** [Link to PR if applicable]

@@ -26,11 +26,11 @@ nixtla/  (v1.6.0 - Business showcase for Nixtla CEO)
 ├── 000-docs/                    # Documentation (Doc-Filing v3.0 standard)
 │   ├── global/                  #   Executive summaries, DevOps guides
 │   ├── planned-skills/          #   21 generated skills (3 categories)
-│   ├── planned-plugins/         #   Plugin design specs
+│   ├── planned-005-plugins/         #   Plugin design specs
 │   ├── dev-planning-templates/  #   Templates for new features
 │   └── archive/                 #   Historical docs
 │
-├── skills-pack/                 # Production Claude Skills
+├── 003-skills/                 # Production Claude Skills
 │   └── .claude/skills/          #   8 core skills with scripts/ + assets/
 │       ├── nixtla-timegpt-lab
 │       ├── nixtla-experiment-architect
@@ -41,12 +41,12 @@ nixtla/  (v1.6.0 - Business showcase for Nixtla CEO)
 │       ├── nixtla-skills-bootstrap
 │       └── nixtla-skills-index
 │
-├── plugins/                     # Complete applications (3 working)
+├── 005-plugins/                     # Complete applications (3 working)
 │   ├── nixtla-baseline-lab/     #   StatsForecast baselines (M4 benchmarks)
 │   ├── nixtla-bigquery-forecaster/  BigQuery Cloud Functions
 │   └── nixtla-search-to-slack/  #   Research aggregation + Slack
 │
-├── packages/                    # Installable packages
+├── 006-packages/                    # Installable packages
 │   └── nixtla-claude-skills-installer/  CLI for skill installation
 │
 ├── scripts/                     # Repo-level automation (13 scripts)
@@ -85,13 +85,13 @@ nixtla/  (v1.6.0 - Business showcase for Nixtla CEO)
 
 2. **Skills = Scripts + SKILL.md**: Modern pattern (new in v1.6.0)
    - SKILL.md contains frontmatter + instructions
-   - `scripts/` contains Python/shell code
+   - `004-scripts/` contains Python/shell code
    - `assets/templates/` for reusable templates
    - `resources/` for docs, guides, troubleshooting
    - `references/` for external links
 
 3. **Dual Skill Locations**:
-   - `skills-pack/.claude/skills/` = 8 production skills (installed by users)
+   - `003-skills/.claude/skills/` = 8 production skills (installed by users)
    - `000-docs/planned-skills/` = 21 generated skills (3 categories: core-forecasting, prediction-markets, live)
 
 4. **CI-First Culture**: 8 GitHub Actions workflows
@@ -159,7 +159,7 @@ All workflows in `.github/workflows/`:
 - ✅ `pyproject.toml` with black, isort, mypy, pytest config
 - ✅ `.editorconfig` for consistent formatting
 - ✅ `.flake8` for linting rules
-- ✅ `scripts/setup-dev-environment.sh` (basic setup)
+- ✅ `004-scripts/setup-dev-environment.sh` (basic setup)
 - ✅ `CLAUDE.md` (AI assistant instructions - just updated!)
 - ✅ `CONTRIBUTING.md` (contributor guide)
 - ✅ `FOR-MAX-QUICKSTART.md` (onboarding for Nixtla CEO)
@@ -181,7 +181,7 @@ pip install -e . && pip install -r requirements-dev.txt
 pytest -v --tb=short
 
 # 3. Baseline Lab Test (90 sec, offline)
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 python tests/run_baseline_m4_smoke.py
@@ -193,7 +193,7 @@ python tests/run_baseline_m4_smoke.py
 
 ### 3.1 Production Skills (8)
 
-Located in `skills-pack/.claude/skills/`:
+Located in `003-skills/.claude/skills/`:
 
 | Skill | Health | Has Scripts? | Relevant to Explainability? |
 |-------|--------|--------------|----------------------------|
@@ -208,11 +208,11 @@ Located in `skills-pack/.claude/skills/`:
 
 **Pattern Observed**: All 8 skills follow the new standard:
 - YAML frontmatter with `name`, `description`, `allowed-tools`, `version`
-- `scripts/` directory with extracted Python code
+- `004-scripts/` directory with extracted Python code
 - `assets/templates/` for reusable code templates
 - `resources/` for supporting docs
 
-**Compliance**: 100% pass rate on `scripts/validate_skills.py` (strict mode)
+**Compliance**: 100% pass rate on `004-scripts/validate_skills.py` (strict mode)
 
 ### 3.2 Generated Skills (21)
 
@@ -225,7 +225,7 @@ Located in `000-docs/planned-skills/` (3 categories):
 **Status**: Recently enhanced by `add_scripts_to_skills.py`:
 - 16 skills updated with extracted scripts (Dec 8, 2025)
 - File sizes grew 3-8x (scripts extracted from embedded code)
-- All now have `scripts/` directories with working Python
+- All now have `004-scripts/` directories with working Python
 
 **Relevant to Explainability**:
 - `nixtla-uncertainty-quantifier` - Confidence intervals, prediction intervals
@@ -242,7 +242,7 @@ Located in `000-docs/planned-skills/` (3 categories):
   - `000-docs/017-AT-ARCH-plugin-09-nixtla-forecast-explainer.md` - **Full explainability architecture spec**
 
 - ✅ **Benchmark template** (1):
-  - `plugins/nixtla-search-to-slack/skills/nixtla-model-benchmarker/assets/templates/benchmark_template.py`
+  - `005-plugins/nixtla-search-to-slack/skills/nixtla-model-benchmarker/assets/templates/benchmark_template.py`
   - Contains: `from neuralforecast import NeuralForecast` + `from neuralforecast.models import NHITS, NBEATS`
 
 - ⚪ **Archive mentions** (35): All in `archive/backups-20251108/` (not production code)
@@ -314,7 +314,7 @@ Explained Forecast Output
 3. **Well-Defined Skill Pattern**
    - New standard (v1.6.0): SKILL.md + scripts/ + assets/ + resources/
    - 100% compliance on production skills
-   - Automated validation via `scripts/validate_skills.py`
+   - Automated validation via `004-scripts/validate_skills.py`
 
 4. **Cost-Optimized CI**
    - Tiered approach (Linux-only → full matrix)
@@ -322,7 +322,7 @@ Explained Forecast Output
    - 8 workflows covering all bases
 
 5. **Working Example Code**
-   - `plugins/nixtla-baseline-lab/` - Full MCP server, golden tasks, smoke tests
+   - `005-plugins/nixtla-baseline-lab/` - Full MCP server, golden tasks, smoke tests
    - `demo-project/` - Data + experiment runner
    - Pattern library in existing skills
 
@@ -345,7 +345,7 @@ Explained Forecast Output
    - Risk: Starting from scratch, no patterns to follow
 
 2. **Dual Skill Locations (Confusing)**
-   - Production: `skills-pack/.claude/skills/` (8 skills)
+   - Production: `003-skills/.claude/skills/` (8 skills)
    - Generated: `000-docs/planned-skills/` (21 skills)
    - Some duplicates between locations
    - Risk: New engineers won't know where to put new skills
@@ -366,7 +366,7 @@ Explained Forecast Output
    - Risk: Can't run any explainability code today
 
 6. **Validation Script Duplication**
-   - `scripts/validate_skills.py` exists
+   - `004-scripts/validate_skills.py` exists
    - Old `tests/basic_validator.py` referenced in CLAUDE.md (now fixed)
    - Risk: Confusion about which validator to use
 
@@ -388,7 +388,7 @@ Explained Forecast Output
    - Opportunity: Safe place to fail fast
 
 3. **Extend Existing Benchmark Template**
-   - `plugins/nixtla-search-to-slack/.../benchmark_template.py`
+   - `005-plugins/nixtla-search-to-slack/.../benchmark_template.py`
    - Already imports `NeuralForecast`, `NHITS`, `NBEATS`
    - Opportunity: Add IG/SHAP to working code
 
@@ -399,7 +399,7 @@ Explained Forecast Output
    - Opportunity: Standardize DX, onboard Nixtla engineers faster
 
 5. **Unify Skill Locations**
-   - Decide: Production = `skills-pack/`, Experimental = `000-docs/planned-skills/`
+   - Decide: Production = `003-skills/`, Experimental = `000-docs/planned-skills/`
    - Document in CLAUDE.md
    - Opportunity: Reduce confusion for contributors
 
@@ -423,7 +423,7 @@ Explained Forecast Output
 {baseDir}/  (= /home/jeremy/000-projects/nixtla/)
 
 Production Skills (User-Facing)
-├── skills-pack/.claude/skills/
+├── 003-skills/.claude/skills/
 │   ├── nixtla-explain-lab/          # NEW - Phase 2
 │   │   ├── SKILL.md
 │   │   ├── scripts/
@@ -505,7 +505,7 @@ CI/CD
 - `demo-project/explain/` - NEW directory with example scripts
 - `Makefile` - NEW task runner
 - `.pre-commit-config.yaml` - NEW (optional but recommended)
-- `scripts/install-explainability-deps.sh` - NEW helper script
+- `004-scripts/install-explainability-deps.sh` - NEW helper script
 
 **Deliverables**:
 1. ✅ `requirements.txt` updated with explainability stack
@@ -519,7 +519,7 @@ CI/CD
    - `make test` - Run pytest
    - `make explain-demo` - Run all 3 examples
    - `make validate` - Run skills validator
-4. ✅ `scripts/validate-explainability-env.sh` - Check deps installed
+4. ✅ `004-scripts/validate-explainability-env.sh` - Check deps installed
 5. 📝 `000-docs/082-AA-AUDT-repo-audit-neuralforecast-explainability.md` (this doc)
 
 **Gate**: Soft (advisory)
@@ -534,18 +534,18 @@ CI/CD
 **Goal**: Create first production explainability skill following existing patterns. Introduce strict validation.
 
 **Areas Modified**:
-- `skills-pack/.claude/skills/nixtla-explain-lab/` - NEW skill
+- `003-skills/.claude/skills/nixtla-explain-lab/` - NEW skill
 - `000-docs/083-DR-GUID-explainability-quick-start.md` - NEW user guide
 - `tests/test_explainability_skills.py` - NEW test suite
-- `scripts/validate_skills.py` - Update to check explainability-specific patterns
+- `004-scripts/validate_skills.py` - Update to check explainability-specific patterns
 
 **Deliverables**:
 1. ✅ `nixtla-explain-lab` skill with:
    - SKILL.md with proper frontmatter
-   - `scripts/decompose_forecast.py` - Trend/seasonal/residual
-   - `scripts/compute_ig.py` - Integrated Gradients implementation
-   - `scripts/compute_shap.py` - SHAP values implementation
-   - `scripts/generate_report.py` - Markdown/HTML report generator
+   - `004-scripts/decompose_forecast.py` - Trend/seasonal/residual
+   - `004-scripts/compute_ig.py` - Integrated Gradients implementation
+   - `004-scripts/compute_shap.py` - SHAP values implementation
+   - `004-scripts/generate_report.py` - Markdown/HTML report generator
    - `assets/templates/explain_workflow.py` - Reusable workflow template
    - `resources/` with docs, examples, troubleshooting
 2. ✅ Quick-start guide (10-minute read for Nixtla engineers)
@@ -592,9 +592,9 @@ CI/CD
 **Goal**: Integrate explainability into existing TimeGPT workflows. Package for installation.
 
 **Areas Modified**:
-- `skills-pack/.claude/skills/nixtla-timegpt-lab/` - Add explain option
-- `packages/nixtla-claude-skills-installer/` - Add explainability skills
-- `plugins/nixtla-baseline-lab/` - Add explainability to baselines
+- `003-skills/.claude/skills/nixtla-timegpt-lab/` - Add explain option
+- `006-packages/nixtla-claude-skills-installer/` - Add explainability skills
+- `005-plugins/nixtla-baseline-lab/` - Add explainability to baselines
 
 **Deliverables**:
 1. ✅ `nixtla-timegpt-lab` enhanced with `/explain` flag
@@ -617,7 +617,7 @@ CI/CD
 **Goal**: Make explainability enterprise-ready (performance, scale, compliance).
 
 **Areas Modified**:
-- `scripts/` - Add batch processing scripts
+- `004-scripts/` - Add batch processing scripts
 - `000-docs/` - Add compliance docs (SOX, Basel III mappings)
 - `.github/workflows/` - Add performance benchmarks
 
@@ -655,7 +655,7 @@ CI/CD
 
 **Recommendation**: Use two-tier system (already in place):
 
-1. **Production Skills** → `skills-pack/.claude/skills/`
+1. **Production Skills** → `003-skills/.claude/skills/`
    - User-facing, installed via `nixtla-skills init`
    - Must pass strict validation
    - Versioned, stable API
@@ -692,7 +692,7 @@ NeuralForecast mentioned in:
 
 ### 6.3 Should We Use MCP Server Pattern?
 
-**Current MCP Server**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**Current MCP Server**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Recommendation**: **No MCP server for Phase 2-3**
 - Explainability is post-hoc analysis (not real-time forecasting)
@@ -719,7 +719,7 @@ Already in `requirements-dev.txt`: None. Need to add to `requirements.txt`.
 
 **Current Test Structure**:
 - `tests/` - Integration tests
-- `plugins/nixtla-baseline-lab/tests/` - Plugin-specific tests
+- `005-plugins/nixtla-baseline-lab/tests/` - Plugin-specific tests
 - Golden tasks pattern (YAML-driven smoke tests)
 
 **Recommendation**: Follow golden tasks pattern for explainability

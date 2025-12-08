@@ -15,7 +15,7 @@ Implement the Enterprise Plugin README Standard foundation by creating directory
 
 ## What Was Planned
 
-1. Create directory structure: `000-docs/{global/, plugins/, archive/}`
+1. Create directory structure: `000-docs/{global/, 005-plugins/, archive/}`
 2. Create reference standard document
 3. Create implementation guide
 4. Create global documentation (Executive Summary, Engagement Options, Decision Matrix)
@@ -35,7 +35,7 @@ Implement the Enterprise Plugin README Standard foundation by creating directory
 │   ├── 000-EXECUTIVE-SUMMARY.md             # Created
 │   ├── 001-ENGAGEMENT-OPTIONS.md            # Created
 │   └── 002-DECISION-MATRIX.md               # Created
-├── plugins/                                  # Created
+├── 005-plugins/                                  # Created
 │   ├── baseline-lab/                        # 6 docs complete
 │   ├── cost-optimizer/                      # 6 docs (5 placeholders + status)
 │   ├── migration-assistant/                 # 6 docs (5 placeholders + status)
@@ -88,8 +88,8 @@ Each plugin received 5 placeholder docs (45 files total) that reference the comp
 
 ### Automation Scripts ✅ (Previous Session)
 
-- `scripts/new-plugin.sh` - Generate new plugin folder with 6-doc skeleton
-- `scripts/validate-docs.sh` - Verify all plugins have required docs
+- `004-scripts/new-plugin.sh` - Generate new plugin folder with 6-doc skeleton
+- `004-scripts/validate-docs.sh` - Verify all plugins have required docs
 
 ---
 
@@ -118,7 +118,7 @@ Each plugin received 5 placeholder docs (45 files total) that reference the comp
 
 | Metric | Count |
 |--------|-------|
-| Directories created | 12 (global/, plugins/, 10 plugin folders) |
+| Directories created | 12 (global/, 005-plugins/, 10 plugin folders) |
 | Reference docs | 3 |
 | Global docs | 3 |
 | Complete plugin doc sets | 1 (Baseline Lab - 6 docs) |
@@ -187,17 +187,17 @@ Each plugin received 5 placeholder docs (45 files total) that reference the comp
 ### Created This Session
 
 **Plugin Documentation (Baseline Lab - Complete):**
-- `000-docs/plugins/baseline-lab/02-PRD.md`
-- `000-docs/plugins/baseline-lab/03-ARCHITECTURE.md`
-- `000-docs/plugins/baseline-lab/04-USER-JOURNEY.md`
-- `000-docs/plugins/baseline-lab/05-TECHNICAL-SPEC.md`
+- `000-docs/005-plugins/baseline-lab/02-PRD.md`
+- `000-docs/005-plugins/baseline-lab/03-ARCHITECTURE.md`
+- `000-docs/005-plugins/baseline-lab/04-USER-JOURNEY.md`
+- `000-docs/005-plugins/baseline-lab/05-TECHNICAL-SPEC.md`
 
 **Plugin Documentation (9 Specified - Placeholders):**
-- `000-docs/plugins/{plugin-name}/01-BUSINESS-CASE.md` (×9)
-- `000-docs/plugins/{plugin-name}/02-PRD.md` (×9)
-- `000-docs/plugins/{plugin-name}/03-ARCHITECTURE.md` (×9)
-- `000-docs/plugins/{plugin-name}/04-USER-JOURNEY.md` (×9)
-- `000-docs/plugins/{plugin-name}/05-TECHNICAL-SPEC.md` (×9)
+- `000-docs/005-plugins/{plugin-name}/01-BUSINESS-CASE.md` (×9)
+- `000-docs/005-plugins/{plugin-name}/02-PRD.md` (×9)
+- `000-docs/005-plugins/{plugin-name}/03-ARCHITECTURE.md` (×9)
+- `000-docs/005-plugins/{plugin-name}/04-USER-JOURNEY.md` (×9)
+- `000-docs/005-plugins/{plugin-name}/05-TECHNICAL-SPEC.md` (×9)
 
 **AAR:**
 - `052-AA-AAR-phase-1-foundation.md` (this file)
@@ -208,7 +208,7 @@ Each plugin received 5 placeholder docs (45 files total) that reference the comp
 
 **Directory Structure:**
 - `000-docs/global/`
-- `000-docs/plugins/`
+- `000-docs/005-plugins/`
 - `000-docs/archive/`
 - 10 plugin subdirectories
 
@@ -223,11 +223,11 @@ Each plugin received 5 placeholder docs (45 files total) that reference the comp
 - `000-docs/global/002-DECISION-MATRIX.md`
 
 **Plugin Status Files:**
-- `000-docs/plugins/{plugin-name}/06-STATUS.md` (×10)
+- `000-docs/005-plugins/{plugin-name}/06-STATUS.md` (×10)
 
 **Automation:**
-- `scripts/new-plugin.sh`
-- `scripts/validate-docs.sh`
+- `004-scripts/new-plugin.sh`
+- `004-scripts/validate-docs.sh`
 
 **README:**
 - `README.md` (rewritten to v1.0.0)

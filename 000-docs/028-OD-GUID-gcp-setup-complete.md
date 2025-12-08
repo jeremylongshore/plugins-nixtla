@@ -56,7 +56,7 @@ Add the 4 secrets above to GitHub repository settings.
 cd /home/jeremy/000-projects/nixtla
 
 # Add new plugin files
-git add plugins/nixtla-bigquery-forecaster/
+git add 005-plugins/nixtla-bigquery-forecaster/
 git add .github/workflows/deploy-bigquery-forecaster.yml
 
 # Commit
@@ -204,7 +204,7 @@ source nixtla-playground-config.env
 gcloud config set project nixtla-playground-01
 
 # Test BigQuery connector
-cd plugins/nixtla-bigquery-forecaster
+cd 005-plugins/nixtla-bigquery-forecaster
 python src/bigquery_connector.py
 ```
 

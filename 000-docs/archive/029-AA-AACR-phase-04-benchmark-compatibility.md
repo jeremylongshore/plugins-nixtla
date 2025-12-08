@@ -9,9 +9,9 @@ related_docs:
   - 028-AA-STAT-phase-04-benchmark-compat-status.md
   - 027-AA-AACR-phase-03-power-user-controls.md
   - 026-AA-STAT-phase-03-implementation-status.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-26
 ---
 
@@ -49,7 +49,7 @@ Phase 4 successfully transformed the Nixtla Baseline Lab from a convenience tool
 
 ### 1.1 Compatibility Info Tool
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Helper Method** (lines 33-70):
 ```python
@@ -107,7 +107,7 @@ Added to `run_baselines` response:
 
 ### 1.2 Benchmark Report Generator
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **MCP Tool Schema** (lines 166-189):
 ```python
@@ -183,7 +183,7 @@ Key features:
 
 ### 1.3 README Updates
 
-**File**: `plugins/nixtla-baseline-lab/README.md`
+**File**: `005-plugins/nixtla-baseline-lab/README.md`
 
 **Added Section** (lines 251-351): "Nixtla OSS & Compatibility"
 
@@ -214,7 +214,7 @@ Added note after demo tips:
 
 ### 1.4 Skill Updates
 
-**File**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+**File**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Added Section** (lines 278-304): "Benchmark Reports (Optional)"
 
@@ -232,9 +232,9 @@ Added note after demo tips:
 
 | File | Lines Changed | Purpose |
 |------|---------------|---------|
-| `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | +220 lines | Added compatibility tool, benchmark generator, helper methods |
-| `plugins/nixtla-baseline-lab/README.md` | +105 lines | Added Nixtla OSS & Compatibility section |
-| `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` | +30 lines | Added benchmark report guidance |
+| `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | +220 lines | Added compatibility tool, benchmark generator, helper methods |
+| `005-plugins/nixtla-baseline-lab/README.md` | +105 lines | Added Nixtla OSS & Compatibility section |
+| `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` | +30 lines | Added benchmark report guidance |
 
 ### 2.2 New Files
 

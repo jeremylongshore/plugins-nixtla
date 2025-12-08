@@ -54,7 +54,7 @@ This phase delivers what Max Mergenthaler (Nixtla CEO) needs to see: **lifecycle
 
 ### 1. Installer CLI Enhanced (v0.1.0 → v0.3.0)
 
-**Package**: `packages/nixtla-claude-skills-installer/`
+**Package**: `006-packages/nixtla-claude-skills-installer/`
 
 **Files Modified**:
 - `pyproject.toml` - Version 0.1.0 → 0.3.0
@@ -160,7 +160,7 @@ __version__ = "0.3.0"
 
 ### 2. Bootstrap Skill Updated (v1.0.0 → v0.3.0)
 
-**File**: `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
 
 **Frontmatter Changes**:
 
@@ -351,7 +351,7 @@ else:
 ### Created Files
 
 1. **Version Module**:
-   - `packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py`
+   - `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py`
 
 2. **AAR**:
    - `044-AA-REPT-nixtla-skills-installer-versioning-phase-03.md` (this file)
@@ -359,19 +359,19 @@ else:
 ### Modified Files
 
 1. **Installer Package** (v0.1.0 → v0.3.0):
-   - `packages/nixtla-claude-skills-installer/pyproject.toml`
-   - `packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py`
-   - `packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py`
+   - `006-packages/nixtla-claude-skills-installer/pyproject.toml`
+   - `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py`
+   - `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py`
      - Added `extract_skill_version()` function
      - Added `get_skill_versions()` function
      - Enhanced `copy_skills_to_project()` with version display
      - Enhanced `print_installed_skills_summary()` with versions
 
 2. **Skills** (version updates):
-   - `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md` (0.2.0 → 0.3.0)
-   - `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md` (0.2.0 → 0.3.0)
-   - `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md` (0.2.0 → 0.3.0)
-   - `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md` (1.0.0 → 0.3.0)
+   - `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md` (0.2.0 → 0.3.0)
+   - `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md` (0.2.0 → 0.3.0)
+   - `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md` (0.2.0 → 0.3.0)
+   - `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md` (1.0.0 → 0.3.0)
      - Added mode, model, license fields
 
 3. **Architecture Documentation**:
@@ -508,7 +508,7 @@ Continue? (yes/no): yes
    - **Future**: Add unit tests for `extract_skill_version()` function
 
 3. **Pack VERSION file**: No top-level `VERSION` file in repo root
-   - **Future**: Add `skills-pack/VERSION` or repo `VERSION` file for pack version
+   - **Future**: Add `003-skills/VERSION` or repo `VERSION` file for pack version
 
 ---
 
@@ -567,10 +567,10 @@ frontmatter, providing clear visibility during install/update operations.
    - Single source of truth for package version
 
 ## Files Changed
-- packages/nixtla-claude-skills-installer/pyproject.toml (0.1.0 → 0.3.0)
-- packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py (0.1.0 → 0.3.0)
-- packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py (added version functions)
-- packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py (created)
+- 006-packages/nixtla-claude-skills-installer/pyproject.toml (0.1.0 → 0.3.0)
+- 006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py (0.1.0 → 0.3.0)
+- 006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py (added version functions)
+- 006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py (created)
 
 ## User Experience
 Before: No version visibility
@@ -619,10 +619,10 @@ Added comprehensive "Versioning Strategy (Phase 3)" section to architecture doc:
 - Versioning Strategy: ~120 lines of comprehensive guidance
 
 ## Files Changed
-- skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md
-- skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md
-- skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md
-- skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md
+- 003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md
+- 003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md
+- 003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md
+- 003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md
 - 000-docs/038-AT-ARCH-nixtla-claude-skills-pack.md
 - 044-AA-REPT-nixtla-skills-installer-versioning-phase-03.md (created)
 

@@ -131,20 +131,20 @@
 
 **Files Updated**:
 - `VERSION` - 0.3.0 → 0.4.0
-- `packages/nixtla-claude-skills-installer/pyproject.toml` - 0.3.0 → 0.4.0
-- `packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py` - 0.3.0 → 0.4.0
-- `packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md` - 0.4.0 (initial)
-- `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md` - 0.4.0 (initial)
-- `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md` - 0.4.0 (initial)
-- `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md` - 0.3.0 → 0.4.0
+- `006-packages/nixtla-claude-skills-installer/pyproject.toml` - 0.3.0 → 0.4.0
+- `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py` - 0.3.0 → 0.4.0
+- `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md` - 0.4.0 (initial)
+- `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md` - 0.4.0 (initial)
+- `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md` - 0.4.0 (initial)
+- `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md` - 0.3.0 → 0.4.0
 
 **Verification**:
 ```bash
-$ grep "^version:" skills-pack/.claude/skills/nixtla-*/SKILL.md | sort
+$ grep "^version:" 003-skills/.claude/skills/nixtla-*/SKILL.md | sort
 nixtla-experiment-architect/SKILL.md:version: "0.4.0"
 nixtla-prod-pipeline-generator/SKILL.md:version: "0.4.0"
 nixtla-schema-mapper/SKILL.md:version: "0.4.0"
@@ -477,9 +477,9 @@ Results saved to: forecasting/results/experiment_summary.csv
 ## Files Modified
 
 **Advanced Skills** (3 files):
-- `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md` - Frontmatter updated (version 0.4.0)
-- `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md` - Frontmatter updated (version 0.4.0)
-- `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md` - Frontmatter updated (version 0.4.0)
+- `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md` - Frontmatter updated (version 0.4.0)
+- `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md` - Frontmatter updated (version 0.4.0)
+- `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md` - Frontmatter updated (version 0.4.0)
 
 **Demo Project** (4 files created):
 - `demo-project/README.md` - Comprehensive walkthrough
@@ -492,13 +492,13 @@ Results saved to: forecasting/results/experiment_summary.csv
 
 **Version Bumps** (11 files):
 - `VERSION` - 0.3.0 → 0.4.0
-- `packages/nixtla-claude-skills-installer/pyproject.toml` - 0.3.0 → 0.4.0
-- `packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py` - 0.3.0 → 0.4.0
-- `packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md` - 0.3.0 → 0.4.0
-- `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md` - 0.3.0 → 0.4.0
+- `006-packages/nixtla-claude-skills-installer/pyproject.toml` - 0.3.0 → 0.4.0
+- `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py` - 0.3.0 → 0.4.0
+- `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md` - 0.3.0 → 0.4.0
+- `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md` - 0.3.0 → 0.4.0
 
 **Architecture Doc** (1 file):
 - `000-docs/038-AT-ARCH-nixtla-claude-skills-pack.md` - Updated Phase 4 section
@@ -540,9 +540,9 @@ All with Phase 4 frontmatter compliance:
 - license: "Proprietary - Nixtla Internal Use Only"
 
 Files:
-- skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md
-- skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md
-- skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md
+- 003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md
+- 003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md
+- 003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md
 
 Phase: 4 (Advanced Skills + Demo + DevOps)
 ```
@@ -591,13 +591,13 @@ All 7 production skills now at v0.4.0
 
 Files:
 - VERSION
-- packages/nixtla-claude-skills-installer/pyproject.toml
-- packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py
-- packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py
-- skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md
-- skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md
-- skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md
-- skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md
+- 006-packages/nixtla-claude-skills-installer/pyproject.toml
+- 006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/__init__.py
+- 006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/version.py
+- 003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md
+- 003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md
+- 003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md
+- 003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md
 
 Phase: 4 (Version Synchronization)
 ```

@@ -307,7 +307,7 @@ This document defines the technical architecture for **Nixtla DeFi Sentinel**, a
 
 **5.1 MCP Server Implementation**
 - **Technology**: Python with MCP SDK
-- **Location**: `plugins/nixtla-defi-sentinel/scripts/mcp_server.py`
+- **Location**: `005-plugins/nixtla-defi-sentinel/scripts/mcp_server.py`
 - **Tools Exposed**:
   - `monitor_contract(address, chain)` - Start monitoring a DeFi contract
   - `get_contract_status(address)` - Fetch current metrics and anomalies
@@ -315,12 +315,12 @@ This document defines the technical architecture for **Nixtla DeFi Sentinel**, a
   - `generate_security_report(address)` - Create PDF report with findings
 
 **5.2 Slash Command**
-- **Location**: `plugins/nixtla-defi-sentinel/commands/nixtla-defi-monitor.md`
+- **Location**: `005-plugins/nixtla-defi-sentinel/commands/nixtla-defi-monitor.md`
 - **Usage**: `/nixtla-defi-monitor contract=0x123... chain=ethereum`
 - **Prompt**: Activates Claude as DeFi security analyst, runs full analysis
 
 **5.3 AI Skill**
-- **Location**: `skills-pack/.claude/skills/nixtla-defi-sentinel/`
+- **Location**: `003-skills/.claude/skills/nixtla-defi-sentinel/`
 - **Trigger**: Automatic when Claude detects blockchain addresses or DeFi terms
 - **Capabilities**:
   - Explain anomaly types (sudden TVL drop, gas spike, etc.)

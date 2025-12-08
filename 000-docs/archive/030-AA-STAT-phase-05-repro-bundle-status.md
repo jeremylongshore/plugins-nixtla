@@ -9,9 +9,9 @@ related_docs:
   - 028-AA-STAT-phase-04-benchmark-compat-status.md
   - 029-AA-AACR-phase-04-benchmark-compatibility.md
   - 031-AA-AACR-phase-05-repro-bundle-github-issues.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-26
 ---
 

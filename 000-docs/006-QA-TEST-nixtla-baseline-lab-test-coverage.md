@@ -89,7 +89,7 @@ This document maps the test plan to the actual implementation, confirming that a
 | BL-004 | Error handling (baseline) | ✅   | ❌ | ✅      | ✅        |
 
 **BL-001: Setup Script Basic**
-- **Location**: `plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`
+- **Location**: `005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`
 - **Behavior**:
   - Validates Python + `pip`
   - Installs all required packages:
@@ -99,7 +99,7 @@ This document maps the test plan to the actual implementation, confirming that a
 - **Exit**: Returns code `0` on success
 
 **BL-002: MCP Test (M4)**
-- **Location**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py test`
+- **Location**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py test`
 - **Behavior**:
   - Loads M4 Daily subset (5 series)
   - Runs SeasonalNaive, AutoETS, AutoTheta with `horizon=7`
@@ -112,7 +112,7 @@ This document maps the test plan to the actual implementation, confirming that a
 - **Status**: ✅ Verified locally and via CI
 
 **BL-003: Golden Task Default**
-- **Location**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
+- **Location**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
 - **Behavior**:
   - `[1/5]` Runs MCP test with default arguments (M4, horizon=7, series_limit=5)
   - `[2/5]` Verifies output directory exists
@@ -142,7 +142,7 @@ This document maps the test plan to the actual implementation, confirming that a
 **CSV-001: CSV Happy Path**
 - **Command** (example):
   ```bash
-  cd plugins/nixtla-baseline-lab
+  cd 005-plugins/nixtla-baseline-lab
   python3 tests/run_baseline_m4_smoke.py \
     --dataset-type csv \
     --csv-path tests/data/example_timeseries.csv \
@@ -189,7 +189,7 @@ This document maps the test plan to the actual implementation, confirming that a
 **PLOT-001: Plots Enabled**
 - **Command**:
   ```bash
-  cd plugins/nixtla-baseline-lab
+  cd 005-plugins/nixtla-baseline-lab
   python3 scripts/nixtla_baseline_mcp.py test --enable-plots
   ```
 - **Behavior**:
@@ -229,7 +229,7 @@ This document maps the test plan to the actual implementation, confirming that a
 **TG-002: include_timegpt with No API Key**
 - **Command**:
   ```bash
-  cd plugins/nixtla-baseline-lab
+  cd 005-plugins/nixtla-baseline-lab
   unset NIXTLA_TIMEGPT_API_KEY
   python3 tests/run_baseline_m4_smoke.py --include-timegpt
   ```
@@ -316,13 +316,13 @@ TimeGPT handling is non-breaking and fully structured:
 **Workflow**: `.github/workflows/nixtla-baseline-lab-ci.yml`
 
 **Triggers**:
-- Push to `main` (paths: `plugins/nixtla-baseline-lab/**`, or the workflow YAML)
+- Push to `main` (paths: `005-plugins/nixtla-baseline-lab/**`, or the workflow YAML)
 - Pull requests targeting `main` that touch those paths
 
 **Steps**:
 1. ✅ Checkout repository
 2. ✅ Set up Python 3.12 with pip caching
-3. ✅ Install dependencies from `scripts/requirements.txt`
+3. ✅ Install dependencies from `004-scripts/requirements.txt`
 4. ✅ Print installed package versions (including `nixtla` and `matplotlib`)
 5. ✅ Run MCP test (`python scripts/nixtla_baseline_mcp.py test`)
 6. ✅ Run golden task harness (`python tests/run_baseline_m4_smoke.py`)
@@ -330,7 +330,7 @@ TimeGPT handling is non-breaking and fully structured:
 
 **Artifacts**:
 - **Name**: `nixtla-baseline-test-results`
-- **Path**: `plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/`
+- **Path**: `005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/`
 - **Retention**: 7 days
 
 ### What CI Tests
@@ -408,7 +408,7 @@ The plugin currently has:
 
 **BL-002: MCP Test (M4)**
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 python3 scripts/nixtla_baseline_mcp.py test
 # Output: JSON with success: true, CSV + summary written to nixtla_baseline_m4_test/
 ```

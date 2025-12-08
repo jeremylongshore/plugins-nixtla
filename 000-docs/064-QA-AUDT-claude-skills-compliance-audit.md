@@ -6,7 +6,7 @@
 **Auditor**: Claude Code (Opus 4.5)
 **Standard**: [Claude Skills Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)
 **Skills Audited**: 8 Nixtla Claude Skills
-**Location**: `/home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/`
+**Location**: `/home/jeremy/000-projects/nixtla/003-skills/.claude/skills/`
 
 ---
 
@@ -19,7 +19,7 @@
 | Issue | Before | After | Status |
 |-------|--------|-------|--------|
 | Non-standard YAML fields | `author`, `priority`, `audience` in all 7 skills | Removed from all 8 skills | ✅ Fixed |
-| Missing subdirectories | No `scripts/`, `references/`, `assets/` | Created for all 8 skills | ✅ Fixed |
+| Missing subdirectories | No `004-scripts/`, `references/`, `assets/` | Created for all 8 skills | ✅ Fixed |
 | Bootstrap safety flag | No `disable-model-invocation` | Added `disable-model-invocation: true` | ✅ Fixed |
 | Usage optimizer tools | Had `Write` tool (unnecessary) | Reduced to `Read,Glob,Grep` only | ✅ Fixed |
 | Word count exceeds 5,000 | Initial estimate (false positive) | All skills under 5,000 words | ✅ Verified |
@@ -78,7 +78,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 **Completed Fixes**:
 1. ✅ Removed deprecated YAML fields (`author`, `priority`, `audience`) from all skills
-2. ✅ Created `scripts/`, `references/`, `assets/` subdirectories for all skills
+2. ✅ Created `004-scripts/`, `references/`, `assets/` subdirectories for all skills
 3. ✅ Added `disable-model-invocation: true` to infrastructure skills
 4. ✅ Reduced `allowed-tools` to minimal set (removed `Write` from read-only audit skill)
 5. ✅ Verified all SKILL.md files under 5,000 words
@@ -93,7 +93,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 1. nixtla-timegpt-lab
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-timegpt-lab`
@@ -115,7 +115,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 - ❌ **Uses non-standard YAML field**: `author: "Intent Solutions (Jeremy Longshore)"`
 - ❌ **Uses non-standard YAML field**: `priority: "P1"`
 - ❌ **Uses non-standard YAML field**: `audience: "INT,OSS,PAY"`
-- ❌ No `scripts/` directory (though may not be needed for mode skill)
+- ❌ No `004-scripts/` directory (though may not be needed for mode skill)
 
 #### Recommendations
 1. **HIGH PRIORITY**: Remove `author`, `priority`, `audience` from frontmatter
@@ -127,7 +127,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 2. nixtla-experiment-architect
 
-**Location**: `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-experiment-architect`
@@ -163,7 +163,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 3. nixtla-schema-mapper
 
-**Location**: `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-schema-mapper`
@@ -196,7 +196,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 4. nixtla-timegpt-finetune-lab
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-timegpt-finetune-lab`
@@ -233,7 +233,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 5. nixtla-prod-pipeline-generator
 
-**Location**: `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-prod-pipeline-generator`
@@ -275,7 +275,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 6. nixtla-usage-optimizer
 
-**Location**: `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-usage-optimizer`
@@ -307,7 +307,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ### 7. nixtla-skills-bootstrap
 
-**Location**: `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
 
 #### ✅ Compliant Items
 - ✅ Has `name: nixtla-skills-bootstrap`
@@ -350,7 +350,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 | **File Structure** | | | | | | | |
 | ✅ Has `SKILL.md` | YES | YES | YES | YES | YES | YES | YES |
 | ⚠️ Has `references/` (if >5k words) | NO | NO | NO | NO | NO | NO | NO |
-| ⚠️ Has `scripts/` (if needed) | NO | NO | NO | NO | NO | NO | N/A |
+| ⚠️ Has `004-scripts/` (if needed) | NO | NO | NO | NO | NO | NO | N/A |
 | ⚠️ Has `assets/` (if templates) | NO | NO | NO | NO | NO | NO | N/A |
 | **Content Quality** | | | | | | | |
 | ⚠️ Under 5,000 words | **NO** (670 lines) | **NO** (877 lines) | **NO** (750 lines) | **NO** (945 lines) | **NO** (1,149 lines) | **NO** (586 lines) | **NO** (405 lines) |
@@ -418,7 +418,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 
 ---
 
-**Issue 2**: No use of `references/`, `scripts/`, or `assets/` subdirectories
+**Issue 2**: No use of `references/`, `004-scripts/`, or `assets/` subdirectories
 
 **Why Important**: Standard recommends organizing lengthy docs and templates into subdirectories
 
@@ -426,7 +426,7 @@ All SKILL.md files are **well under** the 5,000 word limit:
 1. Create subdirectories where appropriate:
    - `references/` for detailed documentation
    - `assets/` for templates (YAML, Python, SQL)
-   - `scripts/` for executable code (if needed)
+   - `004-scripts/` for executable code (if needed)
 2. Move content out of SKILL.md
 3. Reference files from SKILL.md using relative paths
 

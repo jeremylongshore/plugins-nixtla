@@ -129,7 +129,7 @@ skill-name/
 
 | Directory | Purpose | Loaded Into Context? | Token Cost |
 |-----------|---------|---------------------|------------|
-| `scripts/` | Executable code (deterministic operations) | No (executed via Bash) | None |
+| `004-scripts/` | Executable code (deterministic operations) | No (executed via Bash) | None |
 | `references/` | Documentation (API docs, examples) | Yes (via Read tool) | High |
 | `assets/` | Templates, configs, static files | No (path reference only) | None |
 

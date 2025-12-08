@@ -61,7 +61,7 @@ A complete MVP implementation that demonstrates automated content discovery and 
 
 ```bash
 # 1. Navigate to plugin
-cd plugins/nixtla-search-to-slack
+cd 005-plugins/nixtla-search-to-slack
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -94,7 +94,7 @@ No migration needed. The plugin is a new addition that doesn't impact v0.1.0 con
 
 All tests passing:
 ```bash
-cd plugins/nixtla-search-to-slack
+cd 005-plugins/nixtla-search-to-slack
 pytest --cov=nixtla_search_to_slack
 # Result: 80% coverage, all tests pass
 ```
@@ -174,7 +174,7 @@ This is a **construction kit** and **reference implementation**:
 ```bash
 # If updating from v0.1.0
 git pull origin main
-cd plugins/nixtla-search-to-slack
+cd 005-plugins/nixtla-search-to-slack
 pip install -r requirements.txt
 ```
 

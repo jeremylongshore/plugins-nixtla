@@ -33,7 +33,7 @@
 | Aspect | Plugins | Skills |
 |--------|---------|--------|
 | **What they are** | Complete applications with backends, servers, and tools | AI behavior modifiers (prompts that teach Claude) |
-| **Where they live** | `plugins/plugin-name/` | `.claude/skills/skill-name/SKILL.md` |
+| **Where they live** | `005-plugins/plugin-name/` | `.claude/skills/skill-name/SKILL.md` |
 | **How they work** | Run actual code via MCP servers | Inject instructions into Claude's system prompt |
 | **Persistence** | Installed per-project, runs server processes | Markdown files that persist across sessions |
 | **Complexity** | High (Python backends, tests, configs) | Low (just markdown with YAML frontmatter) |
@@ -61,14 +61,14 @@
 │   • Full applications with MCP servers                          │
 │   • Expose tools: run_baselines, generate_report, etc.          │
 │   • 3 working plugins                                           │
-│   • Location: plugins/*/                                        │
+│   • Location: 005-plugins/*/                                        │
 └─────────────────────────┬───────────────────────────────────────┘
                           │
 ┌─────────────────────────▼───────────────────────────────────────┐
 │                 LAYER 3: SLASH COMMANDS                          │
 │   • User-invoked commands                                        │
 │   • Trigger specific workflows                                   │
-│   • Location: plugins/*/commands/*.md                           │
+│   • Location: 005-plugins/*/commands/*.md                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -82,7 +82,7 @@ We have **3 working plugins**, each demonstrating different patterns.
 
 ### Plugin 1: Nixtla Baseline Lab
 
-**Location**: `plugins/nixtla-baseline-lab/`
+**Location**: `005-plugins/nixtla-baseline-lab/`
 **Status**: Production-ready flagship plugin
 
 #### Purpose
@@ -99,7 +99,7 @@ Runs Nixtla's statsforecast baseline models (SeasonalNaive, AutoETS, AutoTheta) 
 #### Directory Structure
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin manifest (version, author, entry points)
 ├── .mcp.json                 # MCP server configuration
@@ -121,7 +121,7 @@ plugins/nixtla-baseline-lab/
 
 #### MCP Server Tools (4 Tools)
 
-The MCP server (`scripts/nixtla_baseline_mcp.py`) exposes these tools:
+The MCP server (`004-scripts/nixtla_baseline_mcp.py`) exposes these tools:
 
 | Tool | Description | Key Parameters |
 |------|-------------|----------------|
@@ -191,13 +191,13 @@ From actual M4 Daily run:
 | AutoTheta | 0.85% | 0.454 | Close second |
 | SeasonalNaive | 1.49% | 0.898 | Baseline |
 
-**Reference**: `plugins/nixtla-baseline-lab/README.md` (1200 lines)
+**Reference**: `005-plugins/nixtla-baseline-lab/README.md` (1200 lines)
 
 ---
 
 ### Plugin 2: Nixtla BigQuery Forecaster
 
-**Location**: `plugins/nixtla-bigquery-forecaster/`
+**Location**: `005-plugins/nixtla-bigquery-forecaster/`
 **Status**: Working (requires GCP)
 
 #### Purpose
@@ -214,7 +214,7 @@ Run Nixtla statsforecast models on BigQuery data via Google Cloud Functions. Dem
 #### Directory Structure
 
 ```
-plugins/nixtla-bigquery-forecaster/
+005-plugins/nixtla-bigquery-forecaster/
 ├── src/
 │   ├── main.py                  # Cloud Function entry point
 │   ├── bigquery_connector.py    # BigQuery data reader/writer
@@ -279,13 +279,13 @@ curl -X POST "https://YOUR-FUNCTION-URL" \
 - BigQuery public datasets are excellent for demos
 - Cost: ~$0.01 per forecast run
 
-**Reference**: `plugins/nixtla-bigquery-forecaster/README.md`
+**Reference**: `005-plugins/nixtla-bigquery-forecaster/README.md`
 
 ---
 
 ### Plugin 3: Nixtla Search-to-Slack
 
-**Location**: `plugins/nixtla-search-to-slack/`
+**Location**: `005-plugins/nixtla-search-to-slack/`
 **Status**: MVP
 
 #### Purpose
@@ -302,7 +302,7 @@ Find Nixtla-related content across web/GitHub, create AI summaries, post to Slac
 #### Directory Structure
 
 ```
-plugins/nixtla-search-to-slack/
+005-plugins/nixtla-search-to-slack/
 ├── src/nixtla_search_to_slack/
 │   ├── main.py                 # Entry point
 │   ├── search_orchestrator.py  # Search coordination
@@ -361,13 +361,13 @@ topics:
 - No persistence (may re-send duplicates)
 - Single-threaded, no queue system
 
-**Reference**: `plugins/nixtla-search-to-slack/README.md`, `SETUP_GUIDE.md`
+**Reference**: `005-plugins/nixtla-search-to-slack/README.md`, `SETUP_GUIDE.md`
 
 ---
 
 ## Production Skills (8)
 
-Located in `skills-pack/.claude/skills/`:
+Located in `003-skills/.claude/skills/`:
 
 ### 1. nixtla-timegpt-lab
 
@@ -393,7 +393,7 @@ from mlforecast import MLForecast
 from nixtla import NixtlaClient
 ```
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
 
 ---
 
@@ -419,7 +419,7 @@ experiment/
 └── README.md        # Instructions
 ```
 
-**Location**: `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md`
 
 ---
 
@@ -442,7 +442,7 @@ store_id,date,sales   →    unique_id,ds,y
 A1,2023-01-01,100     →    A1,2023-01-01,100
 ```
 
-**Location**: `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md`
 
 ---
 
@@ -458,7 +458,7 @@ A1,2023-01-01,100     →    A1,2023-01-01,100
 - Executes fine-tuning workflow
 - Evaluates and saves model
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
 
 ---
 
@@ -474,7 +474,7 @@ A1,2023-01-01,100     →    A1,2023-01-01,100
 - Creates deployment configuration
 - Outputs ready-to-deploy code
 
-**Location**: `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
 
 ---
 
@@ -490,7 +490,7 @@ A1,2023-01-01,100     →    A1,2023-01-01,100
 - Recommends cost optimizations
 - Estimates potential savings
 
-**Location**: `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md`
 
 ---
 
@@ -506,7 +506,7 @@ A1,2023-01-01,100     →    A1,2023-01-01,100
 - Outputs formatted index
 - Guides skill selection
 
-**Location**: `skills-pack/.claude/skills/nixtla-skills-index/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-skills-index/SKILL.md`
 
 ---
 
@@ -522,7 +522,7 @@ A1,2023-01-01,100     →    A1,2023-01-01,100
 - Runs nixtla-skills command
 - Lists installed skills
 
-**Location**: `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
 
 ---
 
@@ -1350,7 +1350,7 @@ The `.mcp.json` file tells Claude Code how to start the MCP server:
     "nixtla-baseline-mcp": {
       "command": "python",
       "args": ["scripts/nixtla_baseline_mcp.py"],
-      "cwd": "${workspaceFolder}/plugins/nixtla-baseline-lab",
+      "cwd": "${workspaceFolder}/005-plugins/nixtla-baseline-lab",
       "timeout": 300000
     }
   }
@@ -1478,9 +1478,9 @@ User: /nixtla-baseline-m4 demo_preset=m4_daily_small
 
 | Document | Location |
 |----------|----------|
-| Baseline Lab README | `plugins/nixtla-baseline-lab/README.md` |
-| BigQuery Forecaster README | `plugins/nixtla-bigquery-forecaster/README.md` |
-| Search-to-Slack README | `plugins/nixtla-search-to-slack/README.md` |
+| Baseline Lab README | `005-plugins/nixtla-baseline-lab/README.md` |
+| BigQuery Forecaster README | `005-plugins/nixtla-bigquery-forecaster/README.md` |
+| Search-to-Slack README | `005-plugins/nixtla-search-to-slack/README.md` |
 | Plugin Implementation Guide | `000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md` |
 
 ### Skill Documentation
@@ -1507,9 +1507,9 @@ User: /nixtla-baseline-m4 demo_preset=m4_daily_small
 
 | Plugin | Location | Status | Purpose |
 |--------|----------|--------|---------|
-| Baseline Lab | `plugins/nixtla-baseline-lab/` | Production | Run statsforecast benchmarks |
-| BigQuery Forecaster | `plugins/nixtla-bigquery-forecaster/` | Working | GCP + BigQuery integration |
-| Search-to-Slack | `plugins/nixtla-search-to-slack/` | MVP | Content curation workflow |
+| Baseline Lab | `005-plugins/nixtla-baseline-lab/` | Production | Run statsforecast benchmarks |
+| BigQuery Forecaster | `005-plugins/nixtla-bigquery-forecaster/` | Working | GCP + BigQuery integration |
+| Search-to-Slack | `005-plugins/nixtla-search-to-slack/` | MVP | Content curation workflow |
 
 ### All 8 Production Skills
 
@@ -1605,8 +1605,8 @@ This repository demonstrates the **full Claude Code plugin and skill ecosystem**
 
 ### Entry Points
 
-- **New to plugins?** → `plugins/nixtla-baseline-lab/README.md`
-- **New to skills?** → `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+- **New to plugins?** → `005-plugins/nixtla-baseline-lab/README.md`
+- **New to skills?** → `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
 - **DevOps?** → `000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md`
 - **Stakeholders?** → `000-docs/062-OD-SUMM-nixtla-collaboration-one-pager.md`
 

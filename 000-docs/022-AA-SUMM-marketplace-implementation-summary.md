@@ -28,7 +28,7 @@ Successfully implemented the official Claude Code marketplace structure for the 
 **Schema Compliance**: ✅ Fully compliant with Claude Code marketplace specification
 
 ### 2. Plugin Manifest
-**Location**: `/plugins/nixtla-search-to-slack/.claude-plugin/plugin.json`
+**Location**: `/005-plugins/nixtla-search-to-slack/.claude-plugin/plugin.json`
 
 **Size**: 3,097 bytes
 
@@ -98,7 +98,7 @@ Successfully implemented the official Claude Code marketplace structure for the 
 nixtla/
 ├── .claude-plugin/                    # NEW - Marketplace metadata
 │   └── marketplace.json               # NEW - Marketplace manifest
-├── plugins/
+├── 005-plugins/
 │   └── nixtla-search-to-slack/
 │       ├── .claude-plugin/            # NEW - Plugin metadata
 │       │   └── plugin.json            # NEW - Plugin manifest
@@ -141,7 +141,7 @@ cd claude-code-plugins-nixtla
 ./scripts/validate-marketplace.sh
 
 # Install in development mode
-claude plugin install --dev ./plugins/nixtla-search-to-slack
+claude plugin install --dev ./005-plugins/nixtla-search-to-slack
 ```
 
 ## Validation Results
@@ -214,7 +214,7 @@ Found 1 plugin(s)
 **Synchronized Locations**:
 - `/VERSION`: `0.2.0`
 - `/.claude-plugin/marketplace.json` → `metadata.version`: `"0.2.0"`
-- `/plugins/*/plugin.json` → `version`: `"0.2.0"`
+- `/005-plugins/*/plugin.json` → `version`: `"0.2.0"`
 - `/CHANGELOG.md`: Latest entry for `v0.2.0`
 
 **Rationale**:
@@ -244,7 +244,7 @@ Found 1 plugin(s)
 
 1. **Commit Changes**:
    ```bash
-   git add .claude-plugin plugins/*/\.claude-plugin scripts/validate-marketplace.sh
+   git add .claude-plugin 005-plugins/*/\.claude-plugin scripts/validate-marketplace.sh
    git add README.md claudes-docs/marketplace-*.md
    git commit -m "feat(marketplace): implement Claude Code marketplace structure
 
@@ -408,7 +408,7 @@ md5sum .claude-plugin/marketplace.json
 # [Generate on commit]
 
 # Plugin manifest
-md5sum plugins/nixtla-search-to-slack/.claude-plugin/plugin.json
+md5sum 005-plugins/nixtla-search-to-slack/.claude-plugin/plugin.json
 # [Generate on commit]
 
 # Validation script

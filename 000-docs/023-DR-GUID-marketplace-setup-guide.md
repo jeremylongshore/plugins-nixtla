@@ -16,7 +16,7 @@ This document describes the Claude Code marketplace structure implemented for th
 nixtla/
 ├── .claude-plugin/
 │   └── marketplace.json          # Marketplace manifest
-├── plugins/
+├── 005-plugins/
 │   └── nixtla-search-to-slack/
 │       ├── .claude-plugin/
 │       │   └── plugin.json       # Plugin manifest
@@ -60,7 +60,7 @@ nixtla/
 
 **Note**: `strict: false` means the plugin.json is optional - marketplace entry serves as complete manifest if plugin.json is missing.
 
-### 2. Plugin Manifest (`/plugins/nixtla-search-to-slack/.claude-plugin/plugin.json`)
+### 2. Plugin Manifest (`/005-plugins/nixtla-search-to-slack/.claude-plugin/plugin.json`)
 
 **Purpose**: Detailed plugin metadata, configuration, and capabilities.
 
@@ -120,7 +120,7 @@ claude marketplace list nixtla-plugins
 
 ```bash
 # Install directly from repository
-claude plugin install github:intent-solutions-io/plugins-nixtla/plugins/nixtla-search-to-slack
+claude plugin install github:intent-solutions-io/plugins-nixtla/005-plugins/nixtla-search-to-slack
 ```
 
 ### Method 3: Local Development Installation
@@ -131,7 +131,7 @@ git clone https://github.com/intent-solutions-io/plugins-nixtla.git
 cd claude-code-plugins-nixtla
 
 # Install in development mode
-claude plugin install --dev ./plugins/nixtla-search-to-slack
+claude plugin install --dev ./005-plugins/nixtla-search-to-slack
 ```
 
 ## Validation
@@ -160,7 +160,7 @@ Run the validation script to check marketplace structure:
 ```bash
 # Validate JSON syntax
 jq empty .claude-plugin/marketplace.json
-jq empty plugins/nixtla-search-to-slack/.claude-plugin/plugin.json
+jq empty 005-plugins/nixtla-search-to-slack/.claude-plugin/plugin.json
 
 # Check required fields
 jq '.name, .owner, .plugins' .claude-plugin/marketplace.json
@@ -177,7 +177,7 @@ All version numbers should stay synchronized:
 
 1. `/VERSION` file: `0.2.0`
 2. `/.claude-plugin/marketplace.json` → `metadata.version`: `"0.2.0"`
-3. `/plugins/*/plugin.json` → `version`: `"0.2.0"`
+3. `/005-plugins/*/plugin.json` → `version`: `"0.2.0"`
 4. `/CHANGELOG.md` → Latest entry: `v0.2.0`
 
 ### Version Bump Checklist
@@ -197,11 +197,11 @@ When releasing a new version:
 ### Step 1: Create Plugin Structure
 
 ```bash
-mkdir -p plugins/new-plugin/.claude-plugin
-mkdir -p plugins/new-plugin/{src,tests,config}
-touch plugins/new-plugin/.claude-plugin/plugin.json
-touch plugins/new-plugin/README.md
-touch plugins/new-plugin/requirements.txt
+mkdir -p 005-plugins/new-plugin/.claude-plugin
+mkdir -p 005-plugins/new-plugin/{src,tests,config}
+touch 005-plugins/new-plugin/.claude-plugin/plugin.json
+touch 005-plugins/new-plugin/README.md
+touch 005-plugins/new-plugin/requirements.txt
 ```
 
 ### Step 2: Create plugin.json
@@ -288,7 +288,7 @@ jq '.plugins[].source' .claude-plugin/marketplace.json
 # Verify plugin.json exists for all plugins
 for plugin in $(jq -r '.plugins[].source' .claude-plugin/marketplace.json); do
   echo "Checking: $plugin"
-  ls -la "plugins/$plugin/.claude-plugin/plugin.json"
+  ls -la "005-plugins/$plugin/.claude-plugin/plugin.json"
 done
 ```
 

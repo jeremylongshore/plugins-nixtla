@@ -156,11 +156,11 @@ description: "Orchestrates multi-step Polymarket analysis workflows. Fetches con
 **Naming Convention**: `[action]_[service/purpose].py`
 
 **Required Scripts**:
-- `scripts/fetch_[service].py` - API data fetcher (Step 1)
-- `scripts/transform_[purpose].py` - Data transformer (Step 2)
-- `scripts/forecast_[method].py` - Forecasting engine (Step 3)
-- `scripts/analyze_[purpose].py` - Analysis/comparison (Step 4)
-- `scripts/generate_report.py` - Report generator (Step 5)
+- `004-scripts/fetch_[service].py` - API data fetcher (Step 1)
+- `004-scripts/transform_[purpose].py` - Data transformer (Step 2)
+- `004-scripts/forecast_[method].py` - Forecasting engine (Step 3)
+- `004-scripts/analyze_[purpose].py` - Analysis/comparison (Step 4)
+- `004-scripts/generate_report.py` - Report generator (Step 5)
 
 **Script Requirements**:
 - Self-contained (can run independently)

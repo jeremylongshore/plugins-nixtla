@@ -13,7 +13,7 @@
 Successfully completed **Phase 1** of the Nixtla Claude Skills initiative, establishing the foundational directory structure, stub implementations, and comprehensive planning documentation for an 11-skill AI agent skills pack.
 
 **Key Deliverables**:
-- ✅ 6 skill directories created in `skills-pack/.claude/skills/`
+- ✅ 6 skill directories created in `003-skills/.claude/skills/`
 - ✅ SKILL.md stub files with YAML frontmatter (6 files)
 - ✅ Architecture document (038-AT-ARCH, 4,800+ words)
 - ✅ 4-Phase rollout plan (039-PP-PLAN, 5,200+ words)
@@ -51,7 +51,7 @@ Establish the skeleton structure for the Nixtla Claude Skills Pack, enabling rap
 | Time | Activity | Duration | Output |
 |------|----------|----------|--------|
 | 00:00 | Received Phase 1 specification from user | 5 min | Understanding scope |
-| 00:05 | Created `skills-pack/.claude/skills/` directory structure | 2 min | 6 skill folders |
+| 00:05 | Created `003-skills/.claude/skills/` directory structure | 2 min | 6 skill folders |
 | 00:07 | Created SKILL.md stubs in each folder | 15 min | 6 SKILL.md files |
 | 00:22 | Created architecture document (038-AT-ARCH) | 45 min | 4,800+ word doc |
 | 01:07 | Created rollout plan (039-PP-PLAN) | 40 min | 5,200+ word doc |
@@ -68,12 +68,12 @@ Establish the skeleton structure for the Nixtla Claude Skills Pack, enabling rap
 
 **Command Executed**:
 ```bash
-mkdir -p skills-pack/.claude/skills/{nixtla-timegpt-lab,nixtla-experiment-architect,nixtla-schema-mapper,nixtla-timegpt-finetune-lab,nixtla-prod-pipeline-generator,nixtla-usage-optimizer}
+mkdir -p 003-skills/.claude/skills/{nixtla-timegpt-lab,nixtla-experiment-architect,nixtla-schema-mapper,nixtla-timegpt-finetune-lab,nixtla-prod-pipeline-generator,nixtla-usage-optimizer}
 ```
 
 **Result**:
 ```
-skills-pack/
+003-skills/
 └── .claude/
     └── skills/
         ├── nixtla-experiment-architect/
@@ -117,7 +117,7 @@ This skill will be fully implemented in Phase 2/3.
 
 **Content** (4,800+ words):
 - Overview of skills pack concept
-- Canonical source model (`skills-pack/` as source of truth)
+- Canonical source model (`003-skills/` as source of truth)
 - User installation model (CLI installer in Phase 3)
 - Update mechanism and versioning strategy
 - All 11 skills in the universe (6 now + 5 later)
@@ -207,7 +207,7 @@ This skill will be fully implemented in Phase 2/3.
 ### Challenge 3: Versioning Strategy
 **Issue**: Unclear whether to version individual skills or the entire pack.
 
-**Resolution**: Both! Each skill has independent version in YAML frontmatter, and the pack has unified release version (`skills-pack/VERSION`). Documented in architecture.
+**Resolution**: Both! Each skill has independent version in YAML frontmatter, and the pack has unified release version (`003-skills/VERSION`). Documented in architecture.
 
 **Impact**: None - clear versioning strategy established.
 
@@ -272,7 +272,7 @@ This skill will be fully implemented in Phase 2/3.
 
 1. **Commit Phase 1 Work**:
    ```bash
-   git add skills-pack/ 000-docs/038-* 000-docs/039-* 000-docs/056-AA-AAR-nixtla-claude-skills-phase-01.md
+   git add 003-skills/ 000-docs/038-* 000-docs/039-* 000-docs/056-AA-AAR-nixtla-claude-skills-phase-01.md
    git commit -m "chore(nixtla-skills): complete phase-01-skeleton"
    git push origin main
    ```
@@ -323,7 +323,7 @@ This skill will be fully implemented in Phase 2/3.
 ## Appendix: Phase 1 File Tree
 
 ```
-skills-pack/
+003-skills/
 └── .claude/
     └── skills/
         ├── nixtla-experiment-architect/

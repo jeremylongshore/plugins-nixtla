@@ -11,9 +11,9 @@ related_docs:
   - 026-AA-STAT-phase-03-implementation-status.md
   - 027-AA-AACR-phase-03-power-user-controls.md
   - 029-AA-AACR-phase-04-benchmark-compatibility.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-26
 ---
 

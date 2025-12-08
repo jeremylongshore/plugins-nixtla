@@ -15,7 +15,7 @@ Successfully completed **compliance remediation** (Phase 0) and **Nixtla SKILL S
 
 **Key Achievements**:
 - ✅ Removed non-standard YAML fields from all 7 existing skills
-- ✅ Created `scripts/`, `references/`, `assets/` subdirectories for all skills
+- ✅ Created `004-scripts/`, `references/`, `assets/` subdirectories for all skills
 - ✅ Added safety flags (`disable-model-invocation`) where appropriate
 - ✅ Created comprehensive Nixtla SKILL Standard specification
 - ✅ Created new `nixtla-skills-index` skill (8th skill)
@@ -106,10 +106,10 @@ Comprehensive specification covering:
 #### 1.2 Create nixtla-skills-index Skill
 
 **Files Created**:
-- `skills-pack/.claude/skills/nixtla-skills-index/SKILL.md`
-- `skills-pack/.claude/skills/nixtla-skills-index/scripts/.gitkeep`
-- `skills-pack/.claude/skills/nixtla-skills-index/references/.gitkeep`
-- `skills-pack/.claude/skills/nixtla-skills-index/assets/.gitkeep`
+- `003-skills/.claude/skills/nixtla-skills-index/SKILL.md`
+- `003-skills/.claude/skills/nixtla-skills-index/scripts/.gitkeep`
+- `003-skills/.claude/skills/nixtla-skills-index/references/.gitkeep`
+- `003-skills/.claude/skills/nixtla-skills-index/assets/.gitkeep`
 
 New utility skill that:
 - Scans `.claude/skills/` for Nixtla skills

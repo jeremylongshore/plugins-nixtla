@@ -23,9 +23,9 @@
 
 ### ✅ Plugin #1: Nixtla Baseline Lab
 - **Status**: PRODUCTION-READY (v0.8.0)
-- **Location**: `plugins/nixtla-baseline-lab/`
+- **Location**: `005-plugins/nixtla-baseline-lab/`
 - **Evidence**:
-  - Complete source code in `scripts/`, `commands/`, `skills/`
+  - Complete source code in `004-scripts/`, `commands/`, `skills/`
   - Test suite at `tests/run_baseline_m4_smoke.py`
   - README with comprehensive documentation
   - Virtual environment configured (`.venv-nixtla-baseline`)
@@ -47,7 +47,7 @@
 
 ### ✅ Plugin #2: Nixtla BigQuery Forecaster
 - **Status**: WORKING DEMO
-- **Location**: `plugins/nixtla-bigquery-forecaster/`
+- **Location**: `005-plugins/nixtla-bigquery-forecaster/`
 - **Evidence**:
   - Complete source code: `src/main.py`, `src/forecaster.py`, `src/bigquery_connector.py`
   - Local test script: `test_local.py`
@@ -79,7 +79,7 @@
 
 ### ✅ Plugin #3: Nixtla Search-to-Slack
 - **Status**: MVP / CONSTRUCTION KIT (v0.1.0)
-- **Location**: `plugins/nixtla-search-to-slack/`
+- **Location**: `005-plugins/nixtla-search-to-slack/`
 - **Evidence**:
   - Complete source code: `src/nixtla_search_to_slack/`
   - Comprehensive test suite: 6 test files in `tests/`
@@ -114,7 +114,7 @@
 
 ### ❌ Plugin #4: Nixtla Baseline M4
 - **Status**: SKELETON / STUB
-- **Location**: `plugins/nixtla-baseline-m4/`
+- **Location**: `005-plugins/nixtla-baseline-m4/`
 - **Evidence**:
   - Empty `commands/` directory
   - Empty `src/` directory

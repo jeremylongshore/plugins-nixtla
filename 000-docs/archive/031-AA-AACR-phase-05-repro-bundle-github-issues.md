@@ -9,9 +9,9 @@ related_docs:
   - 030-AA-STAT-phase-05-repro-bundle-status.md
   - 029-AA-AACR-phase-04-benchmark-compatibility.md
   - 028-AA-STAT-phase-04-benchmark-compat-status.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-26
 ---
 
@@ -50,7 +50,7 @@ Phase 5 successfully transformed the Nixtla Baseline Lab from a **benchmark repo
 
 ### 1.1 Repro Bundle Helper Functions
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Helper Method 1: _write_compat_info** (lines 963-992):
 ```python
@@ -122,7 +122,7 @@ def _write_run_manifest(
 
 ### 1.2 Repro Bundle Integration
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Tool Schema Update** (lines 153-157):
 ```python
@@ -189,7 +189,7 @@ if generate_repro_bundle:
 
 ### 1.3 GitHub Issue Draft Generator
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Tool Schema** (lines 195-226):
 ```python
@@ -298,7 +298,7 @@ elif tool_name == "generate_github_issue_draft":
 
 ### 1.4 README Updates
 
-**File**: `plugins/nixtla-baseline-lab/README.md`
+**File**: `005-plugins/nixtla-baseline-lab/README.md`
 
 **Added Section** (lines 352-481): "Repro Bundle & GitHub Issue Workflow"
 
@@ -332,7 +332,7 @@ elif tool_name == "generate_github_issue_draft":
 
 ### 1.5 Skill Updates
 
-**File**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+**File**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Added Section** (lines 306-367): "GitHub Issue Drafts (Optional)"
 
@@ -382,9 +382,9 @@ elif tool_name == "generate_github_issue_draft":
 
 | File | Lines Changed | Purpose |
 |------|---------------|------------|
-| `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | +185 lines | Added repro bundle helpers, GitHub issue draft generator, tool wiring |
-| `plugins/nixtla-baseline-lab/README.md` | +130 lines | Added repro bundle workflow section |
-| `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` | +63 lines | Added GitHub issue draft guidance |
+| `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | +185 lines | Added repro bundle helpers, GitHub issue draft generator, tool wiring |
+| `005-plugins/nixtla-baseline-lab/README.md` | +130 lines | Added repro bundle workflow section |
+| `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` | +63 lines | Added GitHub issue draft guidance |
 
 ### 2.2 New Files
 

@@ -127,7 +127,7 @@ GOOGLE_API_KEY=...  # For Gemini
 ### Directory Structure
 
 ```
-plugins/nixtla-forecast-explainer/
+005-plugins/nixtla-forecast-explainer/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/

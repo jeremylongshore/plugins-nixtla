@@ -78,8 +78,8 @@ Search Sources → Content Aggregation → AI Curation → Slack Publishing
 ## Files Modified/Created
 
 ### Created
-- `/plugins/nixtla-search-to-slack/` (complete plugin implementation)
-- `/plugins/nixtla-search-to-slack/SETUP_GUIDE.md`
+- `/005-plugins/nixtla-search-to-slack/` (complete plugin implementation)
+- `/005-plugins/nixtla-search-to-slack/SETUP_GUIDE.md`
 - `/000-docs/010-DR-REFF-6767-canonical-document-reference-sheet.md`
 - `/000-docs/011-PP-PLAN-search-to-slack-mvp-planning.md`
 - `/000-docs/012-AT-ARCH-search-to-slack-architecture.md`
@@ -90,7 +90,7 @@ Search Sources → Content Aggregation → AI Curation → Slack Publishing
 - `VERSION` (0.1.0 → 0.2.0)
 - `CHANGELOG.md` (added v0.2.0 release notes)
 - `README.md` (restructured with marketplace section)
-- `/plugins/nixtla-search-to-slack/README.md`
+- `/005-plugins/nixtla-search-to-slack/README.md`
 
 ## Next Steps
 

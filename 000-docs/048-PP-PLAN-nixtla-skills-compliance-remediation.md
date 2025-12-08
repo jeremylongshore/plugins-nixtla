@@ -119,7 +119,7 @@ description: "Transforms Claude into Nixtla forecasting expert with TimeGPT-firs
 **Validation**:
 ```bash
 # Check frontmatter has only 2 fields
-grep -A 10 "^---$" skills-pack/.claude/skills/nixtla-*/SKILL.md | grep ":" | wc -l
+grep -A 10 "^---$" 003-skills/.claude/skills/nixtla-*/SKILL.md | grep ":" | wc -l
 # Should show 14 (2 fields × 7 skills)
 ```
 

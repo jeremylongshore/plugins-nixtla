@@ -11,8 +11,8 @@ related_docs:
   - 015-AA-AACR-phase-01-structure-and-skeleton.md
   - 6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md
   - 6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md
-  - plugins/nixtla-baseline-lab/.claude-plugin/plugin.json
-  - plugins/nixtla-baseline-lab/.mcp.json
+  - 005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json
+  - 005-plugins/nixtla-baseline-lab/.mcp.json
 last_updated: 2025-11-24
 ---
 
@@ -67,7 +67,7 @@ Created complete plugin manifest with:
 - `skills`: "./skills" (directory-based discovery)
 - `mcpServers`: "./.mcp.json" (references MCP config file)
 
-All paths are relative to plugin root (`plugins/nixtla-baseline-lab/`).
+All paths are relative to plugin root (`005-plugins/nixtla-baseline-lab/`).
 
 ### 2.2 MCP Server Configuration: `.mcp.json`
 
@@ -85,7 +85,7 @@ Created MCP server definition with:
 - Enabled unbuffered Python output for debugging
 - Server will start automatically when plugin is enabled
 
-**Note**: The actual MCP server implementation (`scripts/nixtla_baseline_mcp.py`) is deferred to Phase 3. Phase 2 only defines the configuration.
+**Note**: The actual MCP server implementation (`004-scripts/nixtla_baseline_mcp.py`) is deferred to Phase 3. Phase 2 only defines the configuration.
 
 ### 2.3 Command Stub: `commands/nixtla-baseline-m4.md`
 
@@ -183,11 +183,11 @@ model: sonnet
 
 ### Created Files
 
-- `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json` - Plugin manifest
-- `plugins/nixtla-baseline-lab/.mcp.json` - MCP server configuration
-- `plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md` - Command stub
-- `plugins/nixtla-baseline-lab/agents/nixtla-baseline-analyst.md` - Agent stub
-- `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - Skill stub
+- `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json` - Plugin manifest
+- `005-plugins/nixtla-baseline-lab/.mcp.json` - MCP server configuration
+- `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md` - Command stub
+- `005-plugins/nixtla-baseline-lab/agents/nixtla-baseline-analyst.md` - Agent stub
+- `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - Skill stub
 - `000-docs/016-AA-AACR-phase-02-manifest-and-mcp.md` - This AAR
 
 ### Modified Files
@@ -197,7 +197,7 @@ None - Phase 2 only created new files.
 ### Directory Structure After Phase 2
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── .claude-plugin/
 │   └── plugin.json              ✅ Created (Phase 2)
 ├── commands/
@@ -248,7 +248,7 @@ plugins/nixtla-baseline-lab/
 
 ### 4.3 MCP Server Not Yet Implemented
 
-**Acknowledged**: The `scripts/nixtla_baseline_mcp.py` file does not exist yet.
+**Acknowledged**: The `004-scripts/nixtla_baseline_mcp.py` file does not exist yet.
 
 **Impact**: Plugin will load but MCP tool calls will fail until Phase 3.
 
@@ -295,12 +295,12 @@ plugins/nixtla-baseline-lab/
 
 Phase 3 can begin immediately. The configuration skeleton provides:
 - Defined MCP server name and startup command
-- Clear file path for MCP server implementation (`scripts/nixtla_baseline_mcp.py`)
+- Clear file path for MCP server implementation (`004-scripts/nixtla_baseline_mcp.py`)
 - Registered command/agent/skill waiting for detailed logic
 - All paths and naming conventions established
 
 Phase 3 will focus on:
-- Implementing `scripts/nixtla_baseline_mcp.py` with stub baseline logic
+- Implementing `004-scripts/nixtla_baseline_mcp.py` with stub baseline logic
 - Adding detailed instructions to command/agent/skill
 - Testing plugin loading and component discovery
 - Validating MCP server startup
@@ -363,7 +363,7 @@ Related: 6767-PP-PLAN, 6767-OD-ARCH, 015-AA-AACR
 **Immediate**: Await explicit approval to proceed to Phase 3
 
 **Phase 3 Focus**:
-- Implement `scripts/nixtla_baseline_mcp.py` with stub baseline logic
+- Implement `004-scripts/nixtla_baseline_mcp.py` with stub baseline logic
 - Add detailed instructions to command markdown
 - Add step-by-step workflow to agent markdown
 - Add complete instructions to skill SKILL.md

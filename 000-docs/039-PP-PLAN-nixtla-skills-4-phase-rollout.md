@@ -39,7 +39,7 @@ This document outlines the **4-phase rollout plan** for the Nixtla Claude Skills
 
 **Directory Structure**:
 ```
-skills-pack/
+003-skills/
 └── .claude/
     └── skills/
         ├── nixtla-timegpt-lab/
@@ -77,7 +77,7 @@ This skill will be fully implemented in Phase 2.
 
 ### Deliverables Checklist
 
-- [x] Create `skills-pack/.claude/skills/` directory structure
+- [x] Create `003-skills/.claude/skills/` directory structure
 - [x] Create 6 skill folders (nixtla-*)
 - [x] Write SKILL.md stubs with YAML frontmatter
 - [x] Create `038-AT-ARCH-nixtla-claude-skills-pack.md`
@@ -89,7 +89,7 @@ This skill will be fully implemented in Phase 2.
 
 **Single commit** with all Phase 1 changes:
 ```bash
-git add skills-pack/ 000-docs/038-* 000-docs/039-* 000-docs/056-AA-AAR-nixtla-claude-skills-phase-01.md
+git add 003-skills/ 000-docs/038-* 000-docs/039-* 000-docs/056-AA-AAR-nixtla-claude-skills-phase-01.md
 git commit -m "chore(nixtla-skills): complete phase-01-skeleton"
 git push origin main
 ```

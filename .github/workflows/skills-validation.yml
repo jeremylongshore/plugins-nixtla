@@ -1,0 +1,31 @@
+name: Claude Skills Validation (Strict)
+
+on:
+  push:
+    branches: ["main", "master", "**"]
+  pull_request:
+
+jobs:
+  validate-skills:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dev dependencies
+        run: |
+          if [ -f requirements-dev.txt ]; then
+            pip install -r requirements-dev.txt
+          else
+            pip install pyyaml
+          fi
+
+      - name: Validate Claude Skills (strict)
+        run: |
+          python scripts/validate_skills.py

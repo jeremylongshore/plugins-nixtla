@@ -8,8 +8,8 @@ owner: Jeremy Longshore
 related_docs:
   - 017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md
   - 6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
 last_updated: 2025-11-25
 ---
 
@@ -66,7 +66,7 @@ The external Phase 1 prompt requested:
 
 ### 2.1 Real Statsforecast Integration ✅
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (855 lines)
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (855 lines)
 
 **Implementation**:
 ```python
@@ -119,7 +119,7 @@ df_sample = df[df['unique_id'].isin(unique_ids)].copy()
 - ✅ Uses `datasetsforecast.m4.M4` library
 - ✅ Downloads and caches M4 Daily dataset (~95MB)
 - ✅ Supports configurable `series_limit` parameter
-- ✅ Data stored in `plugins/nixtla-baseline-lab/data/`
+- ✅ Data stored in `005-plugins/nixtla-baseline-lab/data/`
 
 ### 2.3 CSV Support (Bonus Feature) ✅
 
@@ -232,7 +232,7 @@ def run_baselines(
 
 ### 2.7 Test Harness ✅
 
-**File**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (369 lines)
+**File**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (369 lines)
 
 **Implementation**:
 ```python
@@ -275,7 +275,7 @@ name: Nixtla Baseline Lab CI
 on:
   push:
     branches: [main]
-    paths: ['plugins/nixtla-baseline-lab/**']
+    paths: ['005-plugins/nixtla-baseline-lab/**']
   pull_request:
     branches: [main]
 
@@ -293,7 +293,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: nixtla-baseline-test-results
-          path: plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
+          path: 005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
 ```
 
 **Verification**:
@@ -308,7 +308,7 @@ jobs:
 
 ### 2.9 Documentation ✅
 
-**Plugin README** (`plugins/nixtla-baseline-lab/README.md`):
+**Plugin README** (`005-plugins/nixtla-baseline-lab/README.md`):
 - Lines 1-43: Clear description of statsforecast integration
 - Lines 23-34: Lists specific models and datasets
 - Lines 99-107: Dependency listing with versions
@@ -352,7 +352,7 @@ jobs:
 ### 4.1 Local Test Run
 
 ```bash
-$ cd plugins/nixtla-baseline-lab
+$ cd 005-plugins/nixtla-baseline-lab
 $ python scripts/nixtla_baseline_mcp.py test
 
 # Output:
@@ -503,12 +503,12 @@ If the goal is to **verify Phase 1 is complete**:
 1. **Review Phase 3 AAR**: Read `017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md`
 2. **Run Tests Locally**:
    ```bash
-   cd plugins/nixtla-baseline-lab
+   cd 005-plugins/nixtla-baseline-lab
    python scripts/nixtla_baseline_mcp.py test
    python tests/run_baseline_m4_smoke.py
    ```
 3. **Check CI Status**: Verify latest runs are passing
-4. **Review Code**: Read `scripts/nixtla_baseline_mcp.py` lines 94-372
+4. **Review Code**: Read `004-scripts/nixtla_baseline_mcp.py` lines 94-372
 
 If the goal is to **extend functionality**:
 

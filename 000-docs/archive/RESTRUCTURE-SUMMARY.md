@@ -51,7 +51,7 @@ The Nixtla Plugin Showcase repository has been completely restructured to follow
 000-docs/
 ├── 053-059-AA-AAR-*.md     # 7 implementation phase AARs (at root)
 ├── global/                 # 3 executive decision docs
-├── plugins/                # 10 plugin folders (6 docs each = 60 files)
+├── 005-plugins/                # 10 plugin folders (6 docs each = 60 files)
 ├── archive/                # Historical documents
 └── 6767-OD-REF-*.md       # Reference standards
 ```
@@ -93,7 +93,7 @@ The Nixtla Plugin Showcase repository has been completely restructured to follow
 
 ### Per-Plugin Documentation (60 files)
 
-Each plugin in `000-docs/plugins/{slug}/` has 6 standardized docs:
+Each plugin in `000-docs/005-plugins/{slug}/` has 6 standardized docs:
 
 | Doc | Filename | Audience | Purpose |
 |-----|----------|----------|---------|
@@ -123,8 +123,8 @@ Each plugin in `000-docs/plugins/{slug}/` has 6 standardized docs:
 - `055-AA-AAR-phase-4-final-verification.md` - Final verification
 
 ### Automation Scripts (2 files)
-- `scripts/new-plugin.sh` - Generate new plugin with 6-doc skeleton
-- `scripts/validate-docs.sh` - Verify documentation completeness
+- `004-scripts/new-plugin.sh` - Generate new plugin with 6-doc skeleton
+- `004-scripts/validate-docs.sh` - Verify documentation completeness
 
 ---
 
@@ -186,12 +186,12 @@ recommendations.
 **Documentation**
 | Doc | Description |
 |-----|-------------|
-| [Business Case](000-docs/plugins/nixtla-cost-optimizer/01-BUSINESS-CASE.md) | ROI and market opportunity |
-| [PRD](000-docs/plugins/nixtla-cost-optimizer/02-PRD.md) | Requirements and success metrics |
-| [Architecture](000-docs/plugins/nixtla-cost-optimizer/03-ARCHITECTURE.md) | System design and integrations |
-| [User Journey](000-docs/plugins/nixtla-cost-optimizer/04-USER-JOURNEY.md) | Step-by-step usage guide |
-| [Technical Spec](000-docs/plugins/nixtla-cost-optimizer/05-TECHNICAL-SPEC.md) | Implementation details |
-| [Status](000-docs/plugins/nixtla-cost-optimizer/06-STATUS.md) | Current state and roadmap |
+| [Business Case](000-docs/005-plugins/nixtla-cost-optimizer/01-BUSINESS-CASE.md) | ROI and market opportunity |
+| [PRD](000-docs/005-plugins/nixtla-cost-optimizer/02-PRD.md) | Requirements and success metrics |
+| [Architecture](000-docs/005-plugins/nixtla-cost-optimizer/03-ARCHITECTURE.md) | System design and integrations |
+| [User Journey](000-docs/005-plugins/nixtla-cost-optimizer/04-USER-JOURNEY.md) | Step-by-step usage guide |
+| [Technical Spec](000-docs/005-plugins/nixtla-cost-optimizer/05-TECHNICAL-SPEC.md) | Implementation details |
+| [Status](000-docs/005-plugins/nixtla-cost-optimizer/06-STATUS.md) | Current state and roadmap |
 ```
 
 **Pros:** Detailed, standalone-readable, clear value, complete doc access
@@ -242,14 +242,14 @@ recommendations.
 - **Status:** 🎉 All links verified successfully
 
 ### Demo Commands ✅
-- **Setup script:** `plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh` exists
-- **Requirements:** `plugins/nixtla-baseline-lab/scripts/requirements.txt` exists
+- **Setup script:** `005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh` exists
+- **Requirements:** `005-plugins/nixtla-baseline-lab/scripts/requirements.txt` exists
 - **Status:** ✅ Demo commands accurate
 
 ### Directory Structure ✅
 - **000-docs/053-059-AA-AAR-*.md** - 7 phase AARs at root level
 - **000-docs/global/** - Present with 3 docs
-- **000-docs/plugins/** - Present with 10 plugin folders (60 docs)
+- **000-docs/005-plugins/** - Present with 10 plugin folders (60 docs)
 - **000-docs/archive/** - Present for historical docs
 - **Status:** ✅ Clean 3-tier organization
 
@@ -334,7 +334,7 @@ The **Enterprise Plugin README Standard** is documented in:
 - Explaining the rationale for the structure to sponsors
 
 **Key Principles:**
-1. **Audience-Driven Organization** - global/ (executives), plugins/ (engineers)
+1. **Audience-Driven Organization** - global/ (executives), 005-plugins/ (engineers)
 2. **6-Doc Per-Plugin Standard** - Consistent documentation for every plugin
 3. **Clear Lifecycle Tracking** - 💡 Idea → 📋 Specified → 🔨 In Progress → ✅ Working
 4. **Decision Support** - Decision Matrix + Engagement Options for business choices
@@ -386,7 +386,7 @@ All Phase 4 (and overall project) success criteria achieved:
 
 ### When Adding New Plugins
 
-1. Use `scripts/new-plugin.sh <slug> "<Name>" <category>` to scaffold
+1. Use `004-scripts/new-plugin.sh <slug> "<Name>" <category>` to scaffold
 2. Write comprehensive spec first (if complex)
 3. Create 6-doc format when plugin enters development
 4. Update README with dedicated section
@@ -427,7 +427,7 @@ All Phase 4 (and overall project) success criteria achieved:
 ## Appendix: Phase Summaries
 
 ### Phase 1: Foundation & Directory Structure
-- Created `000-docs/{global/, plugins/, archive/}` structure
+- Created `000-docs/{global/, 005-plugins/, archive/}` structure
 - Generated 6-doc skeleton for all 10 plugins
 - Created reference standard documentation
 - Created global decision-making docs

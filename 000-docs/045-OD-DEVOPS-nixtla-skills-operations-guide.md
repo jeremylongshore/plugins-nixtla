@@ -77,7 +77,7 @@ git clone https://github.com/intent-solutions-io/plugins-nixtla.git
 cd plugins-nixtla
 
 # 2. Install the CLI tool
-cd packages/nixtla-claude-skills-installer
+cd 006-packages/nixtla-claude-skills-installer
 pip install -e .
 
 # 3. Navigate to your project
@@ -251,7 +251,7 @@ To update only specific skills:
 
 ```bash
 # Manual update (advanced)
-cp -r /path/to/plugins-nixtla/skills-pack/.claude/skills/nixtla-timegpt-lab \
+cp -r /path/to/plugins-nixtla/003-skills/.claude/skills/nixtla-timegpt-lab \
       .claude/skills/
 
 # Verify version
@@ -410,10 +410,10 @@ rm -rf .claude/skills/nixtla-prod-pipeline-generator
 
 # 2. Checkout previous version from repo
 cd /path/to/plugins-nixtla
-git checkout v0.3.0 -- skills-pack/.claude/skills/nixtla-prod-pipeline-generator
+git checkout v0.3.0 -- 003-skills/.claude/skills/nixtla-prod-pipeline-generator
 
 # 3. Copy to project
-cp -r skills-pack/.claude/skills/nixtla-prod-pipeline-generator \
+cp -r 003-skills/.claude/skills/nixtla-prod-pipeline-generator \
       /path/to/your/project/.claude/skills/
 
 # 4. Verify
@@ -479,7 +479,7 @@ jobs:
       
       - name: Install Nixtla Skills CLI
         run: |
-          cd /tmp/plugins-nixtla/packages/nixtla-claude-skills-installer
+          cd /tmp/plugins-nixtla/006-packages/nixtla-claude-skills-installer
           pip install -e .
       
       - name: Install skills
@@ -544,7 +544,7 @@ install-nixtla-skills:
   image: python:3.10
   script:
     - git clone https://github.com/intent-solutions-io/plugins-nixtla.git /tmp/plugins-nixtla
-    - cd /tmp/plugins-nixtla/packages/nixtla-claude-skills-installer
+    - cd /tmp/plugins-nixtla/006-packages/nixtla-claude-skills-installer
     - pip install -e .
     - cd $CI_PROJECT_DIR
     - nixtla-skills init
@@ -572,7 +572,7 @@ WORKDIR /app
 
 # Install Nixtla Skills
 RUN git clone https://github.com/intent-solutions-io/plugins-nixtla.git /tmp/plugins-nixtla && \
-    cd /tmp/plugins-nixtla/packages/nixtla-claude-skills-installer && \
+    cd /tmp/plugins-nixtla/006-packages/nixtla-claude-skills-installer && \
     pip install -e . && \
     cd /app && \
     nixtla-skills init && \
@@ -602,7 +602,7 @@ CMD ["python", "main.py"]
 pip list | grep nixtla-skills
 
 # If not found, install
-cd /path/to/plugins-nixtla/packages/nixtla-claude-skills-installer
+cd /path/to/plugins-nixtla/006-packages/nixtla-claude-skills-installer
 pip install -e .
 
 # Verify
@@ -669,7 +669,7 @@ nixtla-skills --version
 grep "version:" .claude/skills/nixtla-*/SKILL.md
 
 # Update CLI if needed
-cd /path/to/plugins-nixtla/packages/nixtla-claude-skills-installer
+cd /path/to/plugins-nixtla/006-packages/nixtla-claude-skills-installer
 git pull
 pip install -e . --upgrade
 ```
@@ -800,7 +800,7 @@ nixtla-skills update
 - [ ] Clone project repo: `git clone ...`
 - [ ] Install Python dependencies: `pip install -r requirements.txt`
 - [ ] Clone Nixtla Skills Pack: `git clone https://github.com/intent-solutions-io/plugins-nixtla.git`
-- [ ] Install skills CLI: `cd plugins-nixtla/packages/nixtla-claude-skills-installer && pip install -e .`
+- [ ] Install skills CLI: `cd plugins-nixtla/006-packages/nixtla-claude-skills-installer && pip install -e .`
 - [ ] Install skills in project: `cd /path/to/project && nixtla-skills init`
 - [ ] Verify installation: `ls .claude/skills/nixtla-*/`
 - [ ] Try a skill: Open Claude Code, "Use nixtla-timegpt-lab"

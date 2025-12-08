@@ -1,6 +1,6 @@
 ---
 name: nixtla-liquidity-forecaster
-description: |
+description: >
   Forecasts orderbook depth and spreads to optimize trade execution timing.
   Use when needing to estimate market liquidity for large orders.
   Trigger with "forecast liquidity", "predict orderbook", "estimate depth".
@@ -14,366 +14,170 @@ Predicts future orderbook depth and bid-ask spreads using historical market data
 
 ## Overview
 
-Analyzes historical trade data and orderbook snapshots from Polymarket to forecast liquidity conditions. Predicts near-term changes in orderbook depth and bid-ask spreads. Use when determining optimal trade execution timing based on expected liquidity. Generates CSV files with predicted depth and spread values.
+This skill analyzes historical trade data and orderbook snapshots from Polymarket to forecast liquidity conditions. It predicts near-term changes in orderbook depth and bid-ask spreads, helping determine optimal trade execution timing. The workflow fetches data via Polymarket API, preprocesses it for TimeGPT compatibility, and generates forecasts with visualizations and reports.
+
+**When to use**: Determining optimal trade execution timing based on expected liquidity conditions, predicting orderbook depth changes, estimating bid-ask spread evolution.
+
+**Trigger phrases**: "forecast liquidity", "predict orderbook depth", "estimate spread changes", "analyze market liquidity", "forecast trading conditions".
 
 ## Prerequisites
 
-**Tools**: Read, Write, Bash, Glob, Grep, WebFetch
+**Required environment variables**:
+- `NIXTLA_TIMEGPT_API_KEY` - Your Nixtla TimeGPT API key
 
-**Environment**: `NIXTLA_TIMEGPT_API_KEY`
-
-**Packages**:
+**Python packages**:
 ```bash
 pip install nixtla pandas requests matplotlib
 ```
 
+**Required tools**: Read, Write, Bash, Glob, Grep, WebFetch
+
+**Minimum Python version**: 3.8+
+
 ## Instructions
 
-### Step 1: Fetch data
+### Step 1: Fetch orderbook data
 
-Fetch historical orderbook data from the Polymarket API.
+Fetch historical orderbook data from Polymarket API using the market ID. The script retrieves bids and asks, combines them into a single dataset, and saves to CSV format.
 
-```python
-import requests
-import pandas as pd
-import argparse
-import os
-from typing import Dict, List, Tuple
-import logging
+**Script**: `{baseDir}/scripts/fetch_data.py`
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def fetch_polymarket_data(market_id: str) -> pd.DataFrame:
-    """
-    Fetches historical orderbook data from the Polymarket API.
-
-    Args:
-        market_id: The ID of the Polymarket market.
-
-    Returns:
-        A Pandas DataFrame containing the orderbook data.
-    """
-    try:
-        url = f"https://api.polymarket.com/v3/markets/{market_id}/orderbook"
-        response = requests.get(url)
-        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
-        data = response.json()
-
-        # Extract relevant data (adjust based on actual API response structure)
-        bids = data.get('bids', [])
-        asks = data.get('asks', [])
-
-        # Convert bids and asks to DataFrames
-        bids_df = pd.DataFrame(bids)
-        asks_df = pd.DataFrame(asks)
-
-        # Add a 'side' column to distinguish between bids and asks
-        bids_df['side'] = 'bid'
-        asks_df['side'] = 'ask'
-
-        # Concatenate bids and asks DataFrames
-        orderbook_df = pd.concat([bids_df, asks_df], ignore_index=True)
-
-        if orderbook_df.empty:
-            raise ValueError("No orderbook data found for the specified market ID.")
-
-        return orderbook_df
-
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error fetching data from Polymarket API: {e}")
-        raise
-    except ValueError as e:
-        logging.error(f"Error processing data from Polymarket API: {e}")
-        raise
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
-        raise
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Fetch orderbook data from Polymarket API.")
-    parser.add_argument("--market_id", required=True, help="The Polymarket market ID.")
-    args = parser.parse_args()
-
-    try:
-        orderbook_data = fetch_polymarket_data(args.market_id)
-        print(orderbook_data.head())  # Print the first few rows of the DataFrame
-        orderbook_data.to_csv("orderbook_data.csv", index=False)
-        logging.info("Orderbook data saved to orderbook_data.csv")
-
-    except Exception as e:
-        logging.error(f"Failed to fetch and save orderbook data: {e}")
+**Usage**:
+```bash
+python {baseDir}/scripts/fetch_data.py --market_id <MARKET_ID> [--output orderbook_data.csv]
 ```
+
+**Parameters**:
+- `--market_id` (required): Polymarket market identifier
+- `--output` (optional): Output CSV file path (default: orderbook_data.csv)
+
+**Output**: Raw orderbook data CSV with columns: price, quantity, side
 
 ### Step 2: Preprocess data
 
-Clean and format the orderbook data for TimeGPT input.
+Clean and format orderbook data for TimeGPT input. The script calculates mid-price, spread, and depth metrics, then formats the data according to Nixtla's schema requirements.
 
-```python
-import pandas as pd
-import numpy as np
-import argparse
-import logging
-from typing import Tuple
+**Script**: `{baseDir}/scripts/preprocess_data.py`
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def preprocess_orderbook_data(orderbook_df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Preprocesses the orderbook data for TimeGPT input.
-
-    Args:
-        orderbook_df: A Pandas DataFrame containing the raw orderbook data.
-
-    Returns:
-        A Pandas DataFrame containing the preprocessed data in the Nixtla format.
-    """
-    try:
-        # Ensure necessary columns exist and are of the correct type
-        if not all(col in orderbook_df.columns for col in ['price', 'quantity', 'side']):
-            raise ValueError("Missing required columns: price, quantity, side")
-
-        orderbook_df['price'] = pd.to_numeric(orderbook_df['price'], errors='coerce')
-        orderbook_df['quantity'] = pd.to_numeric(orderbook_df['quantity'], errors='coerce')
-
-        # Handle missing values (e.g., replace with 0 or drop)
-        orderbook_df.dropna(subset=['price', 'quantity'], inplace=True)
-
-        # Calculate mid-price
-        bids = orderbook_df[orderbook_df['side'] == 'bid'].groupby('price')['quantity'].sum()
-        asks = orderbook_df[orderbook_df['side'] == 'ask'].groupby('price')['quantity'].sum()
-
-        if bids.empty or asks.empty:
-            raise ValueError("Insufficient bid or ask data to calculate mid-price.")
-
-        best_bid = bids.index.max()
-        best_ask = asks.index.min()
-        mid_price = (best_bid + best_ask) / 2
-
-        # Calculate spread
-        spread = best_ask - best_bid
-
-        # Calculate depth (example: total quantity at best bid and ask)
-        bid_depth = bids.loc[best_bid]
-        ask_depth = asks.loc[best_ask]
-        depth = bid_depth + ask_depth
-
-        # Create a DataFrame with the calculated features
-        data = {'ds': [pd.Timestamp.now()], 'mid_price': [mid_price], 'spread': [spread], 'depth': [depth]}
-        processed_df = pd.DataFrame(data)
-
-        # Convert 'ds' to datetime and set as index
-        processed_df['ds'] = pd.to_datetime(processed_df['ds'])
-        processed_df.set_index('ds', inplace=True)
-
-        # Resample to a fixed frequency (e.g., 1 minute)
-        processed_df = processed_df.resample('1T').mean().interpolate()
-
-        # Add unique_id column for Nixtla
-        processed_df['unique_id'] = 'polymarket'
-
-        # Rename columns to match Nixtla's expected format
-        processed_df = processed_df.rename(columns={'mid_price': 'y'})
-
-        # Select and reorder columns
-        processed_df = processed_df[['unique_id', 'y', 'spread', 'depth']]
-        processed_df.reset_index(inplace=True)
-
-        return processed_df
-
-    except ValueError as e:
-        logging.error(f"Error during data preprocessing: {e}")
-        raise
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
-        raise
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Preprocess orderbook data for TimeGPT.")
-    parser.add_argument("--input_file", required=True, help="Path to the raw orderbook data CSV file.")
-    args = parser.parse_args()
-
-    try:
-        raw_orderbook_data = pd.read_csv(args.input_file)
-        preprocessed_data = preprocess_orderbook_data(raw_orderbook_data)
-        print(preprocessed_data.head())
-        preprocessed_data.to_csv("preprocessed_data.csv", index=False)
-        logging.info("Preprocessed data saved to preprocessed_data.csv")
-
-    except FileNotFoundError:
-        logging.error(f"Input file not found: {args.input_file}")
-    except Exception as e:
-        logging.error(f"Failed to preprocess and save data: {e}")
+**Usage**:
+```bash
+python {baseDir}/scripts/preprocess_data.py --input_file orderbook_data.csv [--output preprocessed_data.csv]
 ```
+
+**Parameters**:
+- `--input_file` (required): Path to raw orderbook CSV from Step 1
+- `--output` (optional): Output CSV file path (default: preprocessed_data.csv)
+
+**Output**: Preprocessed data CSV with Nixtla format (unique_id, ds, y, spread, depth)
 
 ### Step 3: Execute forecast
 
-Run the TimeGPT forecast.
+Run TimeGPT forecast on preprocessed data. The script generates predictions for the specified horizon, creates visualizations, and produces a summary report.
 
-```python
-import pandas as pd
-import os
-import argparse
-import logging
-from nixtla import NixtlaClient
-import matplotlib.pyplot as plt
-from typing import Optional
+**Script**: `{baseDir}/scripts/forecast_liquidity.py`
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def forecast_liquidity(df: pd.DataFrame, horizon: int) -> Optional[pd.DataFrame]:
-    """
-    Forecasts liquidity (depth and spread) using TimeGPT.
-
-    Args:
-        df: A Pandas DataFrame containing the preprocessed orderbook data in Nixtla format.
-        horizon: The forecast horizon (number of periods to forecast).
-
-    Returns:
-        A Pandas DataFrame containing the forecasted values, or None if an error occurs.
-    """
-    try:
-        api_key = os.getenv('NIXTLA_TIMEGPT_API_KEY')
-        if not api_key:
-            raise ValueError("TimeGPT API Key missing. Set the NIXTLA_TIMEGPT_API_KEY environment variable.")
-
-        client = NixtlaClient(api_key=api_key)
-
-        # Ensure the DataFrame has the correct columns and data types
-        if not all(col in df.columns for col in ['unique_id', 'ds', 'y']):
-            raise ValueError("DataFrame must contain 'unique_id', 'ds', and 'y' columns.")
-
-        df['ds'] = pd.to_datetime(df['ds'])
-
-        # Forecast using TimeGPT
-        forecast = client.forecast(df=df, h=horizon, freq='T') # Assuming 1 minute frequency
-
-        return forecast
-
-    except ValueError as e:
-        logging.error(f"Error: {e}")
-        return None
-    except Exception as e:
-        logging.error(f"TimeGPT forecast failed: {e}")
-        return None
-
-def plot_forecast(df: pd.DataFrame, forecast: pd.DataFrame, file_prefix: str) -> None:
-    """
-    Plots the historical data and the forecast.
-
-    Args:
-        df: The historical data.
-        forecast: The forecast data.
-        file_prefix: The prefix for the output file name.
-    """
-    try:
-        plt.figure(figsize=(12, 6))
-        plt.plot(df['ds'], df['y'], label='Historical Data')
-        plt.plot(forecast['ds'], forecast['y'], label='Forecast', color='red')
-        plt.xlabel('Time')
-        plt.ylabel('Mid Price')
-        plt.title('Mid Price Forecast')
-        plt.legend()
-        plt.grid(True)
-        plt.savefig(f'{file_prefix}_forecast.png')
-        plt.close()
-        logging.info(f"Forecast plot saved to {file_prefix}_forecast.png")
-    except Exception as e:
-        logging.error(f"Error plotting forecast: {e}")
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Forecast liquidity using TimeGPT.")
-    parser.add_argument("--input_file", required=True, help="Path to the preprocessed data CSV file.")
-    parser.add_argument("--horizon", type=int, required=True, help="The forecast horizon.")
-    args = parser.parse_args()
-
-    try:
-        # Load the preprocessed data
-        preprocessed_data = pd.read_csv(args.input_file)
-
-        # Forecast liquidity
-        forecast_data = forecast_liquidity(preprocessed_data, args.horizon)
-
-        if forecast_data is not None:
-            # Save the forecast to a CSV file
-            forecast_data.to_csv("depth_forecast.csv", index=False)
-            logging.info("Forecasted depth saved to depth_forecast.csv")
-
-            # Plot the forecast
-            plot_forecast(preprocessed_data, forecast_data, "depth")
-
-            # Create a report
-            with open("report.txt", "w") as f:
-                f.write("Liquidity Forecasting Report\n")
-                f.write(f"Market ID: {preprocessed_data['unique_id'].iloc[0]}\n")
-                f.write(f"Forecast Horizon: {args.horizon}\n")
-                f.write(f"Forecast saved to depth_forecast.csv\n")
-                f.write(f"Plot saved to depth_forecast.png\n")
-            logging.info("Report saved to report.txt")
-
-        else:
-            logging.error("Forecasting failed. Check the logs for details.")
-
-    except FileNotFoundError:
-        logging.error(f"Input file not found: {args.input_file}")
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
+**Usage**:
+```bash
+python {baseDir}/scripts/forecast_liquidity.py --input_file preprocessed_data.csv --horizon <PERIODS> [--output depth_forecast.csv] [--plot_prefix depth]
 ```
 
-### Step 4: Generate output
+**Parameters**:
+- `--input_file` (required): Path to preprocessed CSV from Step 2
+- `--horizon` (required): Number of periods to forecast
+- `--output` (optional): Output forecast CSV path (default: depth_forecast.csv)
+- `--plot_prefix` (optional): Prefix for plot filename (default: depth)
 
-Save forecast CSV with predicted depth and spread. (This is handled within the `forecast_liquidity.py` script)
+**Output**:
+- Forecast CSV with predicted values
+- PNG plot showing historical data and forecast
+- Text report summarizing the forecasting process
+
+### Step 4: Interpret results
+
+Review the generated outputs to understand predicted liquidity conditions. The forecast CSV contains time-indexed predictions, the plot visualizes trends, and the report provides metadata about the forecasting run.
 
 ## Output
 
-- **depth_forecast.csv**: Predictions for orderbook depth.
-- **spread_forecast.csv**: Predictions for bid-ask spread.
-- **report.txt**: Summary of the forecasting process.
+**Generated files**:
+- `depth_forecast.csv` - Time-series predictions for orderbook depth and mid-price
+- `depth_forecast.png` - Visualization showing historical data and forecast overlay
+- `report.txt` - Summary report with market ID, horizon, and output file paths
+
+**CSV format**: Columns include unique_id, ds (timestamp), y (predicted mid-price), and optional spread/depth metrics.
 
 ## Error Handling
 
-1. **Error**: `Invalid Polymarket Market ID`
-   **Solution**: Verify the Market ID with the Polymarket API.
+**Invalid Polymarket Market ID**
+*Cause*: Market ID not recognized by Polymarket API
+*Solution*: Verify the market ID at https://polymarket.com or check API documentation
 
-2. **Error**: `TimeGPT API Key missing`
-   **Solution**: Set the `NIXTLA_TIMEGPT_API_KEY` environment variable.
+**TimeGPT API Key missing**
+*Cause*: `NIXTLA_TIMEGPT_API_KEY` environment variable not set
+*Solution*: Export your API key: `export NIXTLA_TIMEGPT_API_KEY=your_key_here`
 
-3. **Error**: `Insufficient data from Polymarket API`
-   **Solution**: Check data availability for the specified Market ID and time range.
+**Insufficient data from Polymarket API**
+*Cause*: Empty or incomplete orderbook data for the specified market
+*Solution*: Check data availability for the market ID, try a different market, or verify API endpoint
 
-4. **Error**: `TimeGPT forecast failed`
-   **Solution**: Check the TimeGPT API status and input data format.
+**TimeGPT forecast failed**
+*Cause*: Input data format issues or API connection problems
+*Solution*: Verify preprocessed data has required columns (unique_id, ds, y), check API status, ensure data types are correct
+
+**Missing required columns**
+*Cause*: Raw orderbook data lacks price, quantity, or side columns
+*Solution*: Verify Polymarket API response structure matches expected format, check for API changes
 
 ## Examples
 
-### Example 1: Forecast Depth for "Will Trump Win?" Market
+### Example 1: Forecast depth for presidential election market
 
-**Input**:
-`--input_file preprocessed_data.csv --horizon 6`
+Predict orderbook depth 6 periods ahead for a political prediction market.
 
-**Output**:
-`depth_forecast.csv` containing 6 forecasted depth values.
+**Commands**:
+```bash
+python {baseDir}/scripts/fetch_data.py --market_id trump_election_2024
+python {baseDir}/scripts/preprocess_data.py --input_file orderbook_data.csv
+python {baseDir}/scripts/forecast_liquidity.py --input_file preprocessed_data.csv --horizon 6
+```
 
-### Example 2: Forecast Spread for "Ethereum Price Above $3000?" Market
+**Expected output**: `depth_forecast.csv` with 6 forecasted depth values, plot showing trend, summary report.
 
-**Input**:
-`--input_file preprocessed_data.csv --horizon 24`
+### Example 2: Forecast spread for cryptocurrency market
 
-**Output**:
-`depth_forecast.csv` containing 24 forecasted depth values.
+Predict bid-ask spread 24 periods ahead for an Ethereum price prediction market.
 
-## Usage
+**Commands**:
+```bash
+python {baseDir}/scripts/fetch_data.py --market_id eth_price_3000 --output eth_orderbook.csv
+python {baseDir}/scripts/preprocess_data.py --input_file eth_orderbook.csv --output eth_preprocessed.csv
+python {baseDir}/scripts/forecast_liquidity.py --input_file eth_preprocessed.csv --horizon 24 --output eth_spread_forecast.csv --plot_prefix eth_spread
+```
 
-1.  **Fetch Data**:
-    ```bash
-    python fetch_data.py --market_id polymarket_market_id
-    ```
+**Expected output**: `eth_spread_forecast.csv` with 24 forecasted values, plot named `eth_spread_forecast.png`, summary report.
 
-2.  **Preprocess Data**:
-    ```bash
-    python preprocess_data.py --input_file orderbook_data.csv
-    ```
+### Example 3: Quick workflow for sports outcome market
 
-3.  **Forecast Liquidity**:
-    ```bash
-    python forecast_liquidity.py --input_file preprocessed_data.csv --horizon 12
-    ```
+End-to-end workflow for a sports prediction market using default file names.
+
+**Commands**:
+```bash
+python {baseDir}/scripts/fetch_data.py --market_id superbowl_winner_2025
+python {baseDir}/scripts/preprocess_data.py --input_file orderbook_data.csv
+python {baseDir}/scripts/forecast_liquidity.py --input_file preprocessed_data.csv --horizon 12
+```
+
+**Expected output**: Standard output files (depth_forecast.csv, depth_forecast.png, report.txt) with 12-period forecast.
+
+## Resources
+
+**Nixtla documentation**:
+- TimeGPT API reference: https://docs.nixtla.io/
+- Data format requirements: https://docs.nixtla.io/docs/tutorials-forecasting_with_timegpt
+
+**Polymarket API**:
+- API documentation: https://docs.polymarket.com/
+- Market explorer: https://polymarket.com/markets
+
+**Related skills**:
+- `nixtla-timegpt-lab` - General TimeGPT forecasting workflows
+- `nixtla-schema-mapper` - Data format transformation utilities

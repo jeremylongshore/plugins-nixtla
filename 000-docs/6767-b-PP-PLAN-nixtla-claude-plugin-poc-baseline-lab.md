@@ -172,10 +172,10 @@ User decides next steps
 
 ### Directory Structure
 
-The plugin is located at `plugins/nixtla-baseline-lab/`:
+The plugin is located at `005-plugins/nixtla-baseline-lab/`:
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest
 ├── commands/

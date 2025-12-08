@@ -7,10 +7,10 @@ classification: Project-Specific
 owner: Jeremy Longshore
 related_docs:
   - 022-AA-AACR-phase-08-timegpt-showdown-and-evals.md
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/scripts/timegpt_client.py
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/scripts/timegpt_client.py
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-26
 ---
 
@@ -63,7 +63,7 @@ Add optional TimeGPT comparison feature that:
 
 ### 2.1 TimeGPT Client Helper ✅
 
-**File**: `plugins/nixtla-baseline-lab/scripts/timegpt_client.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/timegpt_client.py`
 
 **Status**: COMPLETE
 - Existing TimeGPTClient class reviewed and validated
@@ -99,7 +99,7 @@ def run_timegpt_forecast(
 
 ### 2.2 MCP Server Integration ✅
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Status**: COMPLETE
 
@@ -191,7 +191,7 @@ WINNER: AutoETS (baseline)
 
 ### 2.3 Repro Bundle Integration ✅
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Status**: COMPLETE
 
@@ -231,7 +231,7 @@ When TimeGPT enabled and successful:
 
 ### 2.4 Documentation Updates ✅
 
-**README** (`plugins/nixtla-baseline-lab/README.md`):
+**README** (`005-plugins/nixtla-baseline-lab/README.md`):
 
 **Status**: COMPLETE
 - Added 180-line "Optional: TimeGPT Showdown" section (Lines 483-662)
@@ -246,7 +246,7 @@ When TimeGPT enabled and successful:
 - Getting API key instructions
 - Complete workflow example
 
-**Skill** (`plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`):
+**Skill** (`005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`):
 
 **Status**: COMPLETE
 - Added "TimeGPT Showdown (Optional)" section (Lines 369-401)
@@ -417,8 +417,8 @@ except Exception as e:
 
 | File | Lines Changed | Purpose |
 |------|---------------|---------|
-| `scripts/timegpt_client.py` | +83 lines | Added `run_timegpt_forecast()` top-level function |
-| `scripts/nixtla_baseline_mcp.py` | +~200 lines | Schema, showdown flow, repro integration |
+| `004-scripts/timegpt_client.py` | +83 lines | Added `run_timegpt_forecast()` top-level function |
+| `004-scripts/nixtla_baseline_mcp.py` | +~200 lines | Schema, showdown flow, repro integration |
 | `README.md` | +180 lines | TimeGPT showdown documentation section |
 | `skills/nixtla-baseline-review/SKILL.md` | +33 lines | TimeGPT awareness guidance for AI analysis |
 
@@ -462,7 +462,7 @@ except Exception as e:
 ### 6.1 Golden Task (Default Behavior)
 
 ```bash
-$ cd plugins/nixtla-baseline-lab
+$ cd 005-plugins/nixtla-baseline-lab
 $ python tests/run_baseline_m4_smoke.py
 
 # Result: ✅ PASSED

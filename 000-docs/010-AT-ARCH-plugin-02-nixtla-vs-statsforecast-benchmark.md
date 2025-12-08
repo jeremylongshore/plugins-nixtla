@@ -274,7 +274,7 @@ CREATE TABLE series_forecasts (
 ### Directory Structure
 
 ```
-plugins/ai-ml/nixtla-vs-statsforecast-benchmark/
+005-plugins/ai-ml/nixtla-vs-statsforecast-benchmark/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── README.md

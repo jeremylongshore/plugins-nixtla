@@ -1007,7 +1007,7 @@ The Model Context Protocol (MCP) is Claude's standard for exposing tools and res
 ### MCP Server File Structure
 
 ```
-plugins/nixtla-defi-sentinel/
+005-plugins/nixtla-defi-sentinel/
 ├── scripts/
 │   └── mcp_server.py          # Main MCP server
 ├── commands/
@@ -1323,7 +1323,7 @@ Be concise but thorough. If anomalies are detected, explain their significance a
 
 ### Skill Definition
 
-**File:** `skills-pack/.claude/skills/nixtla-defi-sentinel/SKILL.md`
+**File:** `003-skills/.claude/skills/nixtla-defi-sentinel/SKILL.md`
 
 ```markdown
 ---

@@ -53,10 +53,10 @@ This document defines the complete technical architecture for the **Nixtla Basel
 
 ### Plugin Structure
 
-The plugin lives in the repository at `plugins/nixtla-baseline-lab/`:
+The plugin lives in the repository at `005-plugins/nixtla-baseline-lab/`:
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest (REQUIRED)
 ├── commands/
@@ -519,7 +519,7 @@ If CSV is malformed:
 
 ## Supporting Scripts
 
-Optional: Use `scripts/analyze_metrics.py` for automated analysis:
+Optional: Use `004-scripts/analyze_metrics.py` for automated analysis:
 
 ```bash
 python skills/nixtla-baseline-review/scripts/analyze_metrics.py \
@@ -601,7 +601,7 @@ Potential causes:
 
 ---
 
-### 6. MCP Server Implementation: `scripts/nixtla_baseline_mcp.py`
+### 6. MCP Server Implementation: `004-scripts/nixtla_baseline_mcp.py`
 
 Python MCP server that exposes the `run_baselines` tool.
 
@@ -1176,7 +1176,7 @@ Connect to orchestrator agent:
 
 ### A. Dependencies
 
-**Python Requirements** (`scripts/requirements.txt`):
+**Python Requirements** (`004-scripts/requirements.txt`):
 ```
 # Phase 1 (PoC)
 # No dependencies - uses stdlib only

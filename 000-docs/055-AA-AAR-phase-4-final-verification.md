@@ -26,8 +26,8 @@ Final verification of all links, cleanup of deprecated files, version finalizati
 **Result:** 64/64 links passing (100%)
 
 ### Demo Commands Verification ✅
-- ✅ Setup script verified: `plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh` exists
-- ✅ Requirements file verified: `plugins/nixtla-baseline-lab/scripts/requirements.txt` exists
+- ✅ Setup script verified: `005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh` exists
+- ✅ Requirements file verified: `005-plugins/nixtla-baseline-lab/scripts/requirements.txt` exists
 - ✅ Demo commands in README confirmed accurate
 
 ### File Cleanup ✅
@@ -42,7 +42,7 @@ Final verification of all links, cleanup of deprecated files, version finalizati
 - ✅ Confirmed clean organization:
   - `000-docs/053-059-*` - AARs at root level
   - `000-docs/global/` - 3 executive docs
-  - `000-docs/plugins/` - 10 plugin folders (60 docs)
+  - `000-docs/005-plugins/` - 10 plugin folders (60 docs)
   - `000-docs/archive/` - Historical documents
 - ✅ Reference docs at 000-docs/ root (6767-OD-REF-*, etc.)
 
@@ -152,7 +152,7 @@ Final verification of all links, cleanup of deprecated files, version finalizati
 ## Lessons Learned Across All Phases
 
 ### Phase 1: Foundation & Directory Structure
-**Lesson:** Systematic directory structure with clear separation (global/, plugins/, archive/) makes navigation intuitive. Creating all 60 plugin doc files (even as placeholders) maintained structure and avoided "we'll add docs later" technical debt.
+**Lesson:** Systematic directory structure with clear separation (global/, 005-plugins/, archive/) makes navigation intuitive. Creating all 60 plugin doc files (even as placeholders) maintained structure and avoided "we'll add docs later" technical debt.
 
 ### Phase 2: README Compliance Audit & Gap Fixes
 **Lesson:** Expanding plugins from table rows to dedicated sections (with metadata, descriptions, value props, doc links) transforms README from technical inventory to business showcase. The "verbose" approach pays off for sponsor-facing repos.
@@ -179,7 +179,7 @@ Final verification of all links, cleanup of deprecated files, version finalizati
 
 ### Documentation Best Practices
 
-8. **Audience-Driven Organization** - Separate executive (global/), technical (plugins/), historical (archive/)
+8. **Audience-Driven Organization** - Separate executive (global/), technical (005-plugins/), historical (archive/)
 9. **Consistent Templates** - All plugins follow same 6-doc structure (easier to navigate)
 10. **Preserve Source Material** - Keep comprehensive specs as reference until migration verified
 11. **Version Carefully** - Use semantic versioning; milestone releases (1.0.0) mark major transformations
@@ -215,7 +215,7 @@ The Nixtla Plugin Showcase repository now fully complies with the **Enterprise P
 
 **Supporting:**
 5. `000-docs/global/` - Executive decision-making docs (3 files)
-6. `000-docs/plugins/` - Per-plugin documentation (60 files)
+6. `000-docs/005-plugins/` - Per-plugin documentation (60 files)
 7. `000-docs/6767-OD-REF-*.md` - Reference standard docs (3 files)
 
 ### Ready For
@@ -324,7 +324,7 @@ If Jeremy wants to complete top 3 plugins first:
 
 **To Developers Viewing This:**
 - Standard template for enterprise plugin repos
-- Clear documentation structure (global/, plugins/, archive/)
+- Clear documentation structure (global/, 005-plugins/, archive/)
 - Complete audit trail (4 phase AARs show every step)
 - Reusable patterns (new-plugin.sh, validate-docs.sh, link verification)
 

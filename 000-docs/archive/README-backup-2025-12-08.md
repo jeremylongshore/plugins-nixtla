@@ -32,7 +32,7 @@ Then install:
 ### Option 2: Direct from GitHub
 
 ```
-/plugin install github:intent-solutions-io/plugins-nixtla/plugins/nixtla-baseline-lab
+/plugin install github:intent-solutions-io/plugins-nixtla/005-plugins/nixtla-baseline-lab
 ```
 
 ---
@@ -51,7 +51,7 @@ Then install:
 
 ```bash
 git clone https://github.com/intent-solutions-io/plugins-nixtla.git
-cd plugins-nixtla/plugins/nixtla-baseline-lab
+cd plugins-nixtla/005-plugins/nixtla-baseline-lab
 
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
@@ -76,12 +76,12 @@ Runs in ~90 seconds, fully offline, zero API costs.
 ## Repository Structure
 
 ```
-plugins/                    # Working plugins
+005-plugins/                    # Working plugins
   nixtla-baseline-lab/      # Benchmarking
   nixtla-bigquery-forecaster/
   nixtla-search-to-slack/
-skills-pack/                # Claude Skills (8 skills)
-packages/                   # Skills CLI installer
+003-skills/                # Claude Skills (8 skills)
+006-packages/                   # Skills CLI installer
 000-docs/                   # All documentation
 ```
 
@@ -103,7 +103,7 @@ Category codes: `PP` Planning, `AT` Architecture, `OD` Overview, `QA` Quality, `
 
 ```bash
 # Run tests (baseline lab)
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 pytest tests/
 
 # Smoke test

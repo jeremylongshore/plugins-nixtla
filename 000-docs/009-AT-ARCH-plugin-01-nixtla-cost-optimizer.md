@@ -128,7 +128,7 @@ GCP_SA_KEY_PATH=/path/to/service-account.json # If using BigQuery
 
 ```bash
 # Auto-generated installation script
-cd ~/.claude/plugins/nixtla-cost-optimizer
+cd ~/.claude/005-plugins/nixtla-cost-optimizer
 ./scripts/setup.sh
 ```
 
@@ -248,7 +248,7 @@ echo "════════════════════════�
 
 ```bash
 # Edit .env file
-vim ~/.claude/plugins/nixtla-cost-optimizer/.env
+vim ~/.claude/005-plugins/nixtla-cost-optimizer/.env
 
 # Add your Nixtla API key
 NIXTLA_API_KEY=nixak-JNfT4z4JQb9uK3gdAyiWYWSBELdt6iW0PmE0Sy3k8ETAInJkFSPp4gOfyAZrENcGOsKyTqfDmuLghVq9
@@ -443,7 +443,7 @@ export interface CostRecommendation {
 ### Directory Structure
 
 ```
-plugins/ai-ml/nixtla-cost-optimizer/
+005-plugins/ai-ml/nixtla-cost-optimizer/
 ├── .claude-plugin/
 │   └── plugin.json                   # Plugin manifest
 ├── README.md                          # User documentation
@@ -784,7 +784,7 @@ Would you like me to fix this automatically? [y/N]
 ❌ ERROR: Nixtla API key not configured
 
 Please add your API key to .env file:
-  echo "NIXTLA_API_KEY=your_key_here" >> ~/.claude/plugins/nixtla-cost-optimizer/.env
+  echo "NIXTLA_API_KEY=your_key_here" >> ~/.claude/005-plugins/nixtla-cost-optimizer/.env
 
 Get your API key: https://dashboard.nixtla.io/api-keys
 ```
@@ -1225,7 +1225,7 @@ Get your API key:
 1. Visit https://dashboard.nixtla.io/api-keys
 2. Create new API key
 3. Add to .env file:
-   echo "NIXTLA_API_KEY=your_key" >> ~/.claude/plugins/nixtla-cost-optimizer/.env
+   echo "NIXTLA_API_KEY=your_key" >> ~/.claude/005-plugins/nixtla-cost-optimizer/.env
 4. Reload plugin: /mcp reload
 ```
 
@@ -1308,7 +1308,7 @@ Options:
 
 2. **Configure API Key**
    ```
-   Sarah: Opens ~/.claude/plugins/nixtla-cost-optimizer/.env
+   Sarah: Opens ~/.claude/005-plugins/nixtla-cost-optimizer/.env
 
    Adds: NIXTLA_API_KEY=nixak-...
 
@@ -1905,7 +1905,7 @@ snowflake:
 
 ```bash
 # Clone plugin
-cd ~/.claude/plugins/nixtla-cost-optimizer
+cd ~/.claude/005-plugins/nixtla-cost-optimizer
 
 # Install dependencies
 ./scripts/setup.sh
@@ -1943,10 +1943,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'plugins/ai-ml/nixtla-cost-optimizer/**'
+      - '005-plugins/ai-ml/nixtla-cost-optimizer/**'
   pull_request:
     paths:
-      - 'plugins/ai-ml/nixtla-cost-optimizer/**'
+      - '005-plugins/ai-ml/nixtla-cost-optimizer/**'
 
 jobs:
   test:
@@ -1963,13 +1963,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd plugins/ai-ml/nixtla-cost-optimizer
+          cd 005-plugins/ai-ml/nixtla-cost-optimizer
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
 
       - name: Run tests
         run: |
-          cd plugins/ai-ml/nixtla-cost-optimizer
+          cd 005-plugins/ai-ml/nixtla-cost-optimizer
           pytest tests/ -v --cov=src --cov-report=xml
 
       - name: Upload coverage

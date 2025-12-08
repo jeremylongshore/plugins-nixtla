@@ -1,489 +1,199 @@
 ---
 name: nixtla-forecast-validator
-description: |
-  Validates the quality of time series forecast metrics.
-  Use when evaluating forecast accuracy, detecting performance degradation, or comparing different models.
-  Trigger with "validate forecast", "check forecast quality", "assess forecast metrics".
+description: >
+  Validates time series forecast quality metrics by comparing current performance
+  against historical benchmarks. Detects degradation in MASE and sMAPE metrics.
+  Activates when user mentions "validate forecast", "check forecast quality",
+  or "assess forecast metrics".
 allowed-tools: "Read,Write,Bash,Glob,Grep"
 version: "1.0.0"
 ---
 
 # Nixtla Forecast Validator
 
-Validates time series forecast quality metrics and detects degradation using Nixtla's TimeGPT API and standard statistical measures.
-
-## Purpose
-
-Evaluates the accuracy and reliability of time series forecasts by comparing current performance against historical benchmarks.
+Validates time series forecast quality metrics and detects performance degradation using statistical measures. Compares current forecast accuracy against historical benchmarks to identify significant deviations in MASE and sMAPE metrics.
 
 ## Overview
 
-Analyzes forecast quality metrics such as MASE (Mean Absolute Scaled Error) and sMAPE (symmetric Mean Absolute Percentage Error). Detects significant deviations from expected performance, indicating potential model degradation or data anomalies. Outputs a report highlighting any detected issues and suggesting possible corrective actions. Use when you need automated monitoring of forecast accuracy or comparison of different forecast models.
+This skill analyzes forecast quality by comparing current performance metrics against historical baselines. It detects significant increases in error metrics (MASE and sMAPE) that may indicate model degradation, data quality issues, or changing patterns in the time series. The skill generates comprehensive reports, alerts, and visualizations to help users identify and address forecast quality problems quickly.
+
+Activates automatically when Claude detects forecast validation needs, or when explicitly requested with phrases like "validate forecast quality", "check model performance", or "assess forecast accuracy".
 
 ## Prerequisites
 
 **Tools**: Read, Write, Bash, Glob, Grep
 
-**Environment**: `NIXTLA_TIMEGPT_API_KEY`
+**Environment**: No API keys required (operates on CSV metrics files)
 
-**Packages**:
+**Python Packages**:
 ```bash
 pip install pandas matplotlib
 ```
 
+**Required CSV Format**:
+CSV files must contain columns: `model`, `MASE`, `sMAPE`
+
 ## Instructions
 
-### Step 1: Load data
+### Step 1: Prepare metrics data
 
-Read historical and current forecast metrics data (MASE, sMAPE) from CSV files.
+Ensure you have two CSV files containing forecast metrics:
+- Historical metrics CSV (baseline performance)
+- Current metrics CSV (recent performance to validate)
 
-```python
-import pandas as pd
-import argparse
-import os
-import logging
-from typing import Tuple, Dict
-import matplotlib.pyplot as plt
+Each CSV must have columns: `model`, `MASE`, `sMAPE`
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def load_metrics_data(file_path: str) -> pd.DataFrame:
-    """
-    Loads forecast metrics data from a CSV file.
-
-    Args:
-        file_path (str): The path to the CSV file.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the metrics data.
-
-    Raises:
-        FileNotFoundError: If the file does not exist.
-        pd.errors.EmptyDataError: If the file is empty.
-        pd.errors.ParserError: If the file cannot be parsed.
-    """
-    try:
-        df = pd.read_csv(file_path)
-        if df.empty:
-            raise pd.errors.EmptyDataError(f"The file {file_path} is empty.")
-        logging.info(f"Successfully loaded metrics data from {file_path}")
-        return df
-    except FileNotFoundError:
-        logging.error(f"File not found: {file_path}")
-        raise
-    except pd.errors.EmptyDataError as e:
-        logging.error(str(e))
-        raise
-    except pd.errors.ParserError as e:
-        logging.error(f"Error parsing file {file_path}: {e}")
-        raise
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
-        raise
-
-if __name__ == "__main__":
-    # Example usage (for testing purposes)
-    try:
-        # Create dummy CSV files for testing
-        historical_data = {'model': ['model_A', 'model_B'], 'MASE': [1.2, 0.8], 'sMAPE': [0.15, 0.10]}
-        current_data = {'model': ['model_A', 'model_B'], 'MASE': [1.8, 0.85], 'sMAPE': [0.18, 0.11]}
-
-        historical_df = pd.DataFrame(historical_data)
-        current_df = pd.DataFrame(current_data)
-
-        historical_df.to_csv('historical_metrics.csv', index=False)
-        current_df.to_csv('current_metrics.csv', index=False)
-
-        historical_metrics = load_metrics_data('historical_metrics.csv')
-        current_metrics = load_metrics_data('current_metrics.csv')
-
-        print("Historical Metrics:")
-        print(historical_metrics)
-        print("\nCurrent Metrics:")
-        print(current_metrics)
-
-    except Exception as e:
-        print(f"Error in example usage: {e}")
+**Example format**:
+```
+model,MASE,sMAPE
+model_A,1.2,0.15
+model_B,0.8,0.10
 ```
 
-### Step 2: Configure validation parameters
+### Step 2: Set validation thresholds
 
-Set thresholds for acceptable metric deviation and the historical baseline period.
+Configure acceptable deviation thresholds for MASE and sMAPE metrics. Default thresholds are 0.2 (20% increase), but these can be adjusted based on business requirements and model characteristics.
 
-```python
-def configure_validation_parameters(mase_threshold: float = 0.2, smape_threshold: float = 0.2) -> Tuple[float, float]:
-    """
-    Configures the validation parameters for MASE and sMAPE thresholds.
+**Recommended thresholds**:
+- Conservative: 0.1 (10% increase triggers alert)
+- Standard: 0.2 (20% increase triggers alert)
+- Lenient: 0.3 (30% increase triggers alert)
 
-    Args:
-        mase_threshold (float): The threshold for acceptable MASE deviation (default: 0.2).
-        smape_threshold (float): The threshold for acceptable sMAPE deviation (default: 0.2).
+### Step 3: Execute validation
 
-    Returns:
-        Tuple[float, float]: A tuple containing the MASE and sMAPE thresholds.
+Run the validation script to compare current metrics against historical benchmarks:
 
-    Raises:
-        ValueError: If either threshold is not a positive number.
-    """
-    if not isinstance(mase_threshold, (int, float)) or mase_threshold <= 0:
-        raise ValueError("MASE threshold must be a positive number.")
-    if not isinstance(smape_threshold, (int, float)) or smape_threshold <= 0:
-        raise ValueError("sMAPE threshold must be a positive number.")
-
-    logging.info(f"Validation parameters configured: MASE threshold = {mase_threshold}, sMAPE threshold = {smape_threshold}")
-    return mase_threshold, smape_threshold
-
-if __name__ == "__main__":
-    # Example usage (for testing purposes)
-    try:
-        mase_threshold, smape_threshold = configure_validation_parameters(mase_threshold=0.25, smape_threshold=0.15)
-        print(f"MASE Threshold: {mase_threshold}")
-        print(f"sMAPE Threshold: {smape_threshold}")
-
-        # Example of invalid threshold
-        try:
-            configure_validation_parameters(mase_threshold=-0.1)
-        except ValueError as e:
-            print(f"Expected Error: {e}")
-
-    except ValueError as e:
-        print(f"Error in example usage: {e}")
+```bash
+python {baseDir}/scripts/validate_forecast.py \
+  --historical historical_metrics.csv \
+  --current current_metrics.csv \
+  --mase_threshold 0.2 \
+  --smape_threshold 0.2
 ```
 
-### Step 3: Execute validation script
+The script performs:
+1. Loads historical and current metrics from CSV files
+2. Calculates percentage increase for each metric per model
+3. Compares increases against configured thresholds
+4. Generates validation report, comparison CSV, alert log, and visualization
 
-Run the validation script to compare current metrics against historical benchmarks.
+### Step 4: Review validation outputs
 
-```python
-import pandas as pd
-import argparse
-import os
-import logging
-import matplotlib.pyplot as plt
-from typing import Tuple, Dict
+Analyze the generated outputs to identify forecast quality issues:
+- Read `validation_report.txt` for summary of findings
+- Check `alert.log` for models requiring immediate attention
+- Review `metrics_comparison.csv` for detailed metric changes
+- Examine `metrics_visualization.png` for visual comparison
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def load_metrics_data(file_path: str) -> pd.DataFrame:
-    """Loads forecast metrics data from a CSV file."""
-    try:
-        df = pd.read_csv(file_path)
-        if df.empty:
-            raise pd.errors.EmptyDataError(f"The file {file_path} is empty.")
-        logging.info(f"Successfully loaded metrics data from {file_path}")
-        return df
-    except FileNotFoundError:
-        logging.error(f"File not found: {file_path}")
-        raise
-    except pd.errors.EmptyDataError as e:
-        logging.error(str(e))
-        raise
-    except pd.errors.ParserError as e:
-        logging.error(f"Error parsing file {file_path}: {e}")
-        raise
-    except Exception as e:
-        logging.error(f"An unexpected error occurred: {e}")
-        raise
-
-def configure_validation_parameters(mase_threshold: float = 0.2, smape_threshold: float = 0.2) -> Tuple[float, float]:
-    """Configures the validation parameters for MASE and sMAPE thresholds."""
-    if not isinstance(mase_threshold, (int, float)) or mase_threshold <= 0:
-        raise ValueError("MASE threshold must be a positive number.")
-    if not isinstance(smape_threshold, (int, float)) or smape_threshold <= 0:
-        raise ValueError("sMAPE threshold must be a positive number.")
-
-    logging.info(f"Validation parameters configured: MASE threshold = {mase_threshold}, sMAPE threshold = {smape_threshold}")
-    return mase_threshold, smape_threshold
-
-def validate_forecast_metrics(historical_metrics: pd.DataFrame, current_metrics: pd.DataFrame,
-                               mase_threshold: float, smape_threshold: float) -> Dict[str, Dict[str, float]]:
-    """
-    Validates forecast metrics by comparing current metrics against historical benchmarks.
-
-    Args:
-        historical_metrics (pd.DataFrame): DataFrame containing historical metrics.
-        current_metrics (pd.DataFrame): DataFrame containing current metrics.
-        mase_threshold (float): Threshold for acceptable MASE deviation.
-        smape_threshold (float): Threshold for acceptable sMAPE deviation.
-
-    Returns:
-        Dict[str, Dict[str, float]]: A dictionary containing validation results for each model.
-            The keys are model names, and the values are dictionaries containing 'MASE_increase' and 'sMAPE_increase' flags.
-    """
-    validation_results = {}
-
-    # Ensure 'model' column exists in both DataFrames
-    if 'model' not in historical_metrics.columns or 'model' not in current_metrics.columns:
-        raise ValueError("Missing required 'model' column in metrics data.")
-
-    # Ensure 'MASE' and 'sMAPE' columns exist in both DataFrames
-    required_metrics = ['MASE', 'sMAPE']
-    for metric in required_metrics:
-        if metric not in historical_metrics.columns or metric not in current_metrics.columns:
-            raise ValueError(f"Missing required metrics column: {metric}")
-
-    # Merge historical and current metrics on the 'model' column
-    merged_metrics = pd.merge(historical_metrics, current_metrics, on='model', suffixes=('_historical', '_current'))
-
-    for index, row in merged_metrics.iterrows():
-        model_name = row['model']
-        historical_mase = row['MASE_historical']
-        current_mase = row['MASE_current']
-        historical_smape = row['sMAPE_historical']
-        current_smape = row['sMAPE_current']
-
-        # Calculate percentage increase
-        mase_increase = (current_mase - historical_mase) / historical_mase if historical_mase != 0 else float('inf')
-        smape_increase = (current_smape - historical_smape) / historical_smape if historical_smape != 0 else float('inf')
-
-        # Check if the increase exceeds the threshold
-        mase_exceeds_threshold = mase_increase > mase_threshold
-        smape_exceeds_threshold = smape_increase > smape_threshold
-
-        validation_results[model_name] = {
-            'MASE_increase': mase_increase,
-            'sMAPE_increase': smape_increase,
-            'MASE_exceeds_threshold': mase_exceeds_threshold,
-            'sMAPE_exceeds_threshold': smape_exceeds_threshold
-        }
-
-        logging.info(f"Validation results for model {model_name}: MASE increase = {mase_increase:.2f}, sMAPE increase = {smape_increase:.2f}")
-
-    return validation_results
-
-def generate_report(validation_results: Dict[str, Dict[str, float]], output_path: str = 'validation_report.txt') -> None:
-    """
-    Generates a report summarizing the validation results.
-
-    Args:
-        validation_results (Dict[str, Dict[str, float]]): A dictionary containing validation results for each model.
-        output_path (str): The path to save the report (default: 'validation_report.txt').
-    """
-    with open(output_path, 'w') as f:
-        report_lines = []
-        for model_name, results in validation_results.items():
-            if results['MASE_exceeds_threshold']:
-                report_lines.append(f"WARNING: Significant increase in MASE detected for model {model_name}.")
-            if results['sMAPE_exceeds_threshold']:
-                report_lines.append(f"WARNING: Significant increase in sMAPE detected for model {model_name}.")
-
-        if not report_lines:
-            report_lines.append("Forecast validation passed. No significant degradation detected.")
-
-        for line in report_lines:
-            f.write(line + '\n')
-            logging.warning(line)
-
-    logging.info(f"Validation report generated at {output_path}")
-
-def create_metrics_comparison_csv(historical_metrics: pd.DataFrame, current_metrics: pd.DataFrame, output_path: str = 'metrics_comparison.csv') -> None:
-    """
-    Creates a CSV file containing a comparison of historical and current metrics.
-
-    Args:
-        historical_metrics (pd.DataFrame): DataFrame containing historical metrics.
-        current_metrics (pd.DataFrame): DataFrame containing current metrics.
-        output_path (str): The path to save the CSV file (default: 'metrics_comparison.csv').
-    """
-    try:
-        merged_metrics = pd.merge(historical_metrics, current_metrics, on='model', suffixes=('_historical', '_current'))
-        merged_metrics.to_csv(output_path, index=False)
-        logging.info(f"Metrics comparison CSV generated at {output_path}")
-    except Exception as e:
-        logging.error(f"Error creating metrics comparison CSV: {e}")
-        raise
-
-def create_alert_log(validation_results: Dict[str, Dict[str, float]], output_path: str = 'alert.log') -> None:
-    """
-    Creates a log file containing alerts if significant degradation is detected.
-
-    Args:
-        validation_results (Dict[str, Dict[str, float]]): A dictionary containing validation results for each model.
-        output_path (str): The path to save the alert log (default: 'alert.log').
-    """
-    with open(output_path, 'w') as f:
-        alert_lines = []
-        for model_name, results in validation_results.items():
-            if results['MASE_exceeds_threshold']:
-                alert_lines.append(f"ALERT: Significant increase in MASE detected for model {model_name}.")
-            if results['sMAPE_exceeds_threshold']:
-                alert_lines.append(f"ALERT: Significant increase in sMAPE detected for model {model_name}.")
-
-        for line in alert_lines:
-            f.write(line + '\n')
-            logging.warning(line)
-
-    logging.info(f"Alert log generated at {output_path}")
-
-def visualize_metrics(historical_metrics: pd.DataFrame, current_metrics: pd.DataFrame, output_path: str = 'metrics_visualization.png') -> None:
-    """
-    Visualizes historical and current metrics using bar plots.
-
-    Args:
-        historical_metrics (pd.DataFrame): DataFrame containing historical metrics.
-        current_metrics (pd.DataFrame): DataFrame containing current metrics.
-        output_path (str): The path to save the visualization (default: 'metrics_visualization.png').
-    """
-    try:
-        # Ensure 'model' column exists in both DataFrames
-        if 'model' not in historical_metrics.columns or 'model' not in current_metrics.columns:
-            raise ValueError("Missing required 'model' column in metrics data.")
-
-        # Ensure 'MASE' and 'sMAPE' columns exist in both DataFrames
-        required_metrics = ['MASE', 'sMAPE']
-        for metric in required_metrics:
-            if metric not in historical_metrics.columns or metric not in current_metrics.columns:
-                raise ValueError(f"Missing required metrics column: {metric}")
-
-        # Set up the figure and axes
-        fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(12, 6))
-
-        # Plot MASE
-        axes[0].bar(historical_metrics['model'], historical_metrics['MASE'], label='Historical', alpha=0.7)
-        axes[0].bar(current_metrics['model'], current_metrics['MASE'], label='Current', alpha=0.7)
-        axes[0].set_xlabel('Model')
-        axes[0].set_ylabel('MASE')
-        axes[0].set_title('MASE Comparison')
-        axes[0].legend()
-
-        # Plot sMAPE
-        axes[1].bar(historical_metrics['model'], historical_metrics['sMAPE'], label='Historical', alpha=0.7)
-        axes[1].bar(current_metrics['model'], current_metrics['sMAPE'], label='Current', alpha=0.7)
-        axes[1].set_xlabel('Model')
-        axes[1].set_ylabel('sMAPE')
-        axes[1].set_title('sMAPE Comparison')
-        axes[1].legend()
-
-        # Adjust layout and save the figure
-        plt.tight_layout()
-        plt.savefig(output_path)
-        logging.info(f"Metrics visualization saved to {output_path}")
-
-    except Exception as e:
-        logging.error(f"Error creating metrics visualization: {e}")
-        raise
-
-def main(historical_file: str, current_file: str, mase_threshold: float = 0.2, smape_threshold: float = 0.2) -> None:
-    """
-    Main function to execute the forecast validation process.
-
-    Args:
-        historical_file (str): Path to the historical metrics CSV file.
-        current_file (str): Path to the current metrics CSV file.
-        mase_threshold (float): Threshold for acceptable MASE deviation (default: 0.2).
-        smape_threshold (float): Threshold for acceptable sMAPE deviation (default: 0.2).
-    """
-    try:
-        # Load data
-        historical_metrics = load_metrics_data(historical_file)
-        current_metrics = load_metrics_data(current_file)
-
-        # Configure validation parameters
-        mase_threshold, smape_threshold = configure_validation_parameters(mase_threshold, smape_threshold)
-
-        # Validate forecast metrics
-        validation_results = validate_forecast_metrics(historical_metrics, current_metrics, mase_threshold, smape_threshold)
-
-        # Generate report
-        generate_report(validation_results)
-
-        # Create metrics comparison CSV
-        create_metrics_comparison_csv(historical_metrics, current_metrics)
-
-        # Create alert log
-        create_alert_log(validation_results)
-
-        # Visualize metrics
-        visualize_metrics(historical_metrics, current_metrics)
-
-    except Exception as e:
-        logging.error(f"An error occurred during the validation process: {e}")
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Validate time series forecast quality metrics.')
-    parser.add_argument('--historical', type=str, required=True, help='Path to the historical metrics CSV file.')
-    parser.add_argument('--current', type=str, required=True, help='Path to the current metrics CSV file.')
-    parser.add_argument('--mase_threshold', type=float, default=0.2, help='Threshold for acceptable MASE deviation.')
-    parser.add_argument('--smape_threshold', type=float, default=0.2, help='Threshold for acceptable sMAPE deviation.')
-
-    args = parser.parse_args()
-
-    main(args.historical, args.current, args.mase_threshold, args.smape_threshold)
-```
-
-### Step 4: Generate report
-
-Analyze the validation results and create a report highlighting any detected degradation. This is handled within the `validate_forecast.py` script.
+If degradation is detected, investigate potential causes such as data quality changes, concept drift, or model staleness.
 
 ## Output
 
-- **validation_report.txt**: Textual report summarizing the validation results.
-- **metrics_comparison.csv**: CSV file containing a comparison of historical and current metrics.
-- **alert.log**: Log file containing alerts if significant degradation is detected.
-- **metrics_visualization.png**: A visualization comparing historical and current metrics.
+The validation process generates four output files:
+
+1. **validation_report.txt**: Summary report indicating which models show significant degradation and overall validation status
+2. **metrics_comparison.csv**: Side-by-side comparison of historical vs current metrics for all models
+3. **alert.log**: Alert messages for models exceeding degradation thresholds
+4. **metrics_visualization.png**: Bar chart visualization comparing historical and current MASE and sMAPE values
 
 ## Error Handling
 
-1. **Error**: `Missing required metrics column (MASE or sMAPE)`
-   **Solution**: Ensure input CSV files contain columns 'MASE' and 'sMAPE'.
+**Common errors and solutions**:
 
-2. **Error**: `Invalid threshold value`
-   **Solution**: Provide a valid numerical threshold value for metric deviation.
+1. **Missing required metrics column (MASE or sMAPE)**
+   - Ensure input CSV files contain columns named exactly `MASE` and `sMAPE` (case-sensitive)
+   - Verify column headers match expected format
 
-3. **Error**: `Historical data unavailable`
-   **Solution**: Ensure a valid historical metrics CSV file is provided.
+2. **Invalid threshold value**
+   - Provide positive numerical values for `--mase_threshold` and `--smape_threshold`
+   - Thresholds represent percentage increase (0.2 = 20%)
 
-4. **Error**: `API Key not found`
-   **Solution**: Set the `NIXTLA_TIMEGPT_API_KEY` environment variable. (Not applicable in this version as TimeGPT API is not directly used)
+3. **Historical data unavailable**
+   - Verify path to historical metrics CSV file is correct
+   - Ensure file exists and is readable
+   - Check file format matches required CSV structure
+
+4. **File not found error**
+   - Verify both `--historical` and `--current` file paths are correct
+   - Use absolute paths if relative paths fail
+   - Check file permissions
+
+5. **Empty DataFrame error**
+   - Ensure CSV files are not empty
+   - Verify CSV files contain data rows beyond the header
+   - Check for proper CSV formatting (commas as delimiters)
 
 ## Examples
 
-### Example 1: Increased MASE
+### Example 1: Significant MASE degradation detected
 
-**Input (historical_metrics.csv)**:
+**Input** (historical_metrics.csv):
 ```
 model,MASE,sMAPE
 model_A,1.2,0.15
 ```
 
-**Input (current_metrics.csv)**:
+**Input** (current_metrics.csv):
 ```
 model,MASE,sMAPE
 model_A,1.8,0.18
 ```
 
-**Output (validation_report.txt)**:
+**Command**:
+```bash
+python scripts/validate_forecast.py --historical historical_metrics.csv --current current_metrics.csv
+```
+
+**Output** (validation_report.txt):
 ```
 WARNING: Significant increase in MASE detected for model model_A.
 ```
 
-### Example 2: Stable performance
+**Interpretation**: Model A shows 50% increase in MASE (from 1.2 to 1.8), exceeding the default 20% threshold. This indicates forecast quality degradation requiring investigation.
 
-**Input (historical_metrics.csv)**:
+### Example 2: Stable performance, no alerts
+
+**Input** (historical_metrics.csv):
 ```
 model,MASE,sMAPE
 model_B,0.8,0.10
 ```
 
-**Input (current_metrics.csv)**:
+**Input** (current_metrics.csv):
 ```
 model,MASE,sMAPE
 model_B,0.85,0.11
 ```
 
-**Output (validation_report.txt)**:
+**Command**:
+```bash
+python scripts/validate_forecast.py --historical historical_metrics.csv --current current_metrics.csv
+```
+
+**Output** (validation_report.txt):
 ```
 Forecast validation passed. No significant degradation detected.
 ```
 
-## Usage
+**Interpretation**: Model B shows only 6.25% increase in MASE and 10% increase in sMAPE, both below the 20% threshold. Performance is stable.
 
-To validate forecast metrics, run the following command:
+### Example 3: Multiple models with custom thresholds
 
+**Command**:
 ```bash
-python validate_forecast.py --historical historical_metrics.csv --current current_metrics.csv --mase_threshold 0.3 --smape_threshold 0.25
+python scripts/validate_forecast.py \
+  --historical multi_model_historical.csv \
+  --current multi_model_current.csv \
+  --mase_threshold 0.3 \
+  --smape_threshold 0.25
 ```
 
-Replace `historical_metrics.csv` and `current_metrics.csv` with the actual paths to your historical and current metrics files. Adjust `mase_threshold` and `smape_threshold` as needed.
+Uses more lenient thresholds (30% for MASE, 25% for sMAPE) suitable for volatile forecasts or experimental models.
+
+## Resources
+
+**Script**: `{baseDir}/scripts/validate_forecast.py`
+
+**Metrics**: MASE (Mean Absolute Scaled Error), sMAPE (symmetric Mean Absolute Percentage Error)
+
+**Related skills**: `nixtla-timegpt-lab`, `nixtla-experiment-architect`, `nixtla-schema-mapper`

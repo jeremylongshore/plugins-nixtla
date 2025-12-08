@@ -191,7 +191,7 @@ claude-code-plugins-nixtla/
 │   ├── statsforecast-pipeline/
 │   ├── mlforecast-automation/
 │   └── neuralforecast-deployment/
-├── plugins/                # Plugin implementations (empty)
+├── 005-plugins/                # Plugin implementations (empty)
 │   ├── README.md
 │   └── __init__.py
 ├── scripts/                # Development tools
@@ -215,12 +215,12 @@ claude-code-plugins-nixtla/
 
 ### Detailed Directory Analysis
 
-#### plugins/ (Core Implementation - Currently Empty)
+#### 005-plugins/ (Core Implementation - Currently Empty)
 **Purpose**: Container for Claude Code plugin implementations
 **Status**: Skeleton structure only, awaiting implementation
 **Planned Structure**:
 ```
-plugins/
+005-plugins/
 ├── timegpt-quickstart/
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -317,10 +317,10 @@ plugins/
 
 | Agent | Purpose | Personas | Runtime | Prompts Location |
 |-------|---------|----------|---------|------------------|
-| Pipeline Builder | Create data pipelines | Data Scientists | Claude Code | plugins/*/agents/ |
-| Model Selector | Choose optimal model | ML Engineers | Claude Code | plugins/*/agents/ |
-| Deploy Assistant | Deploy to cloud | DevOps | Claude Code | plugins/*/agents/ |
-| Cost Optimizer | Minimize API costs | Finance | Claude Code | plugins/*/agents/ |
+| Pipeline Builder | Create data pipelines | Data Scientists | Claude Code | 005-plugins/*/agents/ |
+| Model Selector | Choose optimal model | ML Engineers | Claude Code | 005-plugins/*/agents/ |
+| Deploy Assistant | Deploy to cloud | DevOps | Claude Code | 005-plugins/*/agents/ |
+| Cost Optimizer | Minimize API costs | Finance | Claude Code | 005-plugins/*/agents/ |
 
 ### Slash Commands (Future)
 
@@ -390,12 +390,12 @@ python -m pytest
 **Creating a New Plugin**:
 ```bash
 # 1. Create plugin structure
-mkdir -p plugins/my-plugin/.claude-plugin
-mkdir -p plugins/my-plugin/commands
-mkdir -p plugins/my-plugin/agents
+mkdir -p 005-plugins/my-plugin/.claude-plugin
+mkdir -p 005-plugins/my-plugin/commands
+mkdir -p 005-plugins/my-plugin/agents
 
 # 2. Create manifest
-cat > plugins/my-plugin/.claude-plugin/plugin.json << EOF
+cat > 005-plugins/my-plugin/.claude-plugin/plugin.json << EOF
 {
   "name": "my-plugin",
   "version": "0.1.0",
@@ -407,7 +407,7 @@ EOF
 ./scripts/validate-all-plugins.sh
 
 # 4. Test locally
-python -m pytest tests/plugins/test_my_plugin.py
+python -m pytest tests/005-plugins/test_my_plugin.py
 ```
 
 #### Documentation Deployment
@@ -588,7 +588,7 @@ PYPI_TOKEN=         # Package publishing (future)
 - IDE: VS Code with Python extensions
 - Version Control: Git 2.30+
 
-**Bootstrap Script** (`scripts/setup-dev-environment.sh`):
+**Bootstrap Script** (`004-scripts/setup-dev-environment.sh`):
 ```bash
 #!/bin/bash
 python -m venv venv
@@ -605,13 +605,13 @@ echo "Setup complete!"
 pytest
 
 # Format code
-black plugins/ examples/ tests/
+black 005-plugins/ examples/ tests/
 
 # Type checking
-mypy plugins/
+mypy 005-plugins/
 
 # Linting
-flake8 plugins/
+flake8 005-plugins/
 
 # Validate plugins
 ./scripts/validate-all-plugins.sh
@@ -1058,7 +1058,7 @@ build → lint → test → security → docs → publish
 
 **Symptoms**: Plugin commands not recognized
 **Diagnosis**:
-1. Check plugin manifest exists: `ls plugins/*/plugin.json`
+1. Check plugin manifest exists: `ls 005-plugins/*/plugin.json`
 2. Validate manifest structure: `./scripts/validate-all-plugins.sh`
 3. Check Claude Code logs for errors
 

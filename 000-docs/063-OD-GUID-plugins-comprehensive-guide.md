@@ -157,7 +157,7 @@ MCP is the communication protocol between Claude Code and plugins. It allows:
 Every plugin follows this standard structure:
 
 ```
-plugins/plugin-name/
+005-plugins/plugin-name/
 │
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest (required)
@@ -249,9 +249,9 @@ The MCP configuration tells Claude Code how to start the server:
     "nixtla-baseline-mcp": {
       "command": "python",
       "args": ["scripts/nixtla_baseline_mcp.py"],
-      "cwd": "${workspaceFolder}/plugins/nixtla-baseline-lab",
+      "cwd": "${workspaceFolder}/005-plugins/nixtla-baseline-lab",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/plugins/nixtla-baseline-lab"
+        "PYTHONPATH": "${workspaceFolder}/005-plugins/nixtla-baseline-lab"
       },
       "timeout": 300000
     }
@@ -324,7 +324,7 @@ The Nixtla Baseline Lab is the **flagship plugin** that demonstrates how Claude 
 ### 3.2.1 Directory Structure
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 │
 ├── .claude-plugin/
 │   └── plugin.json                    # Plugin manifest
@@ -519,7 +519,7 @@ plugins/nixtla-baseline-lab/
 
 ### 3.3.1 Plugin Manifest (plugin.json)
 
-**Location**: `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`
+**Location**: `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`
 
 ```json
 {
@@ -559,7 +559,7 @@ plugins/nixtla-baseline-lab/
 
 ### 3.3.2 MCP Configuration (.mcp.json)
 
-**Location**: `plugins/nixtla-baseline-lab/.mcp.json`
+**Location**: `005-plugins/nixtla-baseline-lab/.mcp.json`
 
 ```json
 {
@@ -569,10 +569,10 @@ plugins/nixtla-baseline-lab/
       "args": [
         "scripts/nixtla_baseline_mcp.py"
       ],
-      "cwd": "${workspaceFolder}/plugins/nixtla-baseline-lab",
+      "cwd": "${workspaceFolder}/005-plugins/nixtla-baseline-lab",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/plugins/nixtla-baseline-lab:${workspaceFolder}/plugins/nixtla-baseline-lab/scripts",
-        "NIXTLA_BASELINE_DATA_DIR": "${workspaceFolder}/plugins/nixtla-baseline-lab/data"
+        "PYTHONPATH": "${workspaceFolder}/005-plugins/nixtla-baseline-lab:${workspaceFolder}/005-plugins/nixtla-baseline-lab/scripts",
+        "NIXTLA_BASELINE_DATA_DIR": "${workspaceFolder}/005-plugins/nixtla-baseline-lab/data"
       },
       "timeout": 300000
     }
@@ -582,7 +582,7 @@ plugins/nixtla-baseline-lab/
 
 ### 3.3.3 Python Requirements (requirements.txt)
 
-**Location**: `plugins/nixtla-baseline-lab/scripts/requirements.txt`
+**Location**: `005-plugins/nixtla-baseline-lab/scripts/requirements.txt`
 
 ```text
 # Nixtla OSS Libraries
@@ -605,7 +605,7 @@ tqdm>=4.65.0
 
 ### 3.3.4 Environment Setup Script
 
-**Location**: `plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`
+**Location**: `005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`
 
 ```bash
 #!/bin/bash
@@ -788,7 +788,7 @@ esac
 
 ### 3.4.1 Server Class Structure
 
-The MCP server is implemented in `scripts/nixtla_baseline_mcp.py` (1777 lines). Here's the complete class structure:
+The MCP server is implemented in `004-scripts/nixtla_baseline_mcp.py` (1777 lines). Here's the complete class structure:
 
 ```python
 #!/usr/bin/env python3
@@ -1514,7 +1514,7 @@ run_baselines(
 
 ### 3.6.1 /nixtla-baseline-m4
 
-**Location**: `plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md`
+**Location**: `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md`
 
 **Purpose**: Run statsforecast baselines on M4 Daily data
 
@@ -1589,7 +1589,7 @@ Call the `run_baselines` MCP tool with the following parameters:
 
 ### 3.6.2 /nixtla-baseline-setup
 
-**Location**: `plugins/nixtla-baseline-lab/commands/nixtla-baseline-setup.md`
+**Location**: `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-setup.md`
 
 **Purpose**: Set up the Python environment for the baseline lab
 
@@ -1719,7 +1719,7 @@ Note: This is a limited comparison. TimeGPT often excels on:
 
 ### 3.8.1 Smoke Test
 
-**Location**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
+**Location**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
 
 ```python
 #!/usr/bin/env python3
@@ -1847,7 +1847,7 @@ if __name__ == "__main__":
 
 ```bash
 # Smoke test (recommended first)
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 python tests/run_baseline_m4_smoke.py
 
 # Unit tests
@@ -2026,7 +2026,7 @@ The BigQuery Forecaster demonstrates **enterprise cloud integration** by running
 ### 4.2.1 Directory Structure
 
 ```
-plugins/nixtla-bigquery-forecaster/
+005-plugins/nixtla-bigquery-forecaster/
 │
 ├── src/
 │   ├── main.py                    # Cloud Function entry point
@@ -2591,7 +2591,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'plugins/nixtla-bigquery-forecaster/**'
+      - '005-plugins/nixtla-bigquery-forecaster/**'
   workflow_dispatch:
 
 jobs:
@@ -2615,7 +2615,7 @@ jobs:
 
       - name: Deploy Cloud Function
         run: |
-          cd plugins/nixtla-bigquery-forecaster
+          cd 005-plugins/nixtla-bigquery-forecaster
           gcloud functions deploy nixtla-bigquery-forecaster \
             --gen2 \
             --runtime=python310 \
@@ -2993,9 +2993,9 @@ addopts = -v --tb=short
 
 | Component | Path |
 |-----------|------|
-| Baseline Lab | `plugins/nixtla-baseline-lab/` |
-| BigQuery Forecaster | `plugins/nixtla-bigquery-forecaster/` |
-| Search-to-Slack | `plugins/nixtla-search-to-slack/` |
+| Baseline Lab | `005-plugins/nixtla-baseline-lab/` |
+| BigQuery Forecaster | `005-plugins/nixtla-bigquery-forecaster/` |
+| Search-to-Slack | `005-plugins/nixtla-search-to-slack/` |
 | CI Workflows | `.github/workflows/` |
 
 ## Appendix C: Environment Variables

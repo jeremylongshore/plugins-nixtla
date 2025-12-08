@@ -85,11 +85,11 @@ sequenceDiagram
 ### 2.1 Three Core Plugins Structure
 
 ```
-nixtla-claude-plugins/
+nixtla-claude-005-plugins/
 ├── .claude-plugin/
 │   ├── marketplace.json          # CLI catalog
 │   └── marketplace.extended.json # Rich metadata
-├── plugins/
+├── 005-plugins/
 │   ├── timegpt-pipeline/        # Plugin 1
 │   │   ├── .claude-plugin/
 │   │   │   └── plugin.json
@@ -603,7 +603,7 @@ esac
 ### 7.1 Repository Structure
 
 ```
-nixtla-claude-plugins/
+nixtla-claude-005-plugins/
 ├── .github/
 │   ├── workflows/
 │   │   ├── validate-plugins.yml
@@ -615,7 +615,7 @@ nixtla-claude-plugins/
 ├── .claude-plugin/
 │   ├── marketplace.json
 │   └── marketplace.extended.json
-├── plugins/
+├── 005-plugins/
 │   ├── timegpt-pipeline/
 │   ├── nixtla-bench/
 │   └── forecast-service/
@@ -658,7 +658,7 @@ nixtla-claude-plugins/
   "plugins": [
     {
       "name": "timegpt-pipeline",
-      "source": "./plugins/timegpt-pipeline",
+      "source": "./005-plugins/timegpt-pipeline",
       "description": "Complete TimeGPT integration with automated pipeline generation",
       "version": "1.0.0",
       "category": "ai-ml",
@@ -675,7 +675,7 @@ nixtla-claude-plugins/
     },
     {
       "name": "nixtla-bench",
-      "source": "./plugins/nixtla-bench",
+      "source": "./005-plugins/nixtla-bench",
       "description": "Benchmark and compare all Nixtla models on your data",
       "version": "1.0.0",
       "category": "ai-ml",
@@ -691,7 +691,7 @@ nixtla-claude-plugins/
     },
     {
       "name": "forecast-service",
-      "source": "./plugins/forecast-service",
+      "source": "./005-plugins/forecast-service",
       "description": "Production-ready forecast API service with MCP tools",
       "version": "1.0.0",
       "category": "api-development",
@@ -764,7 +764,7 @@ export NIXTLA_API_KEY="your-api-key-here"
 # scripts/validate-all-plugins.sh
 
 # Validate plugin structure
-for plugin in plugins/*; do
+for plugin in 005-plugins/*; do
   echo "Validating $plugin..."
 
   # Check required files

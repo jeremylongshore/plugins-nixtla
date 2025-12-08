@@ -185,7 +185,7 @@ Discovery → Clone & Trust → Plugin Install → Environment Setup → Run Bas
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           GITHUB ACTIONS CI                                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  Trigger: Push/PR to main (paths: plugins/nixtla-baseline-lab/**)           │
+│  Trigger: Push/PR to main (paths: 005-plugins/nixtla-baseline-lab/**)           │
 │  Runner: ubuntu-latest                                                       │
 │  Steps:                                                                      │
 │    1. Checkout → 2. Setup Python 3.12 → 3. Install deps → 4. MCP test       │
@@ -217,7 +217,7 @@ nixtla/                               # Repository root
 │   ├── 6767-PP-PLAN-*.md            # Planning docs (canonical)
 │   ├── 015-022-AA-AACR-phase-*.md   # Phase AARs (8 phases complete)
 │   └── 023-QA-TEST-*.md             # Test coverage report
-├── plugins/                          # ★ MAIN PLUGIN DIRECTORY (1.2GB with venv)
+├── 005-plugins/                          # ★ MAIN PLUGIN DIRECTORY (1.2GB with venv)
 │   ├── nixtla-baseline-lab/         # ★ PRIMARY PLUGIN (v0.6.0)
 │   │   ├── .claude-plugin/plugin.json  # Plugin manifest
 │   │   ├── .mcp.json                 # MCP server config
@@ -252,7 +252,7 @@ nixtla/                               # Repository root
 
 ### Detailed Directory Analysis
 
-#### plugins/nixtla-baseline-lab/scripts/ ★
+#### 005-plugins/nixtla-baseline-lab/scripts/ ★
 
 **Purpose**: Core Python implementation of the MCP server and setup automation.
 
@@ -273,7 +273,7 @@ nixtla/                               # Repository root
 - `python nixtla_baseline_mcp.py test --enable-plots` - With visualization
 - `python nixtla_baseline_mcp.py test --include-timegpt` - With TimeGPT
 
-#### plugins/nixtla-baseline-lab/tests/
+#### 005-plugins/nixtla-baseline-lab/tests/
 
 **Framework**: Custom golden task harness (not pytest)
 **Coverage**:
@@ -298,13 +298,13 @@ nixtla/                               # Repository root
 **CI Workflow**: `nixtla-baseline-lab-ci.yml` (62 lines)
 
 **Triggers**:
-- Push to main (paths: `plugins/nixtla-baseline-lab/**`)
+- Push to main (paths: `005-plugins/nixtla-baseline-lab/**`)
 - Pull requests to main (same paths)
 
 **Steps**:
 1. Checkout repository
 2. Setup Python 3.12 with pip caching
-3. Install dependencies from `scripts/requirements.txt`
+3. Install dependencies from `004-scripts/requirements.txt`
 4. Print package versions (verification)
 5. Run MCP test mode
 6. Run golden task smoke test
@@ -324,7 +324,7 @@ nixtla/                               # Repository root
 | Slash Command | `commands/nixtla-baseline-setup.md` | Environment setup | User types `/nixtla-baseline-setup` |
 | Skill | `skills/nixtla-baseline-review/SKILL.md` | Interpret results | Claude auto-invokes on questions |
 | Agent | `agents/nixtla-baseline-analyst.md` | Deep analysis | Explicit invocation |
-| MCP Server | `scripts/nixtla_baseline_mcp.py` | Forecasting tool | Called by commands |
+| MCP Server | `004-scripts/nixtla_baseline_mcp.py` | Forecasting tool | Called by commands |
 
 ### MCP Server Tools
 
@@ -361,7 +361,7 @@ nixtla/                               # Repository root
    cd claude-code-plugins-nixtla
 
    # Navigate to plugin
-   cd plugins/nixtla-baseline-lab
+   cd 005-plugins/nixtla-baseline-lab
 
    # Create virtualenv and install deps
    ./scripts/setup_nixtla_env.sh --venv
@@ -389,7 +389,7 @@ nixtla/                               # Repository root
 #### CI Deployment
 
 - **Trigger**: Push to main or PR targeting main
-- **Pre-flight**: Automatic path filtering (`plugins/nixtla-baseline-lab/**`)
+- **Pre-flight**: Automatic path filtering (`005-plugins/nixtla-baseline-lab/**`)
 - **Execution**: GitHub Actions workflow
 - **Validation**: Exit code 0 from golden task
 - **Rollback**: Revert commit (no deployment artifacts)
@@ -518,7 +518,7 @@ nixtla/                               # Repository root
 
 **Bootstrap**:
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 ```
 
@@ -610,7 +610,7 @@ python tests/run_baseline_m4_smoke.py --include-timegpt
 
 ### Recommended Reading List
 
-1. **Plugin README** (`plugins/nixtla-baseline-lab/README.md`) - Complete user guide
+1. **Plugin README** (`005-plugins/nixtla-baseline-lab/README.md`) - Complete user guide
 2. **Product Overview** (`000-docs/6767-OD-OVRV-*.md`) - Executive summary
 3. **Architecture** (`000-docs/6767-OD-ARCH-*.md`) - Technical deep dive
 4. **Phase 8 AAR** (`000-docs/022-AA-AACR-phase-08-*.md`) - Latest development
@@ -683,7 +683,7 @@ python tests/run_baseline_m4_smoke.py --include-timegpt
 
 - **Repository**: https://github.com/intent-solutions-io/plugins-nixtla
 - **CI Workflows**: https://github.com/intent-solutions-io/plugins-nixtla/actions
-- **Plugin Directory**: `plugins/nixtla-baseline-lab/`
+- **Plugin Directory**: `005-plugins/nixtla-baseline-lab/`
 - **Documentation**: `000-docs/`
 - **Phase AARs**: `000-docs/015-022-AA-AACR-phase-*.md`
 
@@ -766,7 +766,7 @@ python tests/run_baseline_m4_smoke.py --include-timegpt
 ### Appendix C. Troubleshooting Playbooks
 
 **CI fails on "Install dependencies"**:
-1. Check `scripts/requirements.txt` for syntax errors
+1. Check `004-scripts/requirements.txt` for syntax errors
 2. Verify package versions exist on PyPI
 3. Check Python version compatibility
 

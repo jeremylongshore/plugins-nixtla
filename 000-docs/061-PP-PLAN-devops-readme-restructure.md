@@ -96,7 +96,7 @@ The current README focuses on **plugin installation** but not **operational unde
 | **Who** | Business showcase for Nixtla CEO |
 | **Status** | Experimental (3 plugins, 21 skills) |
 | **Stack** | Python 3.10+, statsforecast, TimeGPT API |
-| **Entry Point** | `plugins/nixtla-baseline-lab/` |
+| **Entry Point** | `005-plugins/nixtla-baseline-lab/` |
 ```
 
 ### Section 2: Health Check (Run First)
@@ -114,7 +114,7 @@ python3 --version  # Need 3.10+
 pytest -v --tb=short 2>/dev/null || echo "Run: pip install -e . && pip install pytest"
 
 # 3. Baseline lab works? (90 sec, offline)
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv 2>/dev/null || echo "Setup required"
 source .venv-nixtla-baseline/bin/activate 2>/dev/null
 python tests/run_baseline_m4_smoke.py
@@ -137,15 +137,15 @@ nixtla/
 │   ├── global/            #    Executive summaries, DevOps guide
 │   └── planned-skills/    #    Generated skill specs (21 skills)
 │
-├── plugins/               # 🔌 WORKING PLUGINS (start here)
+├── 005-plugins/               # 🔌 WORKING PLUGINS (start here)
 │   ├── nixtla-baseline-lab/      # ⭐ Main showcase - M4 benchmarks
 │   ├── nixtla-bigquery-forecaster/  # BigQuery integration
 │   └── nixtla-search-to-slack/      # Slack notifications
 │
-├── skills-pack/           # 🧠 Claude Skills (AI behavior mods)
+├── 003-skills/           # 🧠 Claude Skills (AI behavior mods)
 │   └── .claude/skills/    #    8 production skills
 │
-├── packages/              # 📦 Installable packages
+├── 006-packages/              # 📦 Installable packages
 │   └── nixtla-claude-skills-installer/  # CLI: nixtla-skills
 │
 ├── scripts/               # 🛠️ Repo-level automation
@@ -161,7 +161,7 @@ nixtla/
 | Role | Start Here |
 |------|------------|
 | DevOps | `000-docs/global/003-GUIDE-devops-*.md` |
-| Developer | `plugins/nixtla-baseline-lab/` |
+| Developer | `005-plugins/nixtla-baseline-lab/` |
 | Stakeholder | `000-docs/global/000-EXECUTIVE-SUMMARY.md` |
 ```
 
@@ -207,7 +207,7 @@ pip install -r requirements-dev.txt
 ### Run Tests
 ```bash
 pytest -v                    # All tests
-pytest plugins/ -v           # Plugin tests only
+pytest 005-plugins/ -v           # Plugin tests only
 pytest --cov=plugins -v      # With coverage
 ```
 

@@ -47,7 +47,7 @@ The plugin has been developed through six implementation phases:
 
 ### Phase 2: Manifest & MCP (016-AA-AACR)
 
-- MCP server implementation (`scripts/nixtla_baseline_mcp.py`).
+- MCP server implementation (`004-scripts/nixtla_baseline_mcp.py`).
 - JSON-RPC tool definitions (`run_baselines` tool).
 - Basic test mode for validation.
 
@@ -67,7 +67,7 @@ The plugin has been developed through six implementation phases:
 
 ### Phase 5: Setup & Validation (019-AA-AACR)
 
-- Setup script (`scripts/setup_nixtla_env.sh`).
+- Setup script (`004-scripts/setup_nixtla_env.sh`).
 - Dependency validation and virtualenv support.
 - Repro bundles (`run_manifest.json`, `compat_info.json`).
 - GitHub issue draft generator.
@@ -175,7 +175,7 @@ The plugin has been developed through six implementation phases:
 ### User-Facing Docs
 
 - **[Root README](../README.md)**: Repository overview, quickstart, collaboration context.
-- **[Plugin Manual](../plugins/nixtla-baseline-lab/README.md)**: Complete user guide with detailed setup, parameters, and examples.
+- **[Plugin Manual](../005-plugins/nixtla-baseline-lab/README.md)**: Complete user guide with detailed setup, parameters, and examples.
 
 ### Technical Docs (000-docs)
 

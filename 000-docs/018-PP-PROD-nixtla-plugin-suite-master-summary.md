@@ -507,7 +507,7 @@ cd nixtla-plugins
 export NIXTLA_API_KEY=nixak-your-key-here
 
 # Install specific plugin
-cd plugins/nixtla-cost-optimizer
+cd 005-plugins/nixtla-cost-optimizer
 ./setup.sh
 
 # Or install all
@@ -517,13 +517,13 @@ cd plugins/nixtla-cost-optimizer
 ### Individual Plugin Setup
 ```bash
 # Python-only plugins (#2, #3, #4, #5, #6, #8, #9)
-cd plugins/nixtla-[plugin-name]
+cd 005-plugins/nixtla-[plugin-name]
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
 # TypeScript MCP plugins (#1, #7)
-cd plugins/nixtla-[plugin-name]
+cd 005-plugins/nixtla-[plugin-name]
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 cd mcp && pnpm install && pnpm build
@@ -633,7 +633,7 @@ python tests/test_snowflake_adapter.py
 1. **Set Up Development Environment**
    ```bash
    # Create plugin repository structure
-   mkdir -p nixtla-plugins/plugins
+   mkdir -p nixtla-005-plugins/plugins
    cd nixtla-plugins
 
    # Initialize Git

@@ -38,7 +38,7 @@ Unlike plugins (which run actual code), skills are **behavioral modifiers** - th
 | Aspect | Skills | Plugins | Commands |
 |--------|--------|---------|----------|
 | **Format** | Markdown + YAML | Python/JS + JSON | Markdown |
-| **Location** | `.claude/skills/*/SKILL.md` | `plugins/*/` | `plugins/*/commands/*.md` |
+| **Location** | `.claude/skills/*/SKILL.md` | `005-plugins/*/` | `005-plugins/*/commands/*.md` |
 | **Purpose** | Modify Claude's behavior | Execute code | Trigger workflows |
 | **Activation** | Auto (context) or explicit | Manual (Claude calls) | User invokes |
 | **Persistence** | Per-session | Server process | Per-invocation |
@@ -49,7 +49,7 @@ Unlike plugins (which run actual code), skills are **behavioral modifiers** - th
 
 | Category | Count | Location |
 |----------|-------|----------|
-| Production Skills | 8 | `skills-pack/.claude/skills/` |
+| Production Skills | 8 | `003-skills/.claude/skills/` |
 | Core Forecasting | 5 | `000-docs/planned-skills/core-forecasting/` |
 | Prediction Markets | 10 | `000-docs/planned-skills/prediction-markets/` |
 | Live/Retroactive | 6 | `000-docs/planned-skills/live/` |
@@ -248,7 +248,7 @@ description: "[extremely long description...]"
 
 ## 3.1 Overview
 
-Production skills are located in `skills-pack/.claude/skills/` and are ready for use in projects.
+Production skills are located in `003-skills/.claude/skills/` and are ready for use in projects.
 
 | # | Skill | Purpose |
 |---|-------|---------|
@@ -269,7 +269,7 @@ Production skills are located in `skills-pack/.claude/skills/` and are ready for
 
 **Purpose**: Transform Claude into an expert Nixtla forecasting assistant
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
 
 **Triggers**:
 - "forecast my data"
@@ -603,7 +603,7 @@ print(tg_forecasts.head())
 
 **Purpose**: Design and scaffold complete forecasting experiments
 
-**Location**: `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md`
 
 **Triggers**:
 - "design experiment"
@@ -832,7 +832,7 @@ To run the experiment:
 
 **Purpose**: Transform any tabular data to Nixtla format (unique_id, ds, y)
 
-**Location**: `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md`
 
 **Triggers**:
 - "convert to Nixtla format"
@@ -1071,7 +1071,7 @@ Output schema:
 
 **Purpose**: Fine-tune TimeGPT on custom datasets
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
 
 **Triggers**:
 - "finetune TimeGPT"
@@ -1163,7 +1163,7 @@ print(finetune_result.head())
 
 **Purpose**: Generate Airflow DAGs or Prefect flows for production forecasting
 
-**Location**: `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
 
 **Triggers**:
 - "productionize model"
@@ -1290,7 +1290,7 @@ if __name__ == "__main__":
 
 **Purpose**: Audit and optimize TimeGPT API costs
 
-**Location**: `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md`
 
 **Triggers**:
 - "optimize Nixtla costs"
@@ -1367,7 +1367,7 @@ forecast = client.forecast(df, h=7)  # Not h=30
 
 **Purpose**: Directory of all installed Nixtla skills
 
-**Location**: `skills-pack/.claude/skills/nixtla-skills-index/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-skills-index/SKILL.md`
 
 **Triggers**:
 - "list skills"
@@ -1397,7 +1397,7 @@ allowed-tools: "Read,Glob"
 
 **Purpose**: Install or update Nixtla skills in projects
 
-**Location**: `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
 
 **Triggers**:
 - "install Nixtla skills"
@@ -1423,7 +1423,7 @@ allowed-tools: "Bash,Read,Write"
 
 ```bash
 # Install the skills installer
-pip install -e packages/nixtla-claude-skills-installer
+pip install -e 006-packages/nixtla-claude-skills-installer
 
 # Initialize skills in a project
 cd /path/to/your/project
@@ -2331,7 +2331,7 @@ def validate_skill(skill_path: Path) -> dict:
 python tests/basic_validator.py
 
 # Validate specific skill
-python tests/validate_skill.py skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md
+python tests/validate_skill.py 003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md
 ```
 
 ---
@@ -2368,7 +2368,7 @@ python tests/validate_skill.py skills-pack/.claude/skills/nixtla-timegpt-lab/SKI
 
 | Category | Location |
 |----------|----------|
-| Production Skills | `skills-pack/.claude/skills/` |
+| Production Skills | `003-skills/.claude/skills/` |
 | Core Forecasting | `000-docs/planned-skills/core-forecasting/` |
 | Prediction Markets | `000-docs/planned-skills/prediction-markets/` |
 | Live/Retroactive | `000-docs/planned-skills/live/` |

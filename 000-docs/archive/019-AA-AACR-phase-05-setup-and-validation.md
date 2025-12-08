@@ -39,7 +39,7 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
 
 ### 1. Automated Setup Script
 
-**Created**: `plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`
+**Created**: `005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`
 
 **Purpose**: One-command Nixtla OSS environment setup with safety checks and clear progress feedback.
 
@@ -49,7 +49,7 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
 - **Dual installation modes**:
   - Default: Current Python environment (fast)
   - `--venv` flag: Dedicated virtualenv at `.venv-nixtla-baseline/` (isolated, recommended)
-- **Dependency installation**: Installs from `scripts/requirements.txt`:
+- **Dependency installation**: Installs from `004-scripts/requirements.txt`:
   - statsforecast ≥1.5.0
   - datasetsforecast ≥0.0.8
   - pandas ≥2.0.0
@@ -65,7 +65,7 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
 
 ### 2. Setup Command for Claude Code
 
-**Created**: `plugins/nixtla-baseline-lab/commands/nixtla-baseline-setup.md`
+**Created**: `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-setup.md`
 
 **Purpose**: Slash command (`/nixtla-baseline-setup`) that guides Claude through automated environment setup.
 
@@ -119,7 +119,7 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
 
 **Runtime**: ~50 seconds (including data download and model execution)
 
-**Data cached**: `plugins/nixtla-baseline-lab/data/m4/datasets/` (~274MB total)
+**Data cached**: `005-plugins/nixtla-baseline-lab/data/m4/datasets/` (~274MB total)
 
 ### 4. Golden Task Review
 
@@ -137,7 +137,7 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
 
 ### 5. README Updates
 
-**Modified**: `plugins/nixtla-baseline-lab/README.md`
+**Modified**: `005-plugins/nixtla-baseline-lab/README.md`
 
 **New Sections**:
 1. **Automated Nixtla OSS Setup**:
@@ -189,14 +189,14 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
 ## Files Touched
 
 ### Created
-1. **`plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`** (208 lines)
+1. **`005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh`** (208 lines)
    - Automated Nixtla OSS setup script
    - Bash with safety flags (`set -euo pipefail`)
    - Colored output for clear progress
    - Dual installation modes (current env vs virtualenv)
    - Made executable: `chmod +x`
 
-2. **`plugins/nixtla-baseline-lab/commands/nixtla-baseline-setup.md`** (181 lines)
+2. **`005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-setup.md`** (181 lines)
    - Slash command for automated setup
    - 7-step workflow documentation
    - Comprehensive troubleshooting guide
@@ -206,7 +206,7 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
    - Phase 5 After-Action Report
 
 ### Modified
-1. **`plugins/nixtla-baseline-lab/README.md`** (315 lines, +156 lines)
+1. **`005-plugins/nixtla-baseline-lab/README.md`** (315 lines, +156 lines)
    - Added: Automated Nixtla OSS Setup section
    - Replaced: "Quick Smoke Test" → "Zero-to-First-Forecast"
    - Added: "Proof It Works (Actual Results)" with real metrics
@@ -214,17 +214,17 @@ This phase focuses on **production-grade user experience** for the Nixtla CEO (M
    - Updated: Status, Version (0.3.0), Last Updated (2025-11-25)
 
 ### Generated (by validation)
-1. **`plugins/nixtla-baseline-lab/.venv-nixtla-baseline/`** (directory)
+1. **`005-plugins/nixtla-baseline-lab/.venv-nixtla-baseline/`** (directory)
    - Python virtualenv with Nixtla OSS dependencies
    - ~200MB installed packages
    - Not committed to git (should be in `.gitignore`)
 
-2. **`plugins/nixtla-baseline-lab/data/m4/datasets/`** (directory)
+2. **`005-plugins/nixtla-baseline-lab/data/m4/datasets/`** (directory)
    - M4 Daily dataset cached locally
    - ~274MB total (train, test, info files)
    - Not committed to git (downloaded on demand)
 
-3. **`plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/`** (directory)
+3. **`005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/`** (directory)
    - Test results from validation run
    - 2 files: CSV (438 bytes), TXT (416 bytes)
    - Can be deleted (test artifacts)

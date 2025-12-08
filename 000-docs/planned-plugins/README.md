@@ -5,7 +5,7 @@ This directory contains specifications for **future Claude Code plugins** organi
 ## Directory Structure
 
 ```
-planned-plugins/
+planned-005-plugins/
 ├── internal-efficiency/      # Tools for Nixtla's team (33% of roadmap)
 ├── business-growth/          # Market expansion tools (58% of roadmap)
 └── vertical-defi/            # DeFi/Crypto vertical (experimental)
@@ -15,7 +15,7 @@ planned-plugins/
 
 ## Current Status
 
-**Implemented Plugins**: 3 (in `/plugins/` directory)
+**Implemented Plugins**: 3 (in `/005-plugins/` directory)
 - nixtla-baseline-lab (v0.8.0)
 - nixtla-bigquery-forecaster
 - nixtla-search-to-slack (v0.1.0)
@@ -203,8 +203,8 @@ To add a new planned plugin:
 ## Related Documentation
 
 - **Business Case**: `000-docs/035-PP-PROD-nixtla-plugin-business-case.md`
-- **Implemented Plugins**: `/plugins/`
-- **Skills Pack**: `skills-pack/.claude/skills/`
+- **Implemented Plugins**: `/005-plugins/`
+- **Skills Pack**: `003-skills/.claude/skills/`
 - **CLAUDE.md**: `/CLAUDE.md` (repository guide)
 
 ---

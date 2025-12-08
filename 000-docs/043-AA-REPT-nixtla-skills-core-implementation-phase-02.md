@@ -53,7 +53,7 @@ Phase 2 successfully implemented three flagship Nixtla Claude Skills to producti
 
 ### Skill 1: nixtla-timegpt-lab (Mode Skill)
 
-**File**: `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
 
 **Frontmatter Changes**:
 ```yaml
@@ -98,7 +98,7 @@ license: "Proprietary - Nixtla Internal Use Only"
 
 ### Skill 2: nixtla-experiment-architect (Utility Skill)
 
-**File**: `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md`
 
 **Frontmatter Changes**:
 ```yaml
@@ -147,7 +147,7 @@ license: "Proprietary - Nixtla Internal Use Only"
 
 ### Skill 3: nixtla-schema-mapper (Utility Skill)
 
-**File**: `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md`
 
 **Frontmatter Changes**:
 ```yaml
@@ -327,7 +327,7 @@ These three flagship skills demonstrate the full Nixtla skill patterns and serve
 - [x] ✅ NO deprecated fields (author, priority, audience)
 
 **Structure Compliance**:
-- [x] ✅ Has `scripts/` directory (exists, can be empty)
+- [x] ✅ Has `004-scripts/` directory (exists, can be empty)
 - [x] ✅ Has `references/` directory (exists, can be empty)
 - [x] ✅ Has `assets/` directory (exists, can be empty)
 - [x] ✅ Uses `{baseDir}` for all path references
@@ -381,16 +381,16 @@ These three flagship skills demonstrate the full Nixtla skill patterns and serve
 ### Modified Files
 
 1. **Skills** (v1.0.0 → v0.2.0):
-   - `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+   - `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
      - Removed Bash from allowed-tools
      - Added model, disable-model-invocation, license fields
      - Version: 1.0.0 → 0.2.0
 
-   - `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md`
+   - `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md`
      - Added mode, model, disable-model-invocation, license fields
      - Version: 1.0.0 → 0.2.0
 
-   - `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md`
+   - `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md`
      - Added mode, model, disable-model-invocation, license fields
      - Version: 1.0.0 → 0.2.0
 
@@ -478,9 +478,9 @@ All three skills now fully compliant with Nixtla SKILL Standard (041-SPEC):
 ✅ Error handling documented
 
 ## Files Changed
-- skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md
-- skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md
-- skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md
+- 003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md
+- 003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md
+- 003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md
 - 000-docs/038-AT-ARCH-nixtla-claude-skills-pack.md (updated Phase 2 summary)
 - 043-AA-REPT-nixtla-skills-core-implementation-phase-02.md (created)
 

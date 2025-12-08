@@ -30,13 +30,13 @@
 - `FOR-MAX-QUICKSTART.md` - CEO quickstart guide (10-minute demo)
 
 **Code Assets**:
-- `plugins/` - 4 plugin directories:
+- `005-plugins/` - 4 plugin directories:
   - `nixtla-baseline-lab/` - Primary working plugin with tests/, scripts/, skills/
   - `nixtla-baseline-m4/` - Suspected duplicate/deprecated directory
   - `nixtla-bigquery-forecaster/` - Working demo (GCP deployment)
   - `nixtla-search-to-slack/` - MVP / construction kit
-- `skills-pack/.claude/skills/` - 8 Claude Skills directories (all with SKILL.md)
-- `packages/nixtla-claude-skills-installer/` - Skills installer package (not yet E2E validated)
+- `003-skills/.claude/skills/` - 8 Claude Skills directories (all with SKILL.md)
+- `006-packages/nixtla-claude-skills-installer/` - Skills installer package (not yet E2E validated)
 
 **CI/CD**:
 - `.github/workflows/` - 4 workflow files:
@@ -49,7 +49,7 @@
 - `tests/` - Root tests directory (pre-Phase 01 state):
   - `README.md` - Stated "empty, awaiting implementation"
   - `test_placeholder.py` - Basic pytest placeholder (3 tests)
-- `plugins/nixtla-baseline-lab/tests/` - Plugin-specific tests:
+- `005-plugins/nixtla-baseline-lab/tests/` - Plugin-specific tests:
   - `run_baseline_m4_smoke.py` - Golden task smoke test
   - Subdirectories: `m4_test/`, `csv_test/`, `custom/`, `golden_tasks/`, `data/`
 
@@ -63,7 +63,7 @@
 5. **CI Infrastructure**: Multiple workflows for plugin validation and deployment
 
 **⚠️ Gaps Identified**:
-1. **Skills Installer Not E2E Tested**: `packages/nixtla-claude-skills-installer/` exists but no validation in fresh project
+1. **Skills Installer Not E2E Tested**: `006-packages/nixtla-claude-skills-installer/` exists but no validation in fresh project
 2. **Duplicate Plugin Directory**: `nixtla-baseline-m4/` appears to be duplicate of `nixtla-baseline-lab/`
 3. **Root Tests Not Engineer-Friendly**: `tests/README.md` says "awaiting implementation" but placeholder tests exist
 4. **Version Inconsistencies**: Multiple version references (1.2.0, 0.8.0) across different files
@@ -83,7 +83,7 @@
   - `test_integration_placeholder()` - Marked with pytest integration marker
 - **Coverage**: Basic but functional - provides pytest baseline
 
-**Plugin-Specific Tests** (`plugins/nixtla-baseline-lab/tests/`):
+**Plugin-Specific Tests** (`005-plugins/nixtla-baseline-lab/tests/`):
 - **Golden Task Harness**: `run_baseline_m4_smoke.py` (11,627 bytes)
   - Tests M4 baseline forecasting on small dataset
   - Validates statsforecast models: SeasonalNaive, AutoETS, AutoTheta
@@ -101,7 +101,7 @@
 **Coverage Gap**:
 - Root `tests/` directory exists but lacks engineer-facing entry point
 - No single command to validate "is this repo healthy?"
-- Skills installer (`packages/nixtla-claude-skills-installer/`) not tested in CI
+- Skills installer (`006-packages/nixtla-claude-skills-installer/`) not tested in CI
 
 ---
 
@@ -125,9 +125,9 @@
 - **File Created**: `tests/basic_validator.py`
   - **Purpose**: Single-command health check for Nixtla engineers
   - **Checks Performed**:
-    1. Verify presence of critical directories (plugins/, 000-docs/, skills-pack/)
-    2. Validate plugins/ contains expected plugin directories
-    3. Validate skills-pack/ contains 8 skill directories
+    1. Verify presence of critical directories (005-plugins/, 000-docs/, 003-skills/)
+    2. Validate 005-plugins/ contains expected plugin directories
+    3. Validate 003-skills/ contains 8 skill directories
     4. Check for canonical 6767 reference docs in 000-docs/
     5. Validate CI workflows present in .github/workflows/
   - **Output**: Clear PASS/FAIL with specific error messages
@@ -166,7 +166,7 @@ python tests/basic_validator.py
    - `python tests/basic_validator.py` - Validates repo structure
 
 2. **Baseline Lab Validation** (2-3 minutes):
-   - `cd plugins/nixtla-baseline-lab/tests`
+   - `cd 005-plugins/nixtla-baseline-lab/tests`
    - `python run_baseline_m4_smoke.py` - Tests core forecasting
 
 3. **Full Test Suite** (5-10 minutes):
@@ -182,7 +182,7 @@ python tests/basic_validator.py
 ## Gaps & Deferrals (For Future Phases)
 
 ### Phase 02 - Skills Installer E2E Validation
-**Gap**: `packages/nixtla-claude-skills-installer/` exists but not E2E tested
+**Gap**: `006-packages/nixtla-claude-skills-installer/` exists but not E2E tested
 
 **Evidence**:
 - Package directory structure looks correct
@@ -204,7 +204,7 @@ python tests/basic_validator.py
 **Gap 1**: Duplicate plugin directory `nixtla-baseline-m4/`
 
 **Evidence**:
-- `plugins/nixtla-baseline-m4/` exists alongside `plugins/nixtla-baseline-lab/`
+- `005-plugins/nixtla-baseline-m4/` exists alongside `005-plugins/nixtla-baseline-lab/`
 - Unclear which is authoritative
 - Likely one supersedes the other
 
@@ -267,7 +267,7 @@ python tests/basic_validator.py
 **Deferred To**: Phase 05+
 - Pick one spec to implement (requires business decision)
 - Implement MVP version
-- Add to plugins/ directory
+- Add to 005-plugins/ directory
 - Create plugin-specific CI
 
 **Priority**: LOW for this phase - requires external decision
@@ -288,9 +288,9 @@ Nixtla Repo Structure Validator
 ========================================
 
 [PASS] Critical directories present:
-       - plugins/
+       - 005-plugins/
        - 000-docs/
-       - skills-pack/
+       - 003-skills/
 
 [PASS] Plugin directories found (4):
        - nixtla-baseline-lab
@@ -333,7 +333,7 @@ All critical repo structure checks passed.
 Repo is healthy and ready for development.
 
 For deeper validation, run:
-  cd plugins/nixtla-baseline-lab/tests
+  cd 005-plugins/nixtla-baseline-lab/tests
   python run_baseline_m4_smoke.py
 ```
 
@@ -360,7 +360,7 @@ For deeper validation, run:
 | AAR document created in 000-docs/ following v3 standards | ✅ COMPLETE | This file: `6767-AA-AAR-phase-01-repo-status-and-testing-scaffold.md` |
 | tests/ directory exists with README.md | ✅ COMPLETE | `tests/README.md` updated with engineer-focused docs |
 | Basic validator script created | ✅ COMPLETE | `tests/basic_validator.py` (175 lines, 5 checks) |
-| Validator checks critical directories | ✅ COMPLETE | Checks plugins/, 000-docs/, skills-pack/, .github/workflows/ |
+| Validator checks critical directories | ✅ COMPLETE | Checks 005-plugins/, 000-docs/, 003-skills/, .github/workflows/ |
 | Validator is CI-compatible (exit codes) | ✅ COMPLETE | Returns non-zero on failure |
 | AAR documents what was inspected | ✅ COMPLETE | See "What We Inspected" section above |
 | AAR documents tests added and how to run | ✅ COMPLETE | See "Actions Taken" and "Testing & CI Snapshot" sections |
@@ -468,10 +468,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ### Files Inspected (Not Modified)
 - `README.md`
 - `000-docs/*` (53 files inspected)
-- `plugins/*` (4 directories inspected)
-- `skills-pack/.claude/skills/*` (8 skills inspected)
+- `005-plugins/*` (4 directories inspected)
+- `003-skills/.claude/skills/*` (8 skills inspected)
 - `.github/workflows/*` (4 workflows inspected)
-- `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
+- `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
 - `tests/test_placeholder.py`
 
 ---

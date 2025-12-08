@@ -19,11 +19,11 @@ Successfully implemented the Enterprise Plugin README Standard for the Nixtla Pl
 - [x] **Reference Standard Document** (`6767-OD-REF-enterprise-plugin-readme-standard.md`)
 - [x] **Implementation Guide** (`6767-OD-GUIDE-enterprise-plugin-implementation.md`)
 - [x] **6 Doc Templates** (`000-docs/dev-planning-templates/01-BUSINESS-CASE-TEMPLATE.md` through `06-STATUS-TEMPLATE.md`)
-- [x] **Automation Scripts** (`scripts/new-plugin.sh`, `scripts/validate-docs.sh`)
+- [x] **Automation Scripts** (`004-scripts/new-plugin.sh`, `004-scripts/validate-docs.sh`)
 
 ### Directory Structure
 - [x] `000-docs/global/` created with 3 executive documents
-- [x] `000-docs/plugins/` created with 10 plugin subdirectories
+- [x] `000-docs/005-plugins/` created with 10 plugin subdirectories
 - [x] `000-docs/archive/` created (30 historical docs moved)
 - [x] `000-docs/dev-planning-templates/` created with all 6 templates
 

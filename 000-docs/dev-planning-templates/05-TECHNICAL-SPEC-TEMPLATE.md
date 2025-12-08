@@ -40,7 +40,7 @@
 ## File Structure
 
 ```
-plugins/[plugin-slug]/
+005-plugins/[plugin-slug]/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin manifest
 ├── commands/
@@ -129,7 +129,7 @@ Location: `~/.config/[plugin]/config.yaml`
 
 ### Run All Tests
 ```bash
-cd plugins/[plugin-slug]
+cd 005-plugins/[plugin-slug]
 pytest tests/ -v
 ```
 
@@ -153,7 +153,7 @@ pytest tests/ --cov=scripts --cov-report=html
 ```bash
 # Clone and setup
 git clone [repo-url]
-cd [repo]/plugins/[plugin-slug]
+cd [repo]/005-plugins/[plugin-slug]
 ./scripts/setup.sh
 
 # Or manual

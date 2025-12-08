@@ -308,7 +308,7 @@ Use `${CLAUDE_PLUGIN_ROOT}` for portable paths:
     "email": "platform@company.com",
     "url": "https://github.com/company/platform-team"
   },
-  "homepage": "https://docs.company.com/plugins/enterprise-deployment",
+  "homepage": "https://docs.company.com/005-plugins/enterprise-deployment",
   "repository": "https://github.com/company/enterprise-deployment-plugin",
   "license": "Apache-2.0",
   "keywords": ["deployment", "kubernetes", "ci-cd", "enterprise"],
@@ -585,7 +585,7 @@ Marketplaces are configured via `.claude-plugin/marketplace.json`:
   "plugins": [
     {
       "name": "code-formatter",
-      "source": "./plugins/formatter",
+      "source": "./005-plugins/formatter",
       "description": "Automatic code formatting",
       "version": "2.1.0",
       "author": { "name": "DevTools Team" },
@@ -642,7 +642,7 @@ Plugin entries inherit from `plugin.json` schema (all fields optional except `na
 ```json
 {
   "name": "local-plugin",
-  "source": "./plugins/local-plugin"
+  "source": "./005-plugins/local-plugin"
 }
 ```
 
@@ -729,7 +729,7 @@ Add to `.claude/settings.json` (project) or `~/.claude/settings.json` (user):
    ```json
    {
      "name": "your-plugin",
-     "source": "./plugins/your-plugin",
+     "source": "./005-plugins/your-plugin",
      "description": "What it does",
      "version": "1.0.0",
      "keywords": ["relevant", "tags"]
@@ -1292,7 +1292,7 @@ MIT
   "plugins": [
     {
       "name": "code-quality",
-      "source": "./plugins/code-quality",
+      "source": "./005-plugins/code-quality",
       "description": "Code quality tools including linting and formatting",
       "version": "2.0.0",
       "author": {

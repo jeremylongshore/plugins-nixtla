@@ -45,9 +45,9 @@ This phase focuses on **production-grade infrastructure** and **Nixtla-readiness
 **Added Section**:
 ```gitignore
 # Nixtla Baseline Lab local artifacts
-plugins/nixtla-baseline-lab/.venv-nixtla-baseline/
-plugins/nixtla-baseline-lab/data/
-plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
+005-plugins/nixtla-baseline-lab/.venv-nixtla-baseline/
+005-plugins/nixtla-baseline-lab/data/
+005-plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 ```
 
 **Purpose**: Prevent committing generated artifacts
@@ -59,7 +59,7 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 
 ### 2. Golden Task Test Harness
 
-**Created**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (238 lines)
+**Created**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (238 lines)
 
 **Purpose**: Executable implementation of the golden task YAML
 
@@ -92,7 +92,7 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 **Trigger Conditions**:
 - Push to `main` branch
 - Pull requests targeting `main`
-- Only when `plugins/nixtla-baseline-lab/**` or workflow file changes
+- Only when `005-plugins/nixtla-baseline-lab/**` or workflow file changes
 
 **Job**: `test-baseline-lab` on `ubuntu-latest`
 
@@ -100,10 +100,10 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 1. **Checkout repository** (`actions/checkout@v4`)
 2. **Set up Python 3.12** (`actions/setup-python@v5`)
    - Uses pip cache for faster installs
-   - Caches based on `scripts/requirements.txt`
+   - Caches based on `004-scripts/requirements.txt`
 3. **Install Nixtla OSS dependencies**
    - Upgrade pip
-   - Install from `scripts/requirements.txt`
+   - Install from `004-scripts/requirements.txt`
    - Print installed versions (statsforecast, datasetsforecast, pandas, numpy)
 4. **Run MCP server test**
    - Execute `python scripts/nixtla_baseline_mcp.py test`
@@ -180,7 +180,7 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 
 ### 6. README Enhancements
 
-**Modified**: `plugins/nixtla-baseline-lab/README.md` (+160 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/README.md` (+160 lines)
 
 **New Sections**:
 
@@ -218,9 +218,9 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 ### 7. Version Sync
 
 **Modified**: 3 files to sync version to 0.4.0
-- `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`
+- `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
-- `plugins/nixtla-baseline-lab/README.md`
+- `005-plugins/nixtla-baseline-lab/README.md`
 
 **Reasoning**: Consistent versioning across all metadata sources
 
@@ -233,7 +233,7 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
    - GitHub Actions CI workflow
    - Runs golden task on every push/PR
 
-2. **`plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`** (238 lines)
+2. **`005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`** (238 lines)
    - Golden task test harness
    - Executable Python script with 5-step validation
 
@@ -254,12 +254,12 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
 2. **`.claude-plugin/marketplace.json`** (+11 lines)
    - Enhanced with version, author, category, tags
 
-3. **`plugins/nixtla-baseline-lab/README.md`** (+160 lines, version updated)
+3. **`005-plugins/nixtla-baseline-lab/README.md`** (+160 lines, version updated)
    - Added CI, marketplace, and cross-platform sections
    - Updated status to Phase 6
    - Version 0.4.0
 
-4. **`plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`** (version updated)
+4. **`005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`** (version updated)
    - Synced version to 0.4.0
 
 ---
@@ -300,7 +300,7 @@ plugins/nixtla-baseline-lab/nixtla_baseline_m4*/
    - Line ending conversions (CRLF vs LF)
    - Recommendation: Document as "WSL required" or test natively with Conda
 
-3. **CI trigger optimization**: Currently triggers on any change to `plugins/nixtla-baseline-lab/**`
+3. **CI trigger optimization**: Currently triggers on any change to `005-plugins/nixtla-baseline-lab/**`
    - Could be more selective (skip on doc-only changes)
    - Trade-off: simplicity vs efficiency
    - Current approach: safe, ensures nothing breaks
@@ -474,7 +474,7 @@ json_str = stdout[start:end]
 on:
   push:
     paths:
-      - 'plugins/nixtla-baseline-lab/**'
+      - '005-plugins/nixtla-baseline-lab/**'
       - '.github/workflows/nixtla-baseline-lab-ci.yml'
 ```
 
@@ -532,7 +532,7 @@ test(Phase 6): add executable golden task harness
 ci(Phase 6): add GitHub Actions workflow for baseline lab
 
 - Create nixtla-baseline-lab-ci.yml with ubuntu-latest, Python 3.12
-- Trigger on push/PR to main, only when plugins/nixtla-baseline-lab/** changes
+- Trigger on push/PR to main, only when 005-plugins/nixtla-baseline-lab/** changes
 - Install Nixtla OSS deps (statsforecast, datasetsforecast, pandas, numpy)
 - Run MCP test and golden task harness
 - Upload test artifacts (7 day retention)

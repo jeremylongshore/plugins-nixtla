@@ -138,7 +138,7 @@ from neuralforecast.models import NBEATS
 ### Directory Structure
 
 ```
-plugins/nixtla-migration-assistant/
+005-plugins/nixtla-migration-assistant/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/
