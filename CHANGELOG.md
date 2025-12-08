@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-12-08
+
+### Release Highlights
+**21 AI Skills + DevOps-First README** - Generated 21 production-ready Claude Skills across 3 categories (core-forecasting, prediction-markets, live-retroactive) using Vertex AI Gemini. Restructured README for DevOps engineers with health checks, directory map, and environment variable reference.
+
+### Contributors
+We thank jeremylongshore for this contribution!
+
+### Features
+- **21 Generated Skills**: Automated skill generation using Vertex AI Gemini 2.0 Flash
+  - Core Forecasting (5): anomaly-detector, exogenous-integrator, uncertainty-quantifier, cross-validator, timegpt2-migrator
+  - Prediction Markets (10): polymarket-analyst, arbitrage-detector, contract-schema-mapper, batch-forecaster, event-impact-modeler, forecast-validator, model-selector, liquidity-forecaster, correlation-mapper, market-risk-analyzer
+  - Live-Retroactive (6): timegpt-lab, experiment-architect, schema-mapper, timegpt-finetune-lab, prod-pipeline-generator, usage-optimizer
+- **Overnight Skill Generator**: Python script using Vertex AI ADC for batch skill generation
+- **DevOps-First README**: Complete restructure with TL;DR, health check, directory map, env vars, CI/CD reference
+
+### Documentation
+- **One-Pager for Nixtla**: Created 062-OD-SUMM-nixtla-collaboration-one-pager.md for stakeholder email
+- **README Restructure Plan**: Created 061-PP-PLAN-devops-readme-restructure.md
+- **Skills Compliance Audit**: Created 060-AA-AUDT-generated-skills-compliance-audit.md (21/21 pass)
+- **README Backup**: Archived previous README to 000-docs/archive/
+
+### Metrics
+- New skills generated: 21
+- Skills compliance: 100% (21/21 pass)
+- Skill categories: 3 (core-forecasting, prediction-markets, live-retroactive)
+- README sections: 10 (TL;DR, Health Check, Directory Map, Env Vars, Quick Commands, CI/CD, Plugins, Docs, Troubleshooting, Contributing)
+- Tests passing: 3/3
+
+### Technical Details
+- Vertex AI ADC authentication (no API key needed)
+- Project: pipelinepilot-prod, Region: us-central1
+- Model: gemini-2.0-flash-exp
+- Rate limiting: 10s pause between skills, exponential backoff on 429
+
 ## [1.5.0] - 2025-12-07
 
 ### 🎯 Release Highlights
