@@ -649,7 +649,7 @@ Want to learn more?
 
 1. **Try the demo**: `cd demo-project && cat README.md`
 2. **Read the architecture doc**: `000-docs/038-AT-ARCH-nixtla-claude-skills-pack.md`
-3. **Review individual skills**: `ls skills-pack/.claude/skills/`
+3. **Review individual skills**: `ls 003-skills/.claude/skills/`
 4. **Join the community**: Nixtla Slack, GitHub Discussions
 
 ---

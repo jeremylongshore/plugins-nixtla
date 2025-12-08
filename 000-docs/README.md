@@ -52,7 +52,7 @@ This directory contains **all documentation** for the Nixtla Plugin Showcase. It
 │   ├── 001-ENGAGEMENT-OPTIONS.md      # Evaluate/Pilot/Platform tiers
 │   └── 002-DECISION-MATRIX.md         # Plugin prioritization scoring
 │
-├── plugins/                           # Per-plugin documentation (60 docs)
+├── 005-plugins/                           # Per-plugin documentation (60 docs)
 │   ├── nixtla-baseline-lab/           # 6 docs (5 complete, 1 partial)
 │   ├── nixtla-cost-optimizer/         # 6 placeholder docs
 │   ├── nixtla-migration-assistant/    # 6 placeholder docs
@@ -94,7 +94,7 @@ All numbered docs follow this pattern: `NNN-CC-ABCD-description.md`
 
 ## The 6-Doc Standard (Per-Plugin)
 
-Every plugin has **6 standardized documents** in `plugins/{plugin-slug}/`:
+Every plugin has **6 standardized documents** in `005-plugins/{plugin-slug}/`:
 
 | Doc | File | Purpose |
 |-----|------|---------|
@@ -120,7 +120,7 @@ Every plugin has **6 standardized documents** in `plugins/{plugin-slug}/`:
 
 ### For Engineers
 1. **`009-017-AT-ARCH-plugin-*.md`** - Complete plugin specifications
-2. **`plugins/nixtla-baseline-lab/`** - Working plugin documentation
+2. **`005-plugins/nixtla-baseline-lab/`** - Working plugin documentation
 3. **`036-AA-AUDT-working-plugins-verification.md`** - Verification audit
 
 ### For Understanding the Restructure
@@ -161,7 +161,7 @@ OLD → NEW
 - ✅ README.md
 - ✅ Business case (035-PP-PROD)
 - ✅ Executive Summary
-- ✅ All 54 placeholder docs in plugins/
+- ✅ All 54 placeholder docs in 005-plugins/
 
 ---
 
@@ -250,7 +250,7 @@ ls 000-docs/009-017-AT-ARCH-*.md
 
 ### Finding All Docs for a Plugin
 ```bash
-ls 000-docs/plugins/nixtla-cost-optimizer/
+ls 000-docs/005-plugins/nixtla-cost-optimizer/
 # Shows all 6 docs for Cost Optimizer
 ```
 
@@ -306,13 +306,13 @@ All documentation in this directory meets these standards:
 → `global/000-EXECUTIVE-SUMMARY.md`
 
 **"How do I understand what each plugin does?"**
-→ `plugins/{plugin-name}/01-BUSINESS-CASE.md` or the spec in `009-017-AT-ARCH-*`
+→ `005-plugins/{plugin-name}/01-BUSINESS-CASE.md` or the spec in `009-017-AT-ARCH-*`
 
 **"What's the implementation history?"**
 → `052-055-AA-AAR-*.md` (4 phase AARs)
 
 **"Where are working plugins documented?"**
-→ `plugins/nixtla-baseline-lab/` (production-ready, 5/6 docs complete)
+→ `005-plugins/nixtla-baseline-lab/` (production-ready, 5/6 docs complete)
 
 **"What's the 6767 series?"**
 → Canonical reference documents defining standards (don't renumber these)
@@ -323,7 +323,7 @@ All documentation in this directory meets these standards:
 
 This documentation structure is designed to be:
 
-1. **Audience-Driven**: Executives → global/, Engineers → plugins/, History → 052-058 AARs
+1. **Audience-Driven**: Executives → global/, Engineers → 005-plugins/, History → 052-058 AARs
 2. **Consistent**: Every plugin follows the same 6-doc structure
 3. **Navigable**: Clear numbering, logical grouping, comprehensive README
 4. **Verifiable**: All links tested, all claims backed by git references

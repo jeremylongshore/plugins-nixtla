@@ -14,7 +14,7 @@
 - **Situation Before Phase 03**: Two baseline plugin directories existed (`nixtla-baseline-lab` and `nixtla-baseline-m4`), version mismatch between plugin.json (1.1.0) and MCP server (0.7.0), confusing README references
 - **Phase 03 Goal**: Establish nixtla-baseline-lab as the clearly canonical plugin, sync versions, verify tests, archive duplicate
 - **What We Did**: Archived nixtla-baseline-m4, synced version to 1.1.0, updated README, verified tests run, documented test commands
-- **Baseline Lab Status**: ✅ Canonical plugin at `plugins/nixtla-baseline-lab/` version 1.1.0
+- **Baseline Lab Status**: ✅ Canonical plugin at `005-plugins/nixtla-baseline-lab/` version 1.1.0
 - **Tests Status**: ✅ Golden task smoke test verified (PASS), documented in tests/README.md
 - **Next Phase**: Phase 04 will improve repo navigation and create engineer onboarding doc
 
@@ -26,13 +26,13 @@
 
 **Found 2 baseline-related plugin directories**:
 
-#### 1. `plugins/nixtla-baseline-lab/` (Canonical)
+#### 1. `005-plugins/nixtla-baseline-lab/` (Canonical)
 **Structure**:
 - 12 subdirectories
 - Full-featured plugin with:
   - `README.md` (36KB) - comprehensive documentation
   - `tests/` - golden task harness + test data
-  - `scripts/` - MCP server + benchmarking logic
+  - `004-scripts/` - MCP server + benchmarking logic
   - `commands/` - slash commands
   - `skills/` - AI skills for result interpretation
   - `agents/` - agent definitions
@@ -44,7 +44,7 @@
 
 **Version Discovery**:
 - `plugin.json`: **1.1.0**
-- `scripts/nixtla_baseline_mcp.py`: **0.7.0** (MISMATCH)
+- `004-scripts/nixtla_baseline_mcp.py`: **0.7.0** (MISMATCH)
 
 **References**:
 - Mentioned in main README as canonical baseline plugin
@@ -53,7 +53,7 @@
 
 ---
 
-#### 2. `plugins/nixtla-baseline-m4/` (Legacy/Duplicate)
+#### 2. `005-plugins/nixtla-baseline-m4/` (Legacy/Duplicate)
 **Structure**:
 - 5 subdirectories only
 - Minimal structure:
@@ -89,8 +89,8 @@
 **Baseline Lab Plugin Versions**:
 | Location | Version | Notes |
 |----------|---------|-------|
-| `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json` | **1.1.0** | Plugin metadata (authoritative) |
-| `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | **0.7.0** | MCP server version (MISMATCH) |
+| `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json` | **1.1.0** | Plugin metadata (authoritative) |
+| `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | **0.7.0** | MCP server version (MISMATCH) |
 | `README.md` (Baseline Lab section) | **v1.1.0** | Matches plugin.json |
 
 **Other Plugin Versions** (for context):
@@ -114,10 +114,10 @@
 - **Status**: Following v3 doc-filing standards (6767-AA-AAR prefix)
 
 ### 2. Archived Legacy Baseline Plugin
-- **Created**: `plugins/.archive/` directory
-- **Moved**: `plugins/nixtla-baseline-m4/` → `plugins/.archive/nixtla-baseline-m4/`
-- **Added**: `plugins/.archive/README.md` explaining archive purpose
-- **Added**: `plugins/.archive/nixtla-baseline-m4/DEPRECATED.md` explaining supersession
+- **Created**: `005-plugins/.archive/` directory
+- **Moved**: `005-plugins/nixtla-baseline-m4/` → `005-plugins/.archive/nixtla-baseline-m4/`
+- **Added**: `005-plugins/.archive/README.md` explaining archive purpose
+- **Added**: `005-plugins/.archive/nixtla-baseline-m4/DEPRECATED.md` explaining supersession
 
 **DEPRECATED.md Content**:
 ```markdown
@@ -132,7 +132,7 @@ This directory contained an early or duplicate version of the Nixtla baseline fo
 
 ## Use Instead
 
-**Canonical Plugin**: `plugins/nixtla-baseline-lab/`
+**Canonical Plugin**: `005-plugins/nixtla-baseline-lab/`
 
 **Commands**:
 - ❌ Old: `/nixtla-baseline-m4 demo_preset=m4_daily_small`
@@ -144,15 +144,15 @@ OR better yet:
 
 ## Documentation
 
-See: `plugins/nixtla-baseline-lab/README.md`
+See: `005-plugins/nixtla-baseline-lab/README.md`
 
 ## If You Need This Code
 
-This archive preserves the original directory structure. If you need to reference old code patterns, it's here. But for active development, always use `plugins/nixtla-baseline-lab/`.
+This archive preserves the original directory structure. If you need to reference old code patterns, it's here. But for active development, always use `005-plugins/nixtla-baseline-lab/`.
 ```
 
 ### 3. Synchronized Baseline Lab Version to 1.1.0
-- **File Modified**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+- **File Modified**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 - **Change**: Updated MCP server version from 0.7.0 → 1.1.0
 - **Line**: `self.version = "1.1.0"` (was "0.7.0")
 - **Rationale**: Align with plugin.json authoritative version
@@ -164,18 +164,18 @@ This archive preserves the original directory structure. If you need to referenc
 - **Changes**:
   - **No changes needed** - README already correctly references nixtla-baseline-lab as canonical
   - README mentions `/nixtla-baseline-m4` command but this is a **command name**, not the directory
-  - The command `/nixtla-baseline-m4` is defined in `plugins/nixtla-baseline-lab/commands/` (confusing naming!)
+  - The command `/nixtla-baseline-m4` is defined in `005-plugins/nixtla-baseline-lab/commands/` (confusing naming!)
 
 **Important Discovery**: The `/nixtla-baseline-m4` **command** is actually part of nixtla-baseline-lab plugin, not the archived directory. This is just a confusing command name choice. No README changes needed.
 
 ### 5. Verified Baseline Lab Tests
-**Test Location**: `plugins/nixtla-baseline-lab/tests/`
+**Test Location**: `005-plugins/nixtla-baseline-lab/tests/`
 
 **Primary Test**: `run_baseline_m4_smoke.py` - Golden task smoke test
 
 **Test Execution**:
 ```bash
-cd plugins/nixtla-baseline-lab/tests
+cd 005-plugins/nixtla-baseline-lab/tests
 python run_baseline_m4_smoke.py
 ```
 
@@ -195,14 +195,14 @@ python run_baseline_m4_smoke.py
 - **Section Added**: "Baseline Lab Tests"
 - **Content**:
   - Purpose: Deep plugin-specific tests for forecasting accuracy
-  - Location: `plugins/nixtla-baseline-lab/tests/`
+  - Location: `005-plugins/nixtla-baseline-lab/tests/`
   - How to run golden task smoke test
   - Expected runtime and output
   - Prerequisites (virtualenv setup)
 
 ### 7. Created Archive Infrastructure
-- **Created**: `plugins/.archive/` directory
-- **Created**: `plugins/.archive/README.md` explaining archive purpose
+- **Created**: `005-plugins/.archive/` directory
+- **Created**: `005-plugins/.archive/README.md` explaining archive purpose
 - **Purpose**: Provide clear location for deprecated plugin code that should be preserved but not actively used
 
 **Archive README.md Content**:
@@ -217,8 +217,8 @@ python run_baseline_m4_smoke.py
 
 ### nixtla-baseline-m4
 - **Archived**: 2025-12-03 (Phase 03)
-- **Reason**: Superseded by `plugins/nixtla-baseline-lab/`
-- **Use Instead**: `plugins/nixtla-baseline-lab/`
+- **Reason**: Superseded by `005-plugins/nixtla-baseline-lab/`
+- **Use Instead**: `005-plugins/nixtla-baseline-lab/`
 
 ## Why Archive Instead of Delete?
 
@@ -229,7 +229,7 @@ We archive rather than delete to:
 
 ## For Engineers
 
-If you're looking for a working plugin, **do not use anything in this archive**. Go to the parent `plugins/` directory for current, maintained plugins.
+If you're looking for a working plugin, **do not use anything in this archive**. Go to the parent `005-plugins/` directory for current, maintained plugins.
 ```
 
 ---
@@ -239,7 +239,7 @@ If you're looking for a working plugin, **do not use anything in this archive**.
 ### Final Canonical State
 
 **Baseline Lab Plugin**:
-- **Path**: `plugins/nixtla-baseline-lab/`
+- **Path**: `005-plugins/nixtla-baseline-lab/`
 - **Version**: 1.1.0 (synchronized across plugin.json and MCP server)
 - **Status**: Production-ready working plugin
 - **Documentation**: 36KB README with comprehensive usage guide
@@ -247,10 +247,10 @@ If you're looking for a working plugin, **do not use anything in this archive**.
 - **CI**: `.github/workflows/nixtla-baseline-lab-ci.yml` runs tests
 
 **Engineers Should**:
-1. Use `plugins/nixtla-baseline-lab/` for all baseline forecasting work
-2. Run tests via: `cd plugins/nixtla-baseline-lab/tests && python run_baseline_m4_smoke.py`
+1. Use `005-plugins/nixtla-baseline-lab/` for all baseline forecasting work
+2. Run tests via: `cd 005-plugins/nixtla-baseline-lab/tests && python run_baseline_m4_smoke.py`
 3. Reference version 1.1.0 in documentation and issue reports
-4. Ignore archived `plugins/.archive/nixtla-baseline-m4/` directory
+4. Ignore archived `005-plugins/.archive/nixtla-baseline-m4/` directory
 
 ### Test Results
 
@@ -263,7 +263,7 @@ If you're looking for a working plugin, **do not use anything in this archive**.
   - Metric calculation (sMAPE, MASE)
   - Result file generation
   - Reproducibility bundle creation
-- **Output**: Results written to `plugins/nixtla-baseline-lab/tests/m4_test/`
+- **Output**: Results written to `005-plugins/nixtla-baseline-lab/tests/m4_test/`
 
 **CI Integration**:
 - Workflow: `.github/workflows/nixtla-baseline-lab-ci.yml`
@@ -274,7 +274,7 @@ If you're looking for a working plugin, **do not use anything in this archive**.
 
 **Important Finding**: The `/nixtla-baseline-m4` **command name** is defined in nixtla-baseline-lab plugin, NOT in the archived nixtla-baseline-m4 directory.
 
-**Location**: `plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md`
+**Location**: `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md`
 
 **Why Confusing**: The command name references "m4" (the benchmark dataset) but shares a name with the archived directory. This is coincidental naming, not a dependency.
 
@@ -329,8 +329,8 @@ If you're looking for a working plugin, **do not use anything in this archive**.
 **Gap**: `/nixtla-baseline-m4` command name is confusing (shares name with archived directory)
 
 **Evidence**:
-- Command defined in `plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md`
-- Archived directory: `plugins/.archive/nixtla-baseline-m4/`
+- Command defined in `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md`
+- Archived directory: `005-plugins/.archive/nixtla-baseline-m4/`
 - Naming collision is coincidental (m4 = benchmark dataset name)
 
 **Recommendation**: Consider renaming to `/nixtla-baseline-benchmark` or `/nixtla-baseline-run`
@@ -371,7 +371,7 @@ If you're looking for a working plugin, **do not use anything in this archive**.
 | Criterion | Status | Evidence |
 |-----------|--------|----------|
 | AAR created in 000-docs/ following v3 standards | ✅ COMPLETE | This file: `6767-AA-AAR-phase-03-baseline-lab-cleanup-and-hardening.md` |
-| Legacy baseline dir archived or clearly marked | ✅ COMPLETE | Moved to `plugins/.archive/nixtla-baseline-m4/` with DEPRECATED.md |
+| Legacy baseline dir archived or clearly marked | ✅ COMPLETE | Moved to `005-plugins/.archive/nixtla-baseline-m4/` with DEPRECATED.md |
 | README only lists canonical Baseline Lab | ✅ COMPLETE | README correctly references nixtla-baseline-lab |
 | Versioning consistent (1.1.0 everywhere) | ✅ COMPLETE | plugin.json, MCP server, README all show 1.1.0 |
 | Tests verified to run from current repo state | ✅ COMPLETE | Golden task smoke test: ✅ PASS |
@@ -390,27 +390,27 @@ If you're looking for a working plugin, **do not use anything in this archive**.
 
 ### Baseline Lab: Where to Find Everything
 
-**Plugin Location**: `plugins/nixtla-baseline-lab/`
+**Plugin Location**: `005-plugins/nixtla-baseline-lab/`
 
 **Version**: 1.1.0
 
 **Key Files**:
-- **README**: `plugins/nixtla-baseline-lab/README.md` (36KB comprehensive guide)
-- **Tests**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
-- **MCP Server**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
-- **Commands**: `plugins/nixtla-baseline-lab/commands/`
-- **Skills**: `plugins/nixtla-baseline-lab/skills/`
+- **README**: `005-plugins/nixtla-baseline-lab/README.md` (36KB comprehensive guide)
+- **Tests**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
+- **MCP Server**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+- **Commands**: `005-plugins/nixtla-baseline-lab/commands/`
+- **Skills**: `005-plugins/nixtla-baseline-lab/skills/`
 
 **Setup Environment**:
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 ```
 
 **Run Tests**:
 ```bash
 # Golden task smoke test (validates core functionality)
-cd plugins/nixtla-baseline-lab/tests
+cd 005-plugins/nixtla-baseline-lab/tests
 python run_baseline_m4_smoke.py
 
 # Expected runtime: 2-3 minutes
@@ -430,9 +430,9 @@ python run_baseline_m4_smoke.py
 
 ### What NOT to Use
 
-**Archived Directory**: `plugins/.archive/nixtla-baseline-m4/`
+**Archived Directory**: `005-plugins/.archive/nixtla-baseline-m4/`
 - **Status**: DEPRECATED
-- **Use Instead**: `plugins/nixtla-baseline-lab/`
+- **Use Instead**: `005-plugins/nixtla-baseline-lab/`
 - **Why Archived**: Superseded by nixtla-baseline-lab (Phase 03)
 
 ---
@@ -453,13 +453,13 @@ phase-03: clean up baseline plugins and sync versions
 ## Files Changed
 
 ### Created (3 files + 1 directory)
-- plugins/.archive/ (new directory for deprecated code)
-- plugins/.archive/README.md (explains archive purpose)
-- plugins/.archive/nixtla-baseline-m4/DEPRECATED.md (explains supersession)
+- 005-plugins/.archive/ (new directory for deprecated code)
+- 005-plugins/.archive/README.md (explains archive purpose)
+- 005-plugins/.archive/nixtla-baseline-m4/DEPRECATED.md (explains supersession)
 - 000-docs/6767-AA-AAR-phase-03-baseline-lab-cleanup-and-hardening.md (this AAR)
 
 ### Modified (2 files)
-- plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+- 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
   - Updated MCP server version: 0.7.0 → 1.1.0
   - Aligns with plugin.json authoritative version
 
@@ -470,7 +470,7 @@ phase-03: clean up baseline plugins and sync versions
   - Prerequisites: virtualenv setup via setup_nixtla_env.sh
 
 ### Moved (1 directory)
-- plugins/nixtla-baseline-m4/ → plugins/.archive/nixtla-baseline-m4/
+- 005-plugins/nixtla-baseline-m4/ → 005-plugins/.archive/nixtla-baseline-m4/
   - Reason: Superseded by nixtla-baseline-lab
   - Added DEPRECATED.md explaining migration
 
@@ -483,7 +483,7 @@ phase-03: clean up baseline plugins and sync versions
 
 ## Test Verification
 - Golden task smoke test: ✅ PASS
-- Location: plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
+- Location: 005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
 - Runtime: ~2-3 minutes
 - Tests: Data loading, statsforecast models, metrics, reproducibility
 
@@ -529,23 +529,23 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### Files Created in Phase 03
 1. `000-docs/6767-AA-AAR-phase-03-baseline-lab-cleanup-and-hardening.md` (this file)
-2. `plugins/.archive/README.md` (explains archive directory purpose)
-3. `plugins/.archive/nixtla-baseline-m4/DEPRECATED.md` (explains supersession)
+2. `005-plugins/.archive/README.md` (explains archive directory purpose)
+3. `005-plugins/.archive/nixtla-baseline-m4/DEPRECATED.md` (explains supersession)
 
 ### Directories Created in Phase 03
-1. `plugins/.archive/` (home for deprecated plugin code)
+1. `005-plugins/.archive/` (home for deprecated plugin code)
 
 ### Files Modified in Phase 03
-1. `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (version 0.7.0 → 1.1.0)
+1. `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (version 0.7.0 → 1.1.0)
 2. `tests/README.md` (added Baseline Lab Tests section)
 
 ### Directories Moved in Phase 03
-1. `plugins/nixtla-baseline-m4/` → `plugins/.archive/nixtla-baseline-m4/`
+1. `005-plugins/nixtla-baseline-m4/` → `005-plugins/.archive/nixtla-baseline-m4/`
 
 ### Files Inspected (Not Modified)
-- `plugins/nixtla-baseline-lab/README.md` (36KB)
-- `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json` (version 1.1.0)
-- `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (golden task)
+- `005-plugins/nixtla-baseline-lab/README.md` (36KB)
+- `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json` (version 1.1.0)
+- `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (golden task)
 - `.github/workflows/nixtla-baseline-lab-ci.yml` (CI workflow)
 - `README.md` (main repo README)
 - `000-docs/*` (89 historical references to nixtla-baseline-m4 - left unchanged as historical record)

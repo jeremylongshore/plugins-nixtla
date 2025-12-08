@@ -83,7 +83,7 @@ All specs complete with business cases, PRDs, architecture, and ROI calculations
 | **Efficiency (3)** | Cost Optimizer, Migration Assistant, Forecast Explainer | Team productivity |
 | **Growth (6)** | Airflow, dbt, Snowflake, ROI Calculator, Benchmark, Streaming Monitor | Market expansion |
 
-**Full specs:** See `000-docs/plugins/[plugin-name]/`
+**Full specs:** See `000-docs/005-plugins/[plugin-name]/`
 
 ---
 
@@ -130,7 +130,7 @@ You're not buying plugins. You're buying:
 
 1. **Review this showcase** (15-30 minutes)
 2. **Read the [detailed business case](../035-PP-PROD-nixtla-plugin-business-case.md)** (10 minutes)
-3. **Pick your top 3 plugins** from the [9 specifications](../plugins/)
+3. **Pick your top 3 plugins** from the [9 specifications](../005-plugins/)
 4. **Schedule a call** to discuss priorities, timeline, and investment
 
 ---

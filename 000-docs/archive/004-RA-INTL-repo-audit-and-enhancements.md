@@ -18,7 +18,7 @@ claude-code-plugins-nixtla/
 ├── .github/            ✅ CI/CD workflows configured
 ├── docs/               ✅ GitHub Pages site deployed
 ├── examples/           ❌ EMPTY - no example code
-├── plugins/            ❌ EMPTY - no plugins implemented
+├── 005-plugins/            ❌ EMPTY - no plugins implemented
 ├── scripts/            ✅ Basic scripts present
 ├── tests/              ❌ EMPTY - no tests
 └── [config files]      ✅ Python/project configuration
@@ -26,7 +26,7 @@ claude-code-plugins-nixtla/
 
 ### Critical Gaps Identified
 
-1. **No Actual Plugins**: The `plugins/` directory is completely empty
+1. **No Actual Plugins**: The `005-plugins/` directory is completely empty
 2. **No Examples**: The `examples/` directories exist but contain no code
 3. **No Tests**: The `tests/` directory is empty
 4. **False Claims in README**: Documentation claimed plugins existed and showed non-existent commands

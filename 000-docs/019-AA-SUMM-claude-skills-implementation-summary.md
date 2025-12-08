@@ -265,7 +265,7 @@ User: "Which Nixtla model should I use for retail?"
 ## 📁 File Structure
 
 ```
-plugins/nixtla-search-to-slack/
+005-plugins/nixtla-search-to-slack/
 ├── .claude-plugin/
 │   └── plugin.json              # ✅ Updated with skills
 ├── src/                          # Python plugin code

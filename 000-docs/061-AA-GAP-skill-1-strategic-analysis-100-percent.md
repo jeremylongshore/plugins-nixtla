@@ -690,7 +690,7 @@ If any changes cause issues:
 
 ```bash
 # Restore from backup
-cd /home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/nixtla-timegpt-lab
+cd /home/jeremy/000-projects/nixtla/003-skills/.claude/skills/nixtla-timegpt-lab
 cp SKILL.md.backup SKILL.md
 rm -rf resources/TROUBLESHOOTING.md
 ```

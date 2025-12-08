@@ -8,8 +8,8 @@ owner: Jeremy Longshore
 related_docs:
   - 017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md
   - 024-AA-STAT-phase-01-already-complete.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-25
 ---
 
@@ -81,7 +81,7 @@ The external Phase 2 prompt requested:
 
 ### 2.1 Metric Functions ✅
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **sMAPE Implementation** (Lines 392-417):
 ```python
@@ -376,7 +376,7 @@ return {
 
 ### 2.6 Metrics Interpretation Skill ✅
 
-**File**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+**File**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Purpose** (Lines 1-21):
 ```markdown
@@ -436,7 +436,7 @@ Activate this skill when the user:
 
 ### 2.7 Tests & CI for Metrics Path ✅
 
-**File**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
+**File**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
 
 **Metric Validation** (Lines 257-312):
 ```python
@@ -485,7 +485,7 @@ print("✓ All metrics in valid ranges")
 **CI Workflow** (`.github/workflows/nixtla-baseline-lab-ci.yml`):
 ```yaml
 - name: Run golden task validation
-  working-directory: plugins/nixtla-baseline-lab
+  working-directory: 005-plugins/nixtla-baseline-lab
   run: |
     echo "Running golden task smoke test..."
     python tests/run_baseline_m4_smoke.py
@@ -500,7 +500,7 @@ print("✓ All metrics in valid ranges")
 
 ### 2.8 Documentation ✅
 
-**Plugin README** (`plugins/nixtla-baseline-lab/README.md`):
+**Plugin README** (`005-plugins/nixtla-baseline-lab/README.md`):
 - Lines 149-190: "Proof It Works" section with actual metric examples
 - Lines 23-34: Explains statsforecast models and metrics
 - Lines 99-107: Lists dependencies including statsforecast
@@ -735,7 +735,7 @@ If the goal is to **verify Phase 2 is complete**:
 
 1. **Run Evaluation Locally**:
    ```bash
-   cd plugins/nixtla-baseline-lab
+   cd 005-plugins/nixtla-baseline-lab
    python scripts/nixtla_baseline_mcp.py test
 
    # Check metrics output
@@ -753,7 +753,7 @@ If the goal is to **verify Phase 2 is complete**:
    ```
 
 3. **Review Implementation**:
-   - Metric functions: `scripts/nixtla_baseline_mcp.py` lines 392-466
+   - Metric functions: `004-scripts/nixtla_baseline_mcp.py` lines 392-466
    - Evaluation pipeline: lines 204-328
    - Interpretation skill: `skills/nixtla-baseline-review/SKILL.md`
 

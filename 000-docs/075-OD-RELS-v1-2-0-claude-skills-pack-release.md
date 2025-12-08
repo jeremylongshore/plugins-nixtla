@@ -44,8 +44,8 @@ All skills achieve 100% compliance with Anthropic Agent Skills official standard
 ### 2. Skills Installer CLI
 
 **Package**: `nixtla-claude-skills-installer`
-**Location**: `packages/nixtla-claude-skills-installer/`
-**Installation**: `pip install -e packages/nixtla-claude-skills-installer`
+**Location**: `006-packages/nixtla-claude-skills-installer/`
+**Installation**: `pip install -e 006-packages/nixtla-claude-skills-installer`
 
 **Usage**:
 ```bash
@@ -218,7 +218,7 @@ c908a6f docs(plugins): add nixtla-defi-sentinel technical exploration
 2. **CHANGELOG.md** (538 lines → 643 lines, +105 lines)
    - Added: Complete v1.2.0 release section with all metrics
 
-3. **plugins/nixtla-baseline-lab/.claude-plugin/plugin.json** (30 lines)
+3. **005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json** (30 lines)
    - Changed: `"version": "1.1.0"` → `"version": "1.2.0"`
 
 ### Created Files (1)
@@ -230,7 +230,7 @@ c908a6f docs(plugins): add nixtla-defi-sentinel technical exploration
 
 **Skills Pack**:
 - 8 SKILL.md files (all remediated to 100% compliance)
-- 30+ resource files in `skills-pack/.claude/skills/*/resources/`
+- 30+ resource files in `003-skills/.claude/skills/*/resources/`
 
 **Documentation**:
 - 7 audit reports (081-AA, 084-AA, 086-AA, 088-AA, 090-AA, 092-AA, 094-AA)
@@ -240,7 +240,7 @@ c908a6f docs(plugins): add nixtla-defi-sentinel technical exploration
 - 1 skills strategy (6767-OD-STRAT)
 
 **Infrastructure**:
-- `packages/nixtla-claude-skills-installer/` - Python CLI package
+- `006-packages/nixtla-claude-skills-installer/` - Python CLI package
 - `demo-project/` - Sample forecasting project
 
 ---

@@ -49,7 +49,7 @@ nixtla-<skill-name>/
 The **Nixtla Claude Skills Pack** is a collection of AI agent skills that transform Claude Code into a Nixtla forecasting expert. Skills are Claude Code's mechanism for domain-specific intelligence that activates automatically when users need forecasting help.
 
 **Repository**: This Nixtla showcase repository (`/home/jeremy/000-projects/nixtla/`)
-**Canonical Source**: `skills-pack/.claude/skills/nixtla-*/`
+**Canonical Source**: `003-skills/.claude/skills/nixtla-*/`
 **User Install Target**: `.claude/skills/nixtla-*/` (in user's home directory)
 
 ---
@@ -58,10 +58,10 @@ The **Nixtla Claude Skills Pack** is a collection of AI agent skills that transf
 
 ### 1. Canonical Source Model
 
-The `skills-pack/` directory contains the **authoritative implementation** of all Nixtla skills:
+The `003-skills/` directory contains the **authoritative implementation** of all Nixtla skills:
 
 ```
-skills-pack/
+003-skills/
 └── .claude/
     └── skills/
         ├── nixtla-timegpt-lab/           # Mode: Nixtla-native forecasting
@@ -99,7 +99,7 @@ nixtla-skills update --force
 
 **Installation Process**:
 1. User runs `nixtla-skills init` (or invokes bootstrap skill in Claude Code)
-2. CLI locates skills source from `skills-pack/.claude/skills/` (dev mode)
+2. CLI locates skills source from `003-skills/.claude/skills/` (dev mode)
 3. Creates `.claude/skills/` directory in current working directory
 4. Copies all Nixtla skills to `.claude/skills/nixtla-*/`
 5. Skills become available in Claude Code immediately
@@ -115,7 +115,7 @@ nixtla-skills update --force
 
 Skills are **persistent** in project's `.claude/skills/` directory:
 
-- **Initial Install**: `nixtla-skills init` copies from `skills-pack/` to `.claude/skills/nixtla-*/`
+- **Initial Install**: `nixtla-skills init` copies from `003-skills/` to `.claude/skills/nixtla-*/`
 - **Opt-in Updates**: `nixtla-skills update` pulls latest from canonical source
 - **Preview & Confirmation**: Shows which skills will be overwritten before proceeding
 - **Versioning**: Each skill tracks version in SKILL.md frontmatter
@@ -131,13 +131,13 @@ Skills are **persistent** in project's `.claude/skills/` directory:
 
 ### 4. Installer CLI Implementation (Phase 3)
 
-**Package**: `packages/nixtla-claude-skills-installer/`
+**Package**: `006-packages/nixtla-claude-skills-installer/`
 
 The installer CLI is a Python package that provides the `nixtla-skills` command:
 
 ```bash
 # Installation (development mode)
-pip install -e packages/nixtla-claude-skills-installer
+pip install -e 006-packages/nixtla-claude-skills-installer
 
 # Verify installation
 which nixtla-skills
@@ -147,7 +147,7 @@ nixtla-skills --help
 **Architecture**:
 
 ```
-packages/nixtla-claude-skills-installer/
+006-packages/nixtla-claude-skills-installer/
 ├── pyproject.toml              # Package definition, console script entry point
 ├── nixtla_skills_installer/
 │   ├── __init__.py             # Package exports, version info
@@ -158,7 +158,7 @@ packages/nixtla-claude-skills-installer/
 
 **Key Functions** (`core.py`):
 
-- `locate_skills_source()`: Finds `skills-pack/.claude/skills/` in development mode
+- `locate_skills_source()`: Finds `003-skills/.claude/skills/` in development mode
   - Future: Use `importlib.resources` for bundled package data (PyPI distribution)
 - `ensure_skills_directory()`: Creates `.claude/skills/` in project if not exists
 - `preview_install()`: Compares source vs. installed skills, returns (new, existing, all)
@@ -187,7 +187,7 @@ Both commands support `--force` flag to skip confirmation prompts.
 **Distribution Models**:
 
 - **Development Mode (Current)**: Installed from repo with `pip install -e`
-  - Skills source: `skills-pack/.claude/skills/` relative to repo root
+  - Skills source: `003-skills/.claude/skills/` relative to repo root
   - Requires nixtla repo cloned locally
 
 - **PyPI Mode (TODO)**: Installed from PyPI with `pip install nixtla-claude-skills-installer`
@@ -297,7 +297,7 @@ All skills achieve 100% compliance with official Anthropic standard, with signif
 ## Directory Structure (Detailed)
 
 ```
-skills-pack/
+003-skills/
 └── .claude/
     └── skills/
         ├── nixtla-timegpt-lab/
@@ -377,7 +377,7 @@ Activated Skills:
 
 ### Creating a New Skill
 
-1. **Create Directory**: `skills-pack/.claude/skills/nixtla-{name}/`
+1. **Create Directory**: `003-skills/.claude/skills/nixtla-{name}/`
 2. **Write SKILL.md**: YAML frontmatter + prompt instructions
 3. **Add Examples**: Real-world usage in `examples/`
 4. **Write Tests**: Validation in `tests/`
@@ -475,7 +475,7 @@ The Nixtla Skills Pack uses **synchronized versioning** across core components:
 | Component | Version | Status |
 |-----------|---------|--------|
 | **Skills Pack** | 1.2.0 | Production release with 8 complete skills |
-| **Installer CLI** | 1.2.0 | `packages/nixtla-claude-skills-installer` |
+| **Installer CLI** | 1.2.0 | `006-packages/nixtla-claude-skills-installer` |
 | **All Skills** | 1.2.0 | All 8 skills synchronized at v1.2.0, 100% compliant |
 
 ### Semantic Versioning
@@ -545,7 +545,7 @@ def get_skill_version(skill_dir: Path) -> str:
 
 **Update Workflow**:
 1. User runs: `nixtla-skills update`
-2. Installer reads source skill versions (from `skills-pack/.claude/skills/`)
+2. Installer reads source skill versions (from `003-skills/.claude/skills/`)
 3. Installer reads target skill versions (from `.claude/skills/`)
 4. Installer shows preview with old → new versions
 5. User confirms update
@@ -587,13 +587,13 @@ Each skill will include validation tests:
 
 ```bash
 # Test individual skill
-pytest skills-pack/.claude/skills/nixtla-timegpt-lab/tests/
+pytest 003-skills/.claude/skills/nixtla-timegpt-lab/tests/
 
 # Test all skills
-pytest skills-pack/.claude/skills/*/tests/
+pytest 003-skills/.claude/skills/*/tests/
 
 # Integration test (requires Claude Code)
-./skills-pack/scripts/test-skills-integration.sh
+./003-skills/scripts/test-skills-integration.sh
 ```
 
 ### Quality Gates
@@ -623,7 +623,7 @@ cd nixtla
 
 # Copy skills to project's .claude/skills/ directory
 mkdir -p .claude/skills
-cp -r skills-pack/.claude/skills/nixtla-* .claude/skills/
+cp -r 003-skills/.claude/skills/nixtla-* .claude/skills/
 
 # Verify installation
 ls .claude/skills/nixtla-*
@@ -641,7 +641,7 @@ git clone https://github.com/your-org/nixtla.git
 cd nixtla
 
 # Install installer CLI in development mode
-pip install -e packages/nixtla-claude-skills-installer
+pip install -e 006-packages/nixtla-claude-skills-installer
 
 # Verify installation
 which nixtla-skills
@@ -841,7 +841,7 @@ This section preserved for historical reference. All phases completed as of v1.2
 - [057-AA-AAR-nixtla-claude-skills-phase-02.md](057-AA-AAR-nixtla-claude-skills-phase-02.md) - Phase 2 AAR
 - [058-AA-AAR-nixtla-claude-skills-phase-03.md](058-AA-AAR-nixtla-claude-skills-phase-03.md) - Phase 3 AAR
 - [040-AA-REPT-nixtla-claude-skills-phase-04.md](040-AA-REPT-nixtla-claude-skills-phase-04.md) - Phase 4 AAR
-- [packages/nixtla-claude-skills-installer/README.md](../packages/nixtla-claude-skills-installer/README.md) - Installer CLI documentation
+- [006-packages/nixtla-claude-skills-installer/README.md](../006-packages/nixtla-claude-skills-installer/README.md) - Installer CLI documentation
 - [demo-project/README.md](../demo-project/README.md) - Demo project walkthrough
 - [000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md](global/003-GUIDE-devops-nixtla-skills-operations.md) - DevOps operations guide
 

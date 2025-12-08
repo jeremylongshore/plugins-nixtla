@@ -87,5 +87,5 @@ This plugin is **fully specified** with a comprehensive architecture document bu
 ## Links
 
 - **Full Specification:** `../../013-AT-ARCH-plugin-05-nixtla-dbt-package.md`
-- **Plugin Directory:** `plugins/nixtla-dbt-package/` (not yet created)
+- **Plugin Directory:** `005-plugins/nixtla-dbt-package/` (not yet created)
 - **Category:** Growth

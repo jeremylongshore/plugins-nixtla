@@ -13,7 +13,7 @@ related_docs:
   - 017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md
   - 6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md
   - 6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md
-  - plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/README.md
   - .claude-plugin/marketplace.json
   - .claude/skills/nixtla-baseline-review/SKILL.md
 last_updated: 2025-11-24
@@ -99,7 +99,7 @@ allowed-tools: Read, Grep, Bash
 - Follows Claude Code best practices for project Skills
 
 **Belt-and-Suspenders Approach**: Skill is now available in two locations:
-- Plugin: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+- Plugin: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 - Project: `.claude/skills/nixtla-baseline-review/SKILL.md`
 
 ### 2.3 Local Dev Marketplace
@@ -117,7 +117,7 @@ allowed-tools: Read, Grep, Bash
   "plugins": [
     {
       "name": "nixtla-baseline-lab",
-      "source": "./plugins/nixtla-baseline-lab",
+      "source": "./005-plugins/nixtla-baseline-lab",
       "description": "Nixtla Baseline Lab – run Nixtla OSS baseline forecasts (SeasonalNaive, AutoETS, AutoTheta) on benchmark datasets directly from Claude Code."
     }
   ]
@@ -127,7 +127,7 @@ allowed-tools: Read, Grep, Bash
 **Design Decisions**:
 - **name**: "nixtla-dev-marketplace" (clearly indicates development/local use)
 - **owner**: "Intent Solutions io" (collaboration sponsor)
-- **source**: Relative path `./plugins/nixtla-baseline-lab` (works from repo root)
+- **source**: Relative path `./005-plugins/nixtla-baseline-lab` (works from repo root)
 - **description**: CEO-friendly one-liner explaining what the plugin does
 
 **Installation Workflow** (from README):
@@ -180,7 +180,7 @@ Provides numbered steps for CEO-friendly first run:
 
 ### 2.5 Golden Task for Smoke Testing
 
-**Created**: `plugins/nixtla-baseline-lab/tests/golden_tasks/baseline_m4_smoke.yaml`
+**Created**: `005-plugins/nixtla-baseline-lab/tests/golden_tasks/baseline_m4_smoke.yaml`
 
 **Structure**: Human-readable YAML with two validation steps
 
@@ -238,13 +238,13 @@ Provides numbered steps for CEO-friendly first run:
 
 - `.claude-plugin/marketplace.json` - Local dev marketplace config
 - `.claude/skills/nixtla-baseline-review/SKILL.md` - Project-level Skill mirror (213 lines)
-- `plugins/nixtla-baseline-lab/tests/golden_tasks/baseline_m4_smoke.yaml` - Smoke test golden task (116 lines)
+- `005-plugins/nixtla-baseline-lab/tests/golden_tasks/baseline_m4_smoke.yaml` - Smoke test golden task (116 lines)
 - `000-docs/018-AA-AACR-phase-04-testing-and-skills.md` - This AAR
 
 ### Modified Files
 
-- `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - Normalized frontmatter
-- `plugins/nixtla-baseline-lab/README.md` - Added Installation, Smoke Test, updated Status
+- `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - Normalized frontmatter
+- `005-plugins/nixtla-baseline-lab/README.md` - Added Installation, Smoke Test, updated Status
 
 ### Directory Structure After Phase 4
 
@@ -256,7 +256,7 @@ nixtla/
 │           └── SKILL.md             ✅ NEW (Phase 4)
 ├── .claude-plugin/
 │   └── marketplace.json             ✅ NEW (Phase 4)
-├── plugins/
+├── 005-plugins/
 │   └── nixtla-baseline-lab/
 │       ├── .claude-plugin/
 │       │   └── plugin.json          ✅ Phase 2
@@ -298,7 +298,7 @@ nixtla/
 
 ### 4.2 Project-Level Skill Loading
 
-**Question**: Does having the Skill in both `.claude/skills/` and `plugins/.../skills/` cause conflicts?
+**Question**: Does having the Skill in both `.claude/skills/` and `005-plugins/.../skills/` cause conflicts?
 
 **Expected Behavior**: Claude Code should handle duplicates gracefully (load from both locations without collision).
 
@@ -320,7 +320,7 @@ nixtla/
 
 **Question**: Will M4 dataset download on first run cause confusion or timeout issues?
 
-**Context**: `datasetsforecast` downloads ~50MB of M4 data to `plugins/nixtla-baseline-lab/data/` on first execution.
+**Context**: `datasetsforecast` downloads ~50MB of M4 data to `005-plugins/nixtla-baseline-lab/data/` on first execution.
 
 **Documentation**: README and golden task both mention "first run may take longer due to data download."
 

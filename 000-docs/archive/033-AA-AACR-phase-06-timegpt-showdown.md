@@ -8,10 +8,10 @@ date_completed: 2025-11-26
 related_docs:
   - 032-AA-STAT-phase-06-timegpt-showdown-status.md
   - 022-AA-AACR-phase-08-timegpt-showdown-and-evals.md
-  - plugins/nixtla-baseline-lab/README.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/scripts/timegpt_client.py
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/scripts/timegpt_client.py
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
 maintainer: Jeremy Longshore (jeremy@intentsolutions.io)
 ---
 
@@ -65,7 +65,7 @@ This phase adds TimeGPT comparison as an **optional, non-breaking feature** for 
 
 ### 3.1 TimeGPT Client Enhancement
 
-**File**: `plugins/nixtla-baseline-lab/scripts/timegpt_client.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/timegpt_client.py`
 
 **Changes**: Added top-level `run_timegpt_forecast()` function (+83 lines)
 
@@ -164,7 +164,7 @@ def run_timegpt_forecast(
 
 ### 3.2 MCP Server Integration
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Changes**: +~200 lines across multiple sections
 
@@ -462,7 +462,7 @@ When TimeGPT failed:
 
 #### 3.3.1 Plugin README
 
-**File**: `plugins/nixtla-baseline-lab/README.md`
+**File**: `005-plugins/nixtla-baseline-lab/README.md`
 
 **Changes**: Added comprehensive 180-line section (Lines 483-662)
 
@@ -526,7 +526,7 @@ When `include_timegpt=true`:
 
 #### 3.3.2 AI Skill Update
 
-**File**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+**File**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Changes**: Added TimeGPT awareness section (Lines 369-401)
 
@@ -578,8 +578,8 @@ If the user enabled **TimeGPT showdown** (`include_timegpt=true`), handle the co
 
 | File | Lines Changed | Type | Purpose |
 |------|---------------|------|---------|
-| `scripts/timegpt_client.py` | +83 | Code | Added `run_timegpt_forecast()` entry point |
-| `scripts/nixtla_baseline_mcp.py` | +~200 | Code | Schema, showdown flow, repro integration |
+| `004-scripts/timegpt_client.py` | +83 | Code | Added `run_timegpt_forecast()` entry point |
+| `004-scripts/nixtla_baseline_mcp.py` | +~200 | Code | Schema, showdown flow, repro integration |
 | `README.md` | +180 | Docs | TimeGPT showdown user documentation |
 | `skills/nixtla-baseline-review/SKILL.md` | +33 | Docs | AI guidance for interpreting results |
 | `000-docs/032-AA-STAT-phase-06-timegpt-showdown-status.md` | +1153 | Docs | Status verification document |
@@ -588,8 +588,8 @@ If the user enabled **TimeGPT showdown** (`include_timegpt=true`), handle the co
 **Total**: ~1649 lines of production code and documentation
 
 **Files Read** (for context):
-- `scripts/timegpt_client.py` (241 lines)
-- `scripts/nixtla_baseline_mcp.py` (1400+ lines)
+- `004-scripts/timegpt_client.py` (241 lines)
+- `004-scripts/nixtla_baseline_mcp.py` (1400+ lines)
 - `README.md` (existing sections)
 - `skills/nixtla-baseline-review/SKILL.md` (existing content)
 
@@ -603,7 +603,7 @@ If the user enabled **TimeGPT showdown** (`include_timegpt=true`), handle the co
 
 **Command**:
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 python tests/run_baseline_m4_smoke.py
 ```
 
@@ -1011,8 +1011,8 @@ if include_timegpt:
 ### Internal Documentation
 - `032-AA-STAT-phase-06-timegpt-showdown-status.md` - Status verification
 - `022-AA-AACR-phase-08-timegpt-showdown-and-evals.md` - Related Phase 8 work
-- `plugins/nixtla-baseline-lab/README.md` - User documentation
-- `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - AI guidance
+- `005-plugins/nixtla-baseline-lab/README.md` - User documentation
+- `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - AI guidance
 
 ### External Resources
 - TimeGPT Documentation: https://docs.nixtla.io/

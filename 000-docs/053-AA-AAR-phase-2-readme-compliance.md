@@ -267,11 +267,11 @@ Every plugin now has standardized documentation table:
 ## Link Verification
 
 All documentation links verified to follow pattern:
-`000-docs/plugins/{plugin-slug}/{NN-DOC-TYPE}.md`
+`000-docs/005-plugins/{plugin-slug}/{NN-DOC-TYPE}.md`
 
 **Sample verification:**
-- ✅ `000-docs/plugins/nixtla-baseline-lab/01-BUSINESS-CASE.md` exists
-- ✅ `000-docs/plugins/nixtla-cost-optimizer/01-BUSINESS-CASE.md` exists (placeholder)
+- ✅ `000-docs/005-plugins/nixtla-baseline-lab/01-BUSINESS-CASE.md` exists
+- ✅ `000-docs/005-plugins/nixtla-cost-optimizer/01-BUSINESS-CASE.md` exists (placeholder)
 - ✅ All STATUS docs exist (created in Phase 1)
 
 **Note:** Placeholder docs (5 per specified plugin) reference comprehensive specs and note future migration.

@@ -351,7 +351,7 @@ python ./scripts/fetch_polymarket_batch.py --contract-ids contracts.txt
   - `market.outcomes[]`: YES/NO outcomes
   - `market.last_trade_price`: Current price (0-1)
 
-**Example Request** (from `scripts/fetch_polymarket_batch.py`):
+**Example Request** (from `004-scripts/fetch_polymarket_batch.py`):
 ```python
 import asyncio
 import aiohttp
@@ -409,7 +409,7 @@ async def fetch_single_contract(session, contract_id):
 - **Response Format**: JSON array
 - **Graceful Degradation**: If API key missing or API fails, **skip Step 2 entirely** (no Kalshi comparison)
 
-**Example Request** (from `scripts/match_and_fetch_kalshi.py`):
+**Example Request** (from `004-scripts/match_and_fetch_kalshi.py`):
 ```python
 import os
 import asyncio

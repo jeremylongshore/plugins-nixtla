@@ -125,12 +125,12 @@ claudes-docs/
 
 **Examples of Excessive Nesting**:
 ```
-/claude-code-plugins-plus/backups/skill-structure-cleanup-20251108-073936/plugins/skill-enhancers/search-to-slack/skills/skill-adapter/references/
+/claude-code-plugins-plus/backups/skill-structure-cleanup-20251108-073936/005-plugins/skill-enhancers/search-to-slack/skills/skill-adapter/references/
 │                                                                                                                                             └─── 7 levels deep!
 
-/plugins/nixtla-baseline-lab/nixtla_baseline_csv_test/
-/plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
-/plugins/nixtla-baseline-lab/nixtla_test_custom/
+/005-plugins/nixtla-baseline-lab/nixtla_baseline_csv_test/
+/005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
+/005-plugins/nixtla-baseline-lab/nixtla_test_custom/
 │                            └─── Multiple test dirs that should be consolidated
 ```
 
@@ -200,7 +200,7 @@ SUPPORT.md
 
 ```bash
 # Plugin #1: nixtla-baseline-lab (complex structure)
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── agents/
 ├── commands/
 ├── data/
@@ -212,17 +212,17 @@ plugins/nixtla-baseline-lab/
 └── tests/
 
 # Plugin #2: nixtla-baseline-m4 (minimal structure)
-plugins/nixtla-baseline-m4/
+005-plugins/nixtla-baseline-m4/
 ├── slash-commands/                   # Inconsistent: should be "commands"
 └── src/
 
 # Plugin #3: nixtla-bigquery-forecaster (standard structure)
-plugins/nixtla-bigquery-forecaster/
+005-plugins/nixtla-bigquery-forecaster/
 ├── 000-docs/                         # Has own docs (good)
 └── src/
 
 # Plugin #4: nixtla-search-to-slack (standard structure)
-plugins/nixtla-search-to-slack/
+005-plugins/nixtla-search-to-slack/
 ├── config/
 ├── skills/
 ├── src/
@@ -351,7 +351,7 @@ GITHUB_DESCRIPTION.txt       → 000-docs/076-MC-MEMO-github-description.txt
 **Standard Plugin Scaffold**:
 
 ```
-plugins/<plugin-name>/
+005-plugins/<plugin-name>/
 ├── .claude-plugin/
 │   └── plugin.json                  # Required manifest
 ├── commands/                        # Slash commands (markdown)
@@ -434,7 +434,7 @@ claude-code-plugins-plus/backups/
 ├── archive/                         # Old/deprecated materials
 │   └── backups-20251108/
 ├── claude-code-plugins-plus/        # Plugin marketplace repo
-│   ├── plugins/                     # 200+ marketplace plugins
+│   ├── 005-plugins/                     # 200+ marketplace plugins
 │   ├── marketplace/                 # Website
 │   ├── scripts/
 │   └── README.md
@@ -444,7 +444,7 @@ claude-code-plugins-plus/backups/
 │   ├── neuralforecast-deployment/
 │   ├── statsforecast-pipeline/
 │   └── timegpt-integration/
-├── plugins/                         # ✅ STANDARDIZED structure
+├── 005-plugins/                         # ✅ STANDARDIZED structure
 │   ├── nixtla-baseline-lab/
 │   │   ├── .claude-plugin/
 │   │   ├── commands/
@@ -482,7 +482,7 @@ claude-code-plugins-plus/backups/
 2. ✅ **No claudes-docs/** - Eliminated
 3. ✅ **No duplicate NNN** - Unique chronological ordering
 4. ✅ **Clean root** - Only essential files
-5. ✅ **Standardized plugins/** - Consistent structure
+5. ✅ **Standardized 005-plugins/** - Consistent structure
 6. ✅ **Archived backups** - Reduced clutter
 
 ---

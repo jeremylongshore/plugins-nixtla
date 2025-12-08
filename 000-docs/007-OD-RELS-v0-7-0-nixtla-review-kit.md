@@ -21,7 +21,7 @@
 - `033-AA-AACR-phase-06-timegpt-showdown.md` – Phase 6 AAR
 - `034-AA-AACR-release-v0.7.0.md` – Release AAR
 - `README.md` – Root repository documentation
-- `plugins/nixtla-baseline-lab/README.md` – Plugin manual
+- `005-plugins/nixtla-baseline-lab/README.md` – Plugin manual
 
 ---
 
@@ -77,7 +77,7 @@ cd claude-code-plugins-nixtla
 
 **Where to find results**:
 ```
-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
+005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
 ├── results_M4_Daily_h7.csv           # Per-series, per-model metrics
 ├── summary_M4_Daily_h7.txt           # Human-readable summary
 ├── benchmark_report_M4_Daily_h7.md   # Markdown benchmark report
@@ -113,7 +113,7 @@ export NIXTLA_TIMEGPT_API_KEY="your-api-key-here"
 
 **Additional output**:
 ```
-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
+005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
 └── timegpt_showdown_M4_Daily_h7.txt  # TimeGPT vs baseline comparison
 ```
 
@@ -247,7 +247,7 @@ This plugin is intended to **help developers reproduce baseline behavior**, not 
 **Scenario**: Nixtla wants to validate TimeGPT improvements on small sample.
 
 **Workflow**:
-1. Run `scripts/run_nixtla_review_timegpt.sh` with API key
+1. Run `004-scripts/run_nixtla_review_timegpt.sh` with API key
 2. Review `timegpt_showdown_*.txt` comparison
 3. Check if TimeGPT beats baselines on sample
 4. **Remember**: 3-5 series is indicative, not conclusive
@@ -318,7 +318,7 @@ git clone https://github.com/YOUR-USERNAME/claude-code-plugins-nixtla.git
 cd claude-code-plugins-nixtla
 
 # 2. Set up development environment
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt

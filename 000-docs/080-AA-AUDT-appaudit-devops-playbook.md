@@ -179,14 +179,14 @@ nixtla/
 │   └── workflows/              # CI/CD pipelines (7 workflows)
 ├── 000-docs/                   # Documentation hub (Doc-Filing v3.0)
 │   ├── global/                 # Cross-cutting guides
-│   └── planned-plugins/        # Per-plugin documentation sets
-├── plugins/                    # Working plugins (3)
+│   └── planned-005-plugins/        # Per-plugin documentation sets
+├── 005-plugins/                    # Working plugins (3)
 │   ├── nixtla-baseline-lab/    # Benchmarking plugin
 │   ├── nixtla-bigquery-forecaster/  # Cloud Functions plugin
 │   └── nixtla-search-to-slack/ # Content curation (MVP)
-├── skills-pack/                # Distributable skills
+├── 003-skills/                # Distributable skills
 │   └── .claude/skills/         # 8 skill definitions
-├── packages/                   # Python packages
+├── 006-packages/                   # Python packages
 │   └── nixtla-claude-skills-installer/  # CLI tool (v0.4.0)
 ├── tests/                      # Root-level tests
 ├── CLAUDE.md                   # Claude Code instructions
@@ -200,12 +200,12 @@ nixtla/
 
 ### Detailed Directory Analysis
 
-#### plugins/nixtla-baseline-lab/
+#### 005-plugins/nixtla-baseline-lab/
 
 **Purpose**: Primary working plugin for running statsforecast baseline models on M4 benchmark data
 
 **Key Files**:
-- `scripts/nixtla_baseline_mcp.py:26` - MCP server class (NixtlaBaselineMCP)
+- `004-scripts/nixtla_baseline_mcp.py:26` - MCP server class (NixtlaBaselineMCP)
 - `tests/run_baseline_m4_smoke.py` - Golden task smoke test (90 seconds)
 - `.claude-plugin/plugin.json` - Plugin metadata (v1.4.1)
 - `.mcp.json` - MCP server configuration
@@ -223,7 +223,7 @@ nixtla/
 - Custom CSV support for user data
 - Output: CSV files + markdown reports
 
-#### plugins/nixtla-bigquery-forecaster/
+#### 005-plugins/nixtla-bigquery-forecaster/
 
 **Purpose**: Cloud Function that forecasts BigQuery time-series data
 
@@ -245,7 +245,7 @@ nixtla/
 - Workload Identity Federation (keyless GCP auth)
 - Required secrets: `GCP_WORKLOAD_IDENTITY_PROVIDER`, `GCP_SA_EMAIL`, `GCP_PROJECT_ID`
 
-#### packages/nixtla-claude-skills-installer/
+#### 006-packages/nixtla-claude-skills-installer/
 
 **Purpose**: CLI tool for installing Nixtla skills into projects
 
@@ -304,14 +304,14 @@ nixtla/
 
 | Skill | Purpose | Location |
 |-------|---------|----------|
-| `nixtla-timegpt-lab` | TimeGPT API experimentation | `skills-pack/.claude/skills/` |
-| `nixtla-experiment-architect` | Experiment design | `skills-pack/.claude/skills/` |
-| `nixtla-schema-mapper` | Data schema transformation | `skills-pack/.claude/skills/` |
-| `nixtla-timegpt-finetune-lab` | Model fine-tuning | `skills-pack/.claude/skills/` |
-| `nixtla-prod-pipeline-generator` | Production pipeline code | `skills-pack/.claude/skills/` |
-| `nixtla-usage-optimizer` | API usage optimization | `skills-pack/.claude/skills/` |
-| `nixtla-skills-bootstrap` | Skills installation helper | `skills-pack/.claude/skills/` |
-| `nixtla-skills-index` | Skills discovery | `skills-pack/.claude/skills/` |
+| `nixtla-timegpt-lab` | TimeGPT API experimentation | `003-skills/.claude/skills/` |
+| `nixtla-experiment-architect` | Experiment design | `003-skills/.claude/skills/` |
+| `nixtla-schema-mapper` | Data schema transformation | `003-skills/.claude/skills/` |
+| `nixtla-timegpt-finetune-lab` | Model fine-tuning | `003-skills/.claude/skills/` |
+| `nixtla-prod-pipeline-generator` | Production pipeline code | `003-skills/.claude/skills/` |
+| `nixtla-usage-optimizer` | API usage optimization | `003-skills/.claude/skills/` |
+| `nixtla-skills-bootstrap` | Skills installation helper | `003-skills/.claude/skills/` |
+| `nixtla-skills-index` | Skills discovery | `003-skills/.claude/skills/` |
 
 ### Gemini AI Integration
 
@@ -350,7 +350,7 @@ cd plugins-nixtla
 pip install -r requirements-dev.txt
 
 # For baseline-lab plugin
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt
@@ -362,7 +362,7 @@ pip install -r scripts/requirements.txt
 pytest -v
 
 # Run baseline lab smoke test
-python plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
+python 005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
 ```
 
 #### CI Pipeline Deployment (Automated)
@@ -587,7 +587,7 @@ isort .
 - Category Codes: PP (Planning), AT (Architecture), AA (Audits), OD (Overview), QA (Quality)
 
 **Per-Plugin Documentation**:
-Each plugin requires 6 docs in `000-docs/planned-plugins/{plugin}/`:
+Each plugin requires 6 docs in `000-docs/planned-005-plugins/{plugin}/`:
 - 01-BUSINESS-CASE.md
 - 02-PRD.md
 - 03-ARCHITECTURE.md
@@ -606,6 +606,66 @@ None identified. Documentation is well-maintained and consistent with code.
 3. `000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md` - 20 minutes - Skills lifecycle
 4. `000-docs/078-SPEC-MASTER-claude-code-plugins-standard.md` - 30 minutes - Plugin architecture
 5. Plugin-specific READMEs - 15 minutes each
+
+### 11.1 Claude Skills – SKILL.md Structure Reference
+
+All Claude Skills used in this repository (local `.claude/skills` and `skills-pack`) must conform to a single master standard. This is critical for Developer Experience (DX), CI validation, and marketplace consistency. SKILL.md files serve as the contract between DevOps engineers, Nixtla engineers, and Claude Code—defining how AI assistance is invoked, what tools are permitted, and what behavior to expect.
+
+**Canonical Claude Skills references:**
+
+- `{baseDir}/000-docs/077-SPEC-MASTER-claude-skills-standard.md`
+- `{baseDir}/000-docs/6767-n-DR-GUID-claude-skills-authoring-guide.md`
+- `{baseDir}/000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md`
+
+**SKILL.md Template**
+
+Every skill follows this structure:
+
+```markdown
+---
+name: your-skill-name
+description: |
+  [Primary capabilities]. [Secondary features].
+  Use when [scenario 1], [scenario 2], [scenario 3], [scenario 4].
+  Trigger with "phrase 1", "phrase 2", "phrase 3".
+allowed-tools: "Read,Write,Glob,Grep,Edit,Bash(python:*)"
+version: "1.0.0"
+---
+
+# [Skill Name]
+
+## Purpose
+Brief statement of what this skill does (1-2 sentences).
+
+## Overview
+High-level description of capabilities and workflow.
+
+## Prerequisites
+Required tools, dependencies, environment setup.
+
+## Instructions
+Step-by-step guide using imperative voice.
+
+## Output
+What the skill produces (files, reports, artifacts).
+
+## Error Handling
+Common issues and troubleshooting steps.
+
+## Examples
+Concrete usage examples with real commands/paths.
+
+## Resources
+Links to external docs, related skills, references.
+```
+
+**Key Rules for SKILL.md in This Repo**
+
+- **Descriptions**: Third person only (no "I" or "you"). Must follow the pattern: `[Primary capabilities]. [Secondary features]. Use when […]. Trigger with "…", "…", "…".`
+- **Paths**: All file paths must use `{baseDir}/…` and never absolute or OS-specific paths.
+- **Body Length**: Target ~300 lines, with a hard ceiling at 500 lines. Extract longer code to `004-scripts/` or `assets/templates/`.
+- **Instructions**: Written in imperative voice ("Run the script", "Create the file", "Validate output").
+- **Naming**: The `name` field must be lowercase-with-hyphens and match the skill directory name exactly.
 
 ---
 
@@ -650,7 +710,7 @@ None identified. Documentation is well-maintained and consistent with code.
 | Plugin env | `./scripts/setup_nixtla_env.sh --venv` | baseline-lab | Per-plugin |
 | Run all tests | `pytest -v` | Root | Uses pytest.ini_options |
 | Run single test | `pytest tests/test_file.py::test_name -v` | Root | Standard pytest |
-| Smoke test | `python plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` | baseline-lab | 90 seconds |
+| Smoke test | `python 005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` | baseline-lab | 90 seconds |
 | Format code | `black . && isort .` | Root | Auto-fix |
 | Lint check | `flake8 . --select=E9,F63,F7,F82` | Root | CI-matching |
 | Install skills | `nixtla-skills init` | CLI | Requires pip install |
@@ -660,8 +720,8 @@ None identified. Documentation is well-maintained and consistent with code.
 
 - **Repository**: https://github.com/intent-solutions-io/plugins-nixtla
 - **Marketplace Config**: `.claude-plugin/marketplace.json`
-- **Plugin Manifest**: `plugins/{name}/.claude-plugin/plugin.json`
-- **Skills Location**: `skills-pack/.claude/skills/{skill-name}/SKILL.md`
+- **Plugin Manifest**: `005-plugins/{name}/.claude-plugin/plugin.json`
+- **Skills Location**: `003-skills/.claude/skills/{skill-name}/SKILL.md`
 - **CI Workflows**: `.github/workflows/`
 - **Documentation Hub**: `000-docs/`
 

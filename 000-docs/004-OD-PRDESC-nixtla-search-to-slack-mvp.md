@@ -82,7 +82,7 @@ As per MVP specification, these features are documented but NOT implemented:
 
 ```bash
 # Navigate to plugin directory
-cd plugins/nixtla-search-to-slack
+cd 005-plugins/nixtla-search-to-slack
 
 # Create virtual environment
 python -m venv venv
@@ -162,7 +162,7 @@ python -m nixtla_search_to_slack --topic nixtla-core
 
 ### New Files Created (25 files)
 ```
-plugins/nixtla-search-to-slack/
+005-plugins/nixtla-search-to-slack/
 ├── src/nixtla_search_to_slack/
 │   ├── __init__.py
 │   ├── main.py

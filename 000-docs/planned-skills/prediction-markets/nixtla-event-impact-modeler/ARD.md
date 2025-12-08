@@ -185,7 +185,7 @@ version: "1.0.0"
 - Economic Calendar API documentation (→ `references/ECONOMIC_CALENDAR_API.md`)
 - TimeGPT Exogenous Variables API docs (→ `references/TIMEGPT_EXOG_VARS.md`)
 - Extended examples (→ `references/EXAMPLES.md`)
-- Python script source code (→ `scripts/*.py`)
+- Python script source code (→ `004-scripts/*.py`)
 - Report templates (→ `assets/report_template.md`)
 
 ### 2.3 Level 3: Resources (Extended Context)

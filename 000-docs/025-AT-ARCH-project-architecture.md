@@ -288,7 +288,7 @@ permissions:
       - ./data/**
     write:
       - ./outputs/**
-      - /tmp/claude-plugins/**
+      - /tmp/claude-005-plugins/**
     execute:
       - ./scripts/**
 

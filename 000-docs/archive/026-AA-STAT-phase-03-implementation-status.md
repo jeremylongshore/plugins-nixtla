@@ -9,7 +9,7 @@ related_docs:
   - 024-AA-STAT-phase-01-already-complete.md
   - 025-AA-STAT-phase-02-metrics-already-complete.md
   - 017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
 last_updated: 2025-11-25
 ---
 
@@ -76,7 +76,7 @@ The Phase 3 prompt requests:
 
 ### 2.1 Statsforecast Installation ✅ COMPLETE
 
-**File**: `plugins/nixtla-baseline-lab/scripts/requirements.txt`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/requirements.txt`
 
 **Current State**:
 ```txt
@@ -106,7 +106,7 @@ $ python -c "from statsforecast import StatsForecast"
 
 ### 2.2 Statsforecast Usage in MCP Server ✅ COMPLETE
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Current Implementation** (Lines 124-202):
 ```python
@@ -143,7 +143,7 @@ forecasts_df = sf.forecast(df=df_train, h=horizon)
 
 ### 2.3 Current Tool Parameters
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (Lines 36-92)
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (Lines 36-92)
 
 **Current Parameters**:
 ```python
@@ -188,7 +188,7 @@ def run_baselines(
 
 ### 2.4 Skill for Power Users ⚠️ PARTIAL
 
-**File**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+**File**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Current State**:
 - ✅ Explains sMAPE and MASE
@@ -202,7 +202,7 @@ def run_baselines(
 
 ### 2.5 Demo Flow Documentation ❌ NOT DONE
 
-**File**: `plugins/nixtla-baseline-lab/README.md`
+**File**: `005-plugins/nixtla-baseline-lab/README.md`
 
 **Current State**:
 - ✅ Explains plugin purpose
@@ -221,7 +221,7 @@ def run_baselines(
 ### Phase 3.1: Add Power-User Parameters
 
 **Files to Modify**:
-1. `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+1. `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
    - Update tool schema (lines 36-92)
    - Update function signature (lines 94-104)
    - Add parameter validation
@@ -253,7 +253,7 @@ def run_baselines(
 ### Phase 3.2: Add Demo Preset
 
 **Files to Modify**:
-1. `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+1. `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **New Parameter**:
 ```python
@@ -283,7 +283,7 @@ if demo_preset == "m4_daily_small":
 ### Phase 3.3: Enhance Skill for Power Users
 
 **Files to Modify**:
-1. `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+1. `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Additions Needed**:
 ```markdown
@@ -308,7 +308,7 @@ should feel familiar to anyone who has used statsforecast / M4 examples.
 ### Phase 3.4: Document Demo Flow
 
 **Files to Modify**:
-1. `plugins/nixtla-baseline-lab/README.md`
+1. `005-plugins/nixtla-baseline-lab/README.md`
 
 **New Section**:
 ```markdown
@@ -319,7 +319,7 @@ suitable for live presentations or GitHub walkthroughs.
 
 **Step 1: Setup** (one-time, if self-hosting)
 \```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 \```
 

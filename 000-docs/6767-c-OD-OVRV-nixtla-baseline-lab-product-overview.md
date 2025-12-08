@@ -140,8 +140,8 @@ The **Nixtla Baseline Lab** is a production-ready Claude Code plugin that brings
 - **Setup**: `setup_nixtla_env.sh` script or manual `pip install -r requirements.txt`
 
 **File System**:
-- **Plugin Location**: `plugins/nixtla-baseline-lab/`
-- **Data Cache**: `plugins/nixtla-baseline-lab/data/` (M4 datasets downloaded once)
+- **Plugin Location**: `005-plugins/nixtla-baseline-lab/`
+- **Data Cache**: `005-plugins/nixtla-baseline-lab/data/` (M4 datasets downloaded once)
 - **Output**: User-specified directory (default: `nixtla_baseline_m4_test/`)
 - **Artifacts**: CSV, TXT, optional PNG plots, showdown reports
 
@@ -149,7 +149,7 @@ The **Nixtla Baseline Lab** is a production-ready Claude Code plugin that brings
 
 **GitHub Actions**:
 - **Runner**: `ubuntu-latest` (Python 3.12)
-- **Triggers**: Push to main, PR to main (paths: `plugins/nixtla-baseline-lab/**`)
+- **Triggers**: Push to main, PR to main (paths: `005-plugins/nixtla-baseline-lab/**`)
 - **Steps**: Setup Python → Install deps → Run MCP test → Run golden task → Upload artifacts
 - **Caching**: Pip cache for faster dependency installation
 - **Artifacts**: `nixtla-baseline-test-results` (7-day retention)
@@ -235,7 +235,7 @@ cd claude-code-plugins-nixtla
 /nixtla-baseline-setup
 
 # Or manually
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 ```
 
@@ -337,7 +337,7 @@ export NIXTLA_TIMEGPT_API_KEY="your-key"
 
 **Questions**: jeremy@intentsolutions.io or max@nixtla.io
 **Issues**: GitHub Issues on `intent-solutions-io/plugins-nixtla`
-**Documentation**: `plugins/nixtla-baseline-lab/README.md` (plugin manual)
+**Documentation**: `005-plugins/nixtla-baseline-lab/README.md` (plugin manual)
 
 ---
 

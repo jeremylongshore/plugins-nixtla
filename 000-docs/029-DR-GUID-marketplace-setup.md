@@ -121,7 +121,7 @@ claude plugin install nixtla-search-to-slack
 - LLM API key (Gemini FREE or others)
 - GitHub token (free)
 
-**[📚 Complete Setup Guide →](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)**
+**[📚 Complete Setup Guide →](./005-plugins/nixtla-search-to-slack/SETUP_GUIDE.md)**
 
 ### 2. TimeGPT Pipeline Builder (COMING SOON)
 
@@ -163,7 +163,7 @@ After installation, follow these steps:
 
 #### 1. Navigate to Plugin Directory
 ```bash
-cd ~/.claude/plugins/nixtla-search-to-slack
+cd ~/.claude/005-plugins/nixtla-search-to-slack
 # or wherever Claude Code installed it
 ```
 
@@ -215,7 +215,7 @@ python -m nixtla_search_to_slack --topic nixtla-core --dry-run
 python -m nixtla_search_to_slack --topic nixtla-core
 ```
 
-**[📖 Detailed Setup Instructions →](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)**
+**[📖 Detailed Setup Instructions →](./005-plugins/nixtla-search-to-slack/SETUP_GUIDE.md)**
 
 ---
 
@@ -287,7 +287,7 @@ git clone https://github.com/intent-solutions-io/plugins-nixtla.git
 cd claude-code-plugins-nixtla
 
 # 2. Install plugin locally
-claude plugin install --dev ./plugins/nixtla-search-to-slack
+claude plugin install --dev ./005-plugins/nixtla-search-to-slack
 
 # 3. Continue with setup as above
 ```
@@ -300,7 +300,7 @@ claude plugin install --dev ./plugins/nixtla-search-to-slack
 
 1. **Documentation**:
    - [Main README](./README.md)
-   - [Plugin Setup Guide](./plugins/nixtla-search-to-slack/SETUP_GUIDE.md)
+   - [Plugin Setup Guide](./005-plugins/nixtla-search-to-slack/SETUP_GUIDE.md)
    - [Educational Resources](./EDUCATIONAL_RESOURCES.md)
 
 2. **GitHub Issues**:

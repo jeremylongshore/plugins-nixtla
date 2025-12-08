@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-Successfully scaffolded the global `workspaces/` layer for the Nixtla plugins repository, establishing 5 domain-specific labs (timegpt-lab, statsforecast-lab, mlforecast-lab, neuralforecast-lab, hierarchicalforecast-lab) with consistent structure and standards. This phase transforms the repo from a "collection of plugins" to a "coherent platform for Nixtla engineering" by providing dedicated sandboxes for experimentation, validation, and development before promotion to production artifacts (plugins/ or skills-pack/). All workspaces follow a canonical 5-directory structure (skills/, scripts/, data/, reports/, docs/) with clear promotion paths and compliance requirements.
+Successfully scaffolded the global `002-workspaces/` layer for the Nixtla plugins repository, establishing 5 domain-specific labs (timegpt-lab, statsforecast-lab, mlforecast-lab, neuralforecast-lab, hierarchicalforecast-lab) with consistent structure and standards. This phase transforms the repo from a "collection of plugins" to a "coherent platform for Nixtla engineering" by providing dedicated sandboxes for experimentation, validation, and development before promotion to production artifacts (005-plugins/ or 003-skills/). All workspaces follow a canonical 5-directory structure (skills/, scripts/, data/, reports/, docs/) with clear promotion paths and compliance requirements.
 
 ## Objectives
 
-1. ✅ Create top-level `workspaces/` directory with 5 Nixtla domain labs
+1. ✅ Create top-level `002-workspaces/` directory with 5 Nixtla domain labs
 2. ✅ Establish standard 5-directory substructure for all labs
-3. ✅ Write global workspaces README explaining purpose and relation to plugins/skills-pack
+3. ✅ Write global workspaces README explaining purpose and relation to 005-plugins/skills-pack
 4. ✅ Create per-workspace READMEs with domain-specific guidance
 5. ✅ Document workspaces standards in `.directory-standards.md`
 6. ✅ Create Phase 2 AAR (this document)
@@ -27,7 +27,7 @@ Successfully scaffolded the global `workspaces/` layer for the Nixtla plugins re
 Created 31 new directories:
 
 ```
-workspaces/
+002-workspaces/
 ├── README.md
 ├── .directory-standards.md
 ├── timegpt-lab/
@@ -71,13 +71,13 @@ workspaces/
 
 Created 7 new markdown files:
 
-1. **workspaces/README.md** (77 lines)
+1. **002-workspaces/README.md** (77 lines)
    - Visual overview of workspaces structure
-   - Relation to plugins/ and skills-pack/
+   - Relation to 005-plugins/ and 003-skills/
    - Promotion flow explanation
    - Who uses workspaces (CEO, DevOps, Engineers)
 
-2. **workspaces/.directory-standards.md** (233 lines)
+2. **002-workspaces/.directory-standards.md** (233 lines)
    - Canonical structure for all 5 labs
    - Directory-by-directory standards
    - Naming conventions
@@ -85,28 +85,28 @@ Created 7 new markdown files:
    - CI/CD integration guidance
    - Standards compliance requirements
 
-3. **workspaces/timegpt-lab/README.md**
+3. **002-workspaces/timegpt-lab/README.md**
    - TimeGPT API experiments
    - 5 example future flows
    - Environment setup (NIXTLA_TIMEGPT_API_KEY)
-   - Promotion path to skills-pack/plugins
+   - Promotion path to 003-skills/plugins
 
-4. **workspaces/statsforecast-lab/README.md**
+4. **002-workspaces/statsforecast-lab/README.md**
    - StatsForecast baselines (AutoETS, AutoARIMA, SeasonalNaive)
    - M4/M5 benchmark workflows
    - Promotion to nixtla-baseline-lab plugin
 
-5. **workspaces/mlforecast-lab/README.md**
+5. **002-workspaces/mlforecast-lab/README.md**
    - MLForecast pipelines (LightGBM, XGBoost)
    - Feature engineering workflows
    - ML model training and evaluation
 
-6. **workspaces/neuralforecast-lab/README.md**
+6. **002-workspaces/neuralforecast-lab/README.md**
    - Deep learning (NHITS, NBEATS, TFT)
    - Explainability (Integrated Gradients, SHAP)
    - Model interpretability workflows
 
-7. **workspaces/hierarchicalforecast-lab/README.md**
+7. **002-workspaces/hierarchicalforecast-lab/README.md**
    - Hierarchical reconciliation
    - Coherence metrics
    - Multi-level forecast workflows
@@ -129,23 +129,23 @@ Created 7 new markdown files:
 
 ### 2. Promotion Path from Workspaces to Production
 
-**Decision**: Workspaces are **internal labs** - code graduates to plugins/ or skills-pack/ when stable
+**Decision**: Workspaces are **internal labs** - code graduates to 005-plugins/ or 003-skills/ when stable
 
 **Rationale**:
-- Clear boundary between "experimental" (workspaces) and "shipping" (plugins/skills-pack)
+- Clear boundary between "experimental" (workspaces) and "shipping" (005-plugins/skills-pack)
 - Prototypes can iterate rapidly without breaking production dependencies
 - Promotion is explicit and documented (not automatic)
 
 **Flow**:
 ```
-workspaces/{lab}/skills/     → skills-pack/.claude/skills/     (when stable)
-workspaces/{lab}/scripts/    → plugins/{plugin}/scripts/       (when productionized)
-workspaces/{lab}/reports/    → 000-docs/ (with AA-REPT)       (when sharing externally)
+002-workspaces/{lab}/skills/     → 003-skills/.claude/skills/     (when stable)
+002-workspaces/{lab}/scripts/    → 005-plugins/{plugin}/scripts/       (when productionized)
+002-workspaces/{lab}/reports/    → 000-docs/ (with AA-REPT)       (when sharing externally)
 ```
 
 ### 3. Standards Document in Workspaces Root
 
-**Decision**: `.directory-standards.md` lives at `workspaces/.directory-standards.md`
+**Decision**: `.directory-standards.md` lives at `002-workspaces/.directory-standards.md`
 
 **Rationale**:
 - Co-located with the directories it governs
@@ -154,7 +154,7 @@ workspaces/{lab}/reports/    → 000-docs/ (with AA-REPT)       (when sharing ex
 - Dot-prefix keeps it at top of directory listings
 
 **Alternatives Considered**:
-- Standards in `000-docs/` → Rejected (too far from workspaces/)
+- Standards in `000-docs/` → Rejected (too far from 002-workspaces/)
 - Per-workspace standards → Rejected (duplication, drift risk)
 
 ### 4. Per-Workspace READMEs
@@ -175,33 +175,33 @@ workspaces/{lab}/reports/    → 000-docs/ (with AA-REPT)       (when sharing ex
 
 ## Integration with Existing Structure
 
-### Relation to plugins/
+### Relation to 005-plugins/
 
-**plugins/** (3 working plugins):
+**005-plugins/** (3 working plugins):
 - Production-ready MCP servers, deployable cloud functions
 - Shipping artifacts for external users
 - Golden tasks + smoke tests required
 
-**workspaces/** (5 labs):
+**002-workspaces/** (5 labs):
 - Internal prototyping and validation
 - Experimental code, not production-ready
 - No external dependencies on workspace code
 
-**Promotion**: `workspaces/{lab}/scripts/` → `plugins/{plugin}/scripts/` (when productionized)
+**Promotion**: `002-workspaces/{lab}/scripts/` → `005-plugins/{plugin}/scripts/` (when productionized)
 
-### Relation to skills-pack/
+### Relation to 003-skills/
 
-**skills-pack/** (8 production skills):
+**003-skills/** (8 production skills):
 - Shared SKILL bundle for external projects
 - Stable, well-documented, CI-validated
 - Installed via `nixtla-skills init`
 
-**workspaces/** (5 labs):
+**002-workspaces/** (5 labs):
 - Prototype skills before promotion
 - Rapid iteration without breaking external dependencies
 - Internal-only skills that don't need distribution
 
-**Promotion**: `workspaces/{lab}/skills/` → `skills-pack/.claude/skills/` (when stable)
+**Promotion**: `002-workspaces/{lab}/skills/` → `003-skills/.claude/skills/` (when stable)
 
 ### Relation to 000-docs/
 
@@ -210,12 +210,12 @@ workspaces/{lab}/reports/    → 000-docs/ (with AA-REPT)       (when sharing ex
 - Cross-cutting documentation (architecture, PRDs, AARs)
 - Permanent record of decisions and outcomes
 
-**workspaces/{lab}/docs/** (per-workspace internal docs):
+**002-workspaces/{lab}/docs/** (per-workspace internal docs):
 - Domain-specific guides, best practices, troubleshooting
 - Workspace-local documentation (not cross-cutting)
 - Promote to 000-docs/ when general enough
 
-**Promotion**: `workspaces/{lab}/reports/` → `000-docs/` with AA-REPT type code (when sharing externally)
+**Promotion**: `002-workspaces/{lab}/reports/` → `000-docs/` with AA-REPT type code (when sharing externally)
 
 ## Mental Models
 
@@ -224,7 +224,7 @@ workspaces/{lab}/reports/    → 000-docs/ (with AA-REPT)       (when sharing ex
 **Visual**: Single tree showing 5 Nixtla domains as peer labs
 
 ```
-workspaces/
+002-workspaces/
 ├── timegpt-lab/          (TimeGPT API, forecasting)
 ├── statsforecast-lab/    (Baselines, M4/M5 benchmarks)
 ├── mlforecast-lab/       (ML pipelines, feature engineering)
@@ -239,8 +239,8 @@ workspaces/
 **Pattern**: All labs have identical structure → same CI validation scripts
 
 **Automation**:
-- Smoke tests: `pytest workspaces/{lab}/tests/`
-- Environment validation: `python workspaces/{lab}/scripts/validate_env.py`
+- Smoke tests: `pytest 002-workspaces/{lab}/tests/`
+- Environment validation: `python 002-workspaces/{lab}/scripts/validate_env.py`
 - Standards compliance: `python scripts/validate_workspaces.py`
 
 **Value**: "One validation script works for all 5 labs"
@@ -250,12 +250,12 @@ workspaces/
 **Home Base**: Each domain engineer works in their dedicated lab
 
 **Daily Workflow**:
-1. Clone repo, cd into `workspaces/{my-domain}-lab/`
+1. Clone repo, cd into `002-workspaces/{my-domain}-lab/`
 2. Read README.md for setup instructions
-3. Prototype in `skills/` or `scripts/`
+3. Prototype in `skills/` or `004-scripts/`
 4. Validate with `data/` and generate `reports/`
 5. Document patterns in `docs/`
-6. When stable, promote to `skills-pack/` or `plugins/`
+6. When stable, promote to `003-skills/` or `005-plugins/`
 
 **Value**: "Clear sandbox for experimentation before production"
 
@@ -267,11 +267,11 @@ Each workspace can have `tests/` directory:
 
 ```bash
 # In .github/workflows/workspaces-ci.yml
-pytest workspaces/timegpt-lab/tests/
-pytest workspaces/statsforecast-lab/tests/
-pytest workspaces/mlforecast-lab/tests/
-pytest workspaces/neuralforecast-lab/tests/
-pytest workspaces/hierarchicalforecast-lab/tests/
+pytest 002-workspaces/timegpt-lab/tests/
+pytest 002-workspaces/statsforecast-lab/tests/
+pytest 002-workspaces/mlforecast-lab/tests/
+pytest 002-workspaces/neuralforecast-lab/tests/
+pytest 002-workspaces/hierarchicalforecast-lab/tests/
 ```
 
 ### Environment Validation
@@ -279,14 +279,14 @@ pytest workspaces/hierarchicalforecast-lab/tests/
 Check API keys, dependencies, data availability:
 
 ```bash
-python workspaces/timegpt-lab/scripts/validate_env.py
-python workspaces/statsforecast-lab/scripts/validate_env.py
+python 002-workspaces/timegpt-lab/scripts/validate_env.py
+python 002-workspaces/statsforecast-lab/scripts/validate_env.py
 # ... (for all 5 labs)
 ```
 
 ### Standards Compliance
 
-Extend `scripts/validate_skills.py` to cover workspace SKILLs:
+Extend `004-scripts/validate_skills.py` to cover workspace SKILLs:
 
 ```bash
 python scripts/validate_skills.py --workspaces
@@ -321,7 +321,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 
 ### Documentation Quality
 
-✅ Global README explains relation to plugins/skills-pack
+✅ Global README explains relation to 005-plugins/skills-pack
 ✅ Per-workspace READMEs have 5 sections (Purpose, Structure, Example Flows, Setup, Promotion)
 ✅ Standards doc covers all directories, naming conventions, promotion flow
 
@@ -333,7 +333,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 ## Files Changed
 
 **Created**:
-- 31 directories (workspaces/ + 5 labs × 5 subdirs + 5 lab roots)
+- 31 directories (002-workspaces/ + 5 labs × 5 subdirs + 5 lab roots)
 - 7 markdown files (1 global README + 1 standards + 5 per-workspace READMEs)
 - 1 AAR (084-AA-AACR-phase-02-workspaces-labs-layer.md)
 
@@ -347,7 +347,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 
 1. Environment bootstrap (NIXTLA_TIMEGPT_API_KEY, sample data)
 2. First SKILL: `nixtla-timegpt-forecaster` (API usage, basic prompts)
-3. Sample scripts: `scripts/forecast_sample.py`, `scripts/anomaly_detection.py`
+3. Sample scripts: `004-scripts/forecast_sample.py`, `004-scripts/anomaly_detection.py`
 4. Golden task test
 5. AAR: `085-AA-AACR-phase-03-timegpt-lab.md`
 
@@ -355,7 +355,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 
 1. M4/M5 dataset wiring
 2. SKILLs: `nixtla-statsforecast-baseline` (AutoETS, AutoTheta, SeasonalNaive)
-3. Scripts: `scripts/run_m4_benchmark.py`, `scripts/compare_models.py`
+3. Scripts: `004-scripts/run_m4_benchmark.py`, `004-scripts/compare_models.py`
 4. CI smoke test integration
 5. AAR: `086-AA-AACR-phase-04-statsforecast-lab.md`
 
@@ -363,7 +363,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 
 1. ML pipeline patterns (features, training, prediction)
 2. SKILLs: `nixtla-mlforecast-trainer` (LightGBM, XGBoost patterns)
-3. Scripts: `scripts/feature_engineering.py`, `scripts/ml_pipeline.py`
+3. Scripts: `004-scripts/feature_engineering.py`, `004-scripts/ml_pipeline.py`
 4. AAR: `087-AA-AACR-phase-05-mlforecast-lab.md`
 
 ### Phase 6: Wire NeuralForecast Lab
@@ -371,7 +371,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 1. Deep learning training (NHITS, NBEATS, TFT)
 2. Explainability layer (Integrated Gradients, SHAP, additivity checks)
 3. SKILLs: `nixtla-neuralforecast-trainer`, `nixtla-explainer`
-4. Scripts: `scripts/train_nhits.py`, `scripts/compute_ig.py`, `scripts/shap_plots.py`
+4. Scripts: `004-scripts/train_nhits.py`, `004-scripts/compute_ig.py`, `004-scripts/shap_plots.py`
 5. Reports: `reports/explainability_report.html`
 6. AAR: `088-AA-AACR-phase-06-neuralforecast-lab.md`
 
@@ -379,13 +379,13 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 
 1. Hierarchical reconciliation workflows
 2. SKILLs: `nixtla-hierarchical-reconciler`
-3. Scripts: `scripts/reconcile_forecast.py`, `scripts/coherence_metrics.py`
+3. Scripts: `004-scripts/reconcile_forecast.py`, `004-scripts/coherence_metrics.py`
 4. AAR: `089-AA-AACR-phase-07-hierarchicalforecast-lab.md`
 
 ### Phase 8: CI Integration & Validation
 
 1. Add workspace smoke tests to `.github/workflows/`
-2. Extend `scripts/validate_skills.py` to cover workspace SKILLs
+2. Extend `004-scripts/validate_skills.py` to cover workspace SKILLs
 3. Enforce standards: `{baseDir}` paths, third-person descriptions, imperative voice
 4. Dashboard/report showing all labs + health status
 5. AAR: `090-AA-AACR-phase-08-ci-integration.md`
@@ -395,7 +395,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 ### What Went Well
 
 1. **Consistent structure across all labs** - No special-casing, same DX for all 5 domains
-2. **Clear promotion path** - Explicit boundary between experimental (workspaces) and production (plugins/skills-pack)
+2. **Clear promotion path** - Explicit boundary between experimental (workspaces) and production (005-plugins/skills-pack)
 3. **Documentation-first approach** - READMEs written before any code, reducing future confusion
 4. **Standards doc co-located** - `.directory-standards.md` at workspace root for easy reference
 
@@ -411,7 +411,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 |------|------------|
 | Labs drift from standards over time | CI validation in Phase 8 (enforce standards) |
 | Unclear when to promote from workspace to production | Document promotion criteria in `.directory-standards.md` |
-| Duplicate code across workspaces and plugins/skills-pack | Promotion flow deletes workspace code after move |
+| Duplicate code across workspaces and 005-plugins/skills-pack | Promotion flow deletes workspace code after move |
 | Large data files committed to git | .gitignore templates in each workspace |
 
 ## Metrics
@@ -427,7 +427,7 @@ Phase 2 was **scaffolding only** - no implementation of workflows. Future phases
 
 ## Conclusion
 
-Phase 2 successfully established the global `workspaces/` layer with 5 domain-specific Nixtla labs following a canonical 5-directory structure. This provides dedicated sandboxes for experimentation, validation, and development with clear promotion paths to production artifacts (plugins/ or skills-pack/). The consistent structure across all labs enables automation, reduces onboarding friction, and provides a coherent mental model for CEO, DevOps, and Engineers. Future phases (3-8) will populate these labs with actual workflows, scripts, skills, and CI integration.
+Phase 2 successfully established the global `002-workspaces/` layer with 5 domain-specific Nixtla labs following a canonical 5-directory structure. This provides dedicated sandboxes for experimentation, validation, and development with clear promotion paths to production artifacts (005-plugins/ or 003-skills/). The consistent structure across all labs enables automation, reduces onboarding friction, and provides a coherent mental model for CEO, DevOps, and Engineers. Future phases (3-8) will populate these labs with actual workflows, scripts, skills, and CI integration.
 
 ---
 

@@ -31,7 +31,7 @@ Use this guide when:
 Before making changes, understand what exists:
 
 1. Review the current README.md structure
-2. List all existing plugins in the `plugins/` directory
+2. List all existing plugins in the `005-plugins/` directory
 3. List all existing documentation in `000-docs/`
 4. Identify which plugins have working code vs just specs
 5. Note any historical docs (AARs, research) that should be archived
@@ -45,14 +45,14 @@ Ensure these directories exist:
 ```
 000-docs/
 ├── global/
-├── plugins/
+├── 005-plugins/
 └── archive/
 ```
 
 If restructuring, move existing docs appropriately:
 
 - Repo-wide docs (executive summary, engagement options) → `000-docs/global/`
-- Per-plugin docs → `000-docs/plugins/[slug]/`
+- Per-plugin docs → `000-docs/005-plugins/[slug]/`
 - Historical docs (AARs, old research, decision logs) → `000-docs/archive/`
 
 ### Step 3: Place the Reference Document
@@ -85,7 +85,7 @@ Create these files in `000-docs/global/`:
 
 For each plugin that's Specified, In Progress, or Working:
 
-1. Create `000-docs/plugins/[plugin-slug]/`
+1. Create `000-docs/005-plugins/[plugin-slug]/`
 2. Create all 6 required documents:
    - 01-BUSINESS-CASE.md
    - 02-PRD.md
@@ -176,7 +176,7 @@ When asked to add a new plugin to an enterprise showcase repo:
 
 ### If it should be fully specified:
 
-1. Create `000-docs/plugins/[slug]/` directory
+1. Create `000-docs/005-plugins/[slug]/` directory
 2. Write all 6 docs following the templates in the reference standard:
    - 01-BUSINESS-CASE.md - Focus on ROI and recommendation
    - 02-PRD.md - Define requirements and success metrics
@@ -184,10 +184,10 @@ When asked to add a new plugin to an enterprise showcase repo:
    - 04-USER-JOURNEY.md - Walk through the user experience
    - 05-TECHNICAL-SPEC.md - Detail implementation
    - 06-STATUS.md - Mark as "Not Started" initially
-3. Create `plugins/[slug]/` directory with basic structure:
+3. Create `005-plugins/[slug]/` directory with basic structure:
    - `.claude-plugin/plugin.json`
    - `README.md` (quick start)
-   - Empty `commands/`, `skills/`, `scripts/`, `tests/` folders
+   - Empty `commands/`, `skills/`, `004-scripts/`, `tests/` folders
 4. Add to Specified Plugins table in README with all doc links
 5. Update summary counts
 
@@ -270,7 +270,7 @@ Keep this current. It's the first place people look to understand where things s
 
 **Don't forget the Ideas section.** This is where future possibilities live. An empty Ideas table suggests a lack of vision.
 
-**Don't use relative paths incorrectly.** Doc links from README.md use paths like `000-docs/plugins/slug/01-BUSINESS-CASE.md`. Test every link.
+**Don't use relative paths incorrectly.** Doc links from README.md use paths like `000-docs/005-plugins/slug/01-BUSINESS-CASE.md`. Test every link.
 
 **Don't let status docs go stale.** If 06-STATUS.md says "In Progress" but nothing's happened in weeks, update it to reflect reality.
 

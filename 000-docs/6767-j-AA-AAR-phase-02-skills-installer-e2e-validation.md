@@ -25,7 +25,7 @@
 
 ### Installer Package Discovery
 
-**Location**: `packages/nixtla-claude-skills-installer/`
+**Location**: `006-packages/nixtla-claude-skills-installer/`
 
 **Package Details** (from `pyproject.toml`):
 - **Name**: `nixtla-claude-skills-installer`
@@ -42,7 +42,7 @@
 
 ### Skills Source Location
 
-**Skills Directory**: `skills-pack/.claude/skills/`
+**Skills Directory**: `003-skills/.claude/skills/`
 
 **Skills Count**: 8 Nixtla skills present:
 1. `nixtla-timegpt-lab` (Mode skill)
@@ -58,18 +58,18 @@
 - `SKILL.md` - Core skill prompt (required)
 - `assets/` - Templates, configs
 - `references/` - Long-form documentation
-- `scripts/` - Executable code
+- `004-scripts/` - Executable code
 
 ### How Installer Works
 
 **Installation Flow**:
-1. **Locate Source**: `locate_skills_source()` walks up directory tree to find `skills-pack/.claude/skills`
+1. **Locate Source**: `locate_skills_source()` walks up directory tree to find `003-skills/.claude/skills`
 2. **Ensure Target**: `ensure_skills_directory()` creates `.claude/skills/` in project
 3. **Copy Skills**: `copy_skills_to_project()` copies all `nixtla-*` directories from source to target
 4. **Verify**: Lists installed skills with paths
 
 **Development Mode**:
-- Installer assumes editable install (`pip install -e packages/nixtla-claude-skills-installer`)
+- Installer assumes editable install (`pip install -e 006-packages/nixtla-claude-skills-installer`)
 - Finds skills by walking up from package location to repo root
 
 **Expected Success Criteria** (for a fresh project):
@@ -104,7 +104,7 @@
 - **Temp Directory**: Uses `tempfile.TemporaryDirectory` for isolation
 - **Force Flag**: Uses `--force` to avoid interactive prompts
 - **Subprocess**: Runs installer via `subprocess.run()` to test CLI
-- **Editable Install**: Test assumes installer is installed as `pip install -e packages/nixtla-claude-skills-installer` before running
+- **Editable Install**: Test assumes installer is installed as `pip install -e 006-packages/nixtla-claude-skills-installer` before running
 - **Fast**: Test completes in < 5 seconds
 
 ### What Test Does NOT Cover
@@ -328,7 +328,7 @@ Installer successfully installed 8 Nixtla skills.
 **Prerequisites**:
 ```bash
 # From repo root
-pip install -e packages/nixtla-claude-skills-installer
+pip install -e 006-packages/nixtla-claude-skills-installer
 ```
 
 **Run Test**:
@@ -372,7 +372,7 @@ Nixtla Skills Installer E2E Test
 **If Test Fails**:
 - Check that installer package is installed: `pip show nixtla-claude-skills-installer`
 - Ensure you're running from repo root
-- Check that `skills-pack/.claude/skills/` has 8 nixtla-* directories
+- Check that `003-skills/.claude/skills/` has 8 nixtla-* directories
 - See `tests/README.md` for troubleshooting
 
 ### CI Workflow Details
@@ -498,10 +498,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 1. `tests/README.md` (added installer E2E section)
 
 ### Files Inspected (Not Modified)
-- `packages/nixtla-claude-skills-installer/pyproject.toml`
-- `packages/nixtla-claude-skills-installer/nixtla_skills_installer/cli.py`
-- `packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py`
-- `skills-pack/.claude/skills/` (8 skill directories)
+- `006-packages/nixtla-claude-skills-installer/pyproject.toml`
+- `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/cli.py`
+- `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py`
+- `003-skills/.claude/skills/` (8 skill directories)
 
 ---
 

@@ -10,7 +10,7 @@ collaborators:
 related_docs:
   - 6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md
   - 6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md
-  - plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/README.md
 last_updated: 2025-11-24
 ---
 
@@ -29,7 +29,7 @@ Phase 1 established the foundational repository structure and plugin skeleton fo
 
 **Primary Goals**:
 - Create clean, predictable repository structure
-- Place plugin in dedicated `plugins/` directory following repository conventions
+- Place plugin in dedicated `005-plugins/` directory following repository conventions
 - Establish plugin skeleton with all required component directories
 - Create initial README documenting plugin purpose and scope
 - Align 6767 canonical documentation with actual file paths
@@ -47,10 +47,10 @@ Phase 1 established the foundational repository structure and plugin skeleton fo
 
 ### 2.1 Plugin Directory Structure
 
-Created complete plugin skeleton at `plugins/nixtla-baseline-lab/`:
+Created complete plugin skeleton at `005-plugins/nixtla-baseline-lab/`:
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── .claude-plugin/           # Plugin manifest directory (empty - Phase 2)
 ├── commands/                 # Slash commands (empty - Phase 2)
 ├── agents/                   # Subagents (empty - Phase 2)
@@ -68,7 +68,7 @@ All directories created but left empty as placeholders - actual implementation d
 
 ### 2.2 Plugin README
 
-Created `plugins/nixtla-baseline-lab/README.md` with:
+Created `005-plugins/nixtla-baseline-lab/README.md` with:
 
 - **Clear identity**: What this plugin is (baseline forecasting on M4 datasets)
 - **Audience**: Internal PoC for Nixtla + Intent Solutions collaboration
@@ -87,8 +87,8 @@ Updated canonical 6767 documentation to reflect actual plugin location:
 - `000-docs/6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md`
 
 **Changes**:
-- Added explicit statement that plugin lives at `plugins/nixtla-baseline-lab/`
-- Updated all directory tree examples to show `plugins/` prefix
+- Added explicit statement that plugin lives at `005-plugins/nixtla-baseline-lab/`
+- Updated all directory tree examples to show `005-plugins/` prefix
 - Maintained all doc_id values, titles, and overall narrative structure
 - No changes to technical content or design decisions
 
@@ -109,18 +109,18 @@ Created this AAR document:
 
 ### Created Files
 
-- `plugins/nixtla-baseline-lab/README.md` - Plugin overview and documentation
+- `005-plugins/nixtla-baseline-lab/README.md` - Plugin overview and documentation
 - `000-docs/6767-AA-REPT-nixtla-baseline-lab-phase-01-structure.md` - This AAR
 
 ### Created Directories
 
-- `plugins/nixtla-baseline-lab/.claude-plugin/`
-- `plugins/nixtla-baseline-lab/commands/`
-- `plugins/nixtla-baseline-lab/agents/`
-- `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/references/`
-- `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/scripts/`
-- `plugins/nixtla-baseline-lab/scripts/`
-- `plugins/nixtla-baseline-lab/tests/golden_tasks/`
+- `005-plugins/nixtla-baseline-lab/.claude-plugin/`
+- `005-plugins/nixtla-baseline-lab/commands/`
+- `005-plugins/nixtla-baseline-lab/agents/`
+- `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/references/`
+- `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/scripts/`
+- `005-plugins/nixtla-baseline-lab/scripts/`
+- `005-plugins/nixtla-baseline-lab/tests/golden_tasks/`
 
 ### Modified Files
 
@@ -131,7 +131,7 @@ Created this AAR document:
 
 Confirmed existence of required top-level directories:
 - `000-docs/` - Canonical documentation (existed, no changes needed)
-- `plugins/` - Plugin directory (existed, no changes needed)
+- `005-plugins/` - Plugin directory (existed, no changes needed)
 
 **No new top-level directories created** - adhered to repository conventions.
 
@@ -144,7 +144,7 @@ Confirmed existence of required top-level directories:
 **Question**: Where should M4 dataset files be stored when downloaded?
 
 **Options**:
-1. `plugins/nixtla-baseline-lab/data/` (local to plugin)
+1. `005-plugins/nixtla-baseline-lab/data/` (local to plugin)
 2. Repository-level `data/` directory (shared across plugins)
 3. User's system cache (e.g., `~/.cache/nixtla/`)
 
@@ -162,7 +162,7 @@ Confirmed existence of required top-level directories:
 
 **Question**: Should plugin include virtual environment setup or rely on user's environment?
 
-**Current Approach**: Document required packages in `scripts/requirements.txt` (Phase 2), assume user manages their own Python environment
+**Current Approach**: Document required packages in `004-scripts/requirements.txt` (Phase 2), assume user manages their own Python environment
 
 **Alternative**: Could provide setup script or devcontainer configuration
 
@@ -170,7 +170,7 @@ Confirmed existence of required top-level directories:
 
 ### 4.4 MCP Server Executable Permissions
 
-**Note**: When creating `scripts/nixtla_baseline_mcp.py` in Phase 2, remember to:
+**Note**: When creating `004-scripts/nixtla_baseline_mcp.py` in Phase 2, remember to:
 - Add shebang: `#!/usr/bin/env python3`
 - Make executable: `chmod +x scripts/nixtla_baseline_mcp.py`
 - Test server starts correctly before integrating into plugin
@@ -181,7 +181,7 @@ Confirmed existence of required top-level directories:
 
 ### Phase 1 Deliverables ✅
 
-- [x] `plugins/nixtla-baseline-lab/` exists with complete skeleton structure
+- [x] `005-plugins/nixtla-baseline-lab/` exists with complete skeleton structure
 - [x] README created with clear purpose, scope, and documentation links
 - [x] 6767 architecture doc updated with correct plugin paths
 - [x] 6767 planning doc updated with correct plugin paths
@@ -202,7 +202,7 @@ Confirmed existence of required top-level directories:
 Phase 2 can begin immediately. The skeleton provides clear locations for:
 - `.claude-plugin/plugin.json` - Plugin manifest
 - `.mcp.json` - MCP server configuration
-- `scripts/nixtla_baseline_mcp.py` - MCP server implementation
+- `004-scripts/nixtla_baseline_mcp.py` - MCP server implementation
 - Supporting configuration files
 
 All paths are documented in 6767 architecture spec with complete code examples ready to adapt.
@@ -223,7 +223,7 @@ All paths are documented in 6767 architecture spec with complete code examples r
 1. **Clear Documentation First**: Having 6767 docs created before implementation provided excellent blueprint
 2. **Minimal Scope**: Phase 1 stayed focused on structure only, no feature creep
 3. **Path Consistency**: Single source of truth for plugin location prevents confusion
-4. **Repository Conventions**: Following existing `plugins/` pattern maintains consistency
+4. **Repository Conventions**: Following existing `005-plugins/` pattern maintains consistency
 
 ### What to Improve
 
@@ -245,7 +245,7 @@ All paths are documented in 6767 architecture spec with complete code examples r
 ```
 Phase 1: scaffold nixtla-baseline-lab plugin structure
 
-Created initial plugin folder under plugins/ with complete skeleton:
+Created initial plugin folder under 005-plugins/ with complete skeleton:
 - All component directories (commands, agents, skills, scripts, tests)
 - README with purpose, scope, and documentation links
 - Aligned 6767 architecture/plan docs to new plugin path
@@ -264,7 +264,7 @@ Related: 6767-PP-PLAN, 6767-OD-ARCH
 **Phase 2 Focus**:
 - Create `plugin.json` manifest with metadata and component paths
 - Create `.mcp.json` with MCP server configuration
-- Implement `scripts/nixtla_baseline_mcp.py` with stub logic
+- Implement `004-scripts/nixtla_baseline_mcp.py` with stub logic
 - Create `/nixtla-baseline-m4` command definition
 - Test plugin loads and MCP server starts
 

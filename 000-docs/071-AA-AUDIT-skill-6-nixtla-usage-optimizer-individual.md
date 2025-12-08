@@ -407,7 +407,7 @@ Current size: 587 lines (17.4% over recommendation)
 
 **Commands**:
 ```bash
-cd /home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/nixtla-usage-optimizer
+cd /home/jeremy/000-projects/nixtla/003-skills/.claude/skills/nixtla-usage-optimizer
 # Backup first
 cp SKILL.md SKILL.md.backup
 # Apply fix (use Edit tool)
@@ -428,7 +428,7 @@ head -10 SKILL.md | grep "^[a-z-]*:" | wc -l
 
 **Commands**:
 ```bash
-cd /home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/nixtla-usage-optimizer
+cd /home/jeremy/000-projects/nixtla/003-skills/.claude/skills/nixtla-usage-optimizer
 mkdir -p resources/TEMPLATES
 
 # Split content:

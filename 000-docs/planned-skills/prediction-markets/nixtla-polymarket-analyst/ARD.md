@@ -168,7 +168,7 @@ version: "1.0.1"
 - Polymarket API documentation (→ `references/POLYMARKET_API.md`)
 - TimeGPT API documentation (→ `references/TIMEGPT_GUIDE.md`)
 - Extended examples (→ `references/EXAMPLES.md`)
-- Python script source code (→ `scripts/*.py`)
+- Python script source code (→ `004-scripts/*.py`)
 - Report templates (→ `assets/report_template.md`)
 
 ### 2.3 Level 3: Resources (Extended Context)
@@ -388,7 +388,7 @@ python /home/user/.claude/skills/nixtla-polymarket-analyst/scripts/fetch_polymar
     - `volume`: Trading volume (USD)
     - `liquidity`: Orderbook depth (USD)
 
-**Example Request** (from `scripts/fetch_polymarket.py`):
+**Example Request** (from `004-scripts/fetch_polymarket.py`):
 ```python
 import requests
 
@@ -472,7 +472,7 @@ data = response.json()
 - **Response Format**: JSON with forecast + 80%/95% confidence intervals
 - **Cost**: ~$0.05 per forecast (varies by series length)
 
-**Example Request** (from `scripts/forecast_timegpt.py`):
+**Example Request** (from `004-scripts/forecast_timegpt.py`):
 ```python
 import os
 import requests
@@ -565,7 +565,7 @@ forecast = sf.predict(h=14, level=[80, 95])
 - **Response Format**: JSON with current market odds
 - **Graceful Degradation**: If API key not provided or API fails, **skip Step 4** entirely (arbitrage analysis is optional)
 
-**Example Request** (from `scripts/analyze_arbitrage.py`):
+**Example Request** (from `004-scripts/analyze_arbitrage.py`):
 ```python
 import os
 import requests

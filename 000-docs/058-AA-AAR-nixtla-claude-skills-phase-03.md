@@ -36,7 +36,7 @@ Successfully completed **Phase 3** of the Nixtla Claude Skills initiative, imple
 Create per-project install/update protocol where users install skills into `.claude/skills/nixtla-*` as local files that persist until explicitly updated.
 
 ### Specific Goals
-1. Create Python installer package under `packages/nixtla-claude-skills-installer/`
+1. Create Python installer package under `006-packages/nixtla-claude-skills-installer/`
 2. Implement `nixtla-skills init` command for first-time installation
 3. Implement `nixtla-skills update` command for refreshing existing skills
 4. Create bootstrap skill providing conversational interface to CLI
@@ -46,7 +46,7 @@ Create per-project install/update protocol where users install skills into `.cla
 
 ### Success Criteria
 - [x] Python package with console script entry point (`nixtla-skills` command)
-- [x] CLI can locate skills source from `skills-pack/.claude/skills/`
+- [x] CLI can locate skills source from `003-skills/.claude/skills/`
 - [x] Skills copied to `.claude/skills/nixtla-*` in current working directory
 - [x] Preview shows new vs existing skills before installation
 - [x] Confirmation prompt before overwriting existing skills
@@ -80,7 +80,7 @@ Create per-project install/update protocol where users install skills into `.cla
 
 ### 1. Python Installer Package Structure
 
-**Directory**: `packages/nixtla-claude-skills-installer/`
+**Directory**: `006-packages/nixtla-claude-skills-installer/`
 
 Created new Python package with setuptools configuration:
 
@@ -93,7 +93,7 @@ Created new Python package with setuptools configuration:
 
 **Key Design Decisions**:
 - **Console script entry point**: `nixtla-skills = "nixtla_skills_installer.cli:main"`
-- **Development mode**: Locates skills from `skills-pack/.claude/skills/` by walking up from `__file__`
+- **Development mode**: Locates skills from `003-skills/.claude/skills/` by walking up from `__file__`
 - **Future PyPI mode**: TODO comments indicate use of `importlib.resources` for bundled package data
 - **Per-project installation**: Installs to `.claude/skills/` in current working directory (not global `~/.claude/skills/`)
 
@@ -102,7 +102,7 @@ Created new Python package with setuptools configuration:
 **Key Functions Implemented**:
 
 1. **`locate_skills_source() -> Path`**
-   - Walks up from `__file__` to find `skills-pack/.claude/skills/`
+   - Walks up from `__file__` to find `003-skills/.claude/skills/`
    - Development mode: Requires nixtla repo cloned locally
    - Future: Use `importlib.resources` for bundled skills (PyPI distribution)
    - Raises `FileNotFoundError` with helpful message if source not found
@@ -185,7 +185,7 @@ Same workflow as `init`, but:
 
 **Lines**: 243
 
-### 4. Installer README (`packages/nixtla-claude-skills-installer/README.md`)
+### 4. Installer README (`006-packages/nixtla-claude-skills-installer/README.md`)
 
 **Content Sections**:
 1. **Overview**: Per-project installation utility
@@ -207,7 +207,7 @@ Same workflow as `init`, but:
 
 ### 5. Bootstrap Skill (`nixtla-skills-bootstrap`)
 
-**File**: `skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md`
 
 **YAML Frontmatter**:
 ```yaml
@@ -452,7 +452,7 @@ audience: "INT,OSS,PAY"
 ### Challenges Encountered
 
 1. **Skills Source Location**
-   - **Challenge**: In development mode, need to find `skills-pack/.claude/skills/` from installed package
+   - **Challenge**: In development mode, need to find `003-skills/.claude/skills/` from installed package
    - **Solution**: Walk up from `__file__` until we find `skills-pack` directory
    - **Future**: Use `importlib.resources` for PyPI bundling
 
@@ -512,7 +512,7 @@ audience: "INT,OSS,PAY"
 
 1. **Test Installation End-to-End**
    - Clone nixtla repo to fresh directory
-   - Run `pip install -e packages/nixtla-claude-skills-installer`
+   - Run `pip install -e 006-packages/nixtla-claude-skills-installer`
    - Test `nixtla-skills init` in a test project
    - Verify skills appear in Claude Code
 
@@ -602,8 +602,8 @@ audience: "INT,OSS,PAY"
 
 ### Architecture & Implementation
 - [038-AT-ARCH-nixtla-claude-skills-pack.md](../038-AT-ARCH-nixtla-claude-skills-pack.md) - Skills pack architecture (updated with Phase 3)
-- [packages/nixtla-claude-skills-installer/README.md](../../packages/nixtla-claude-skills-installer/README.md) - Installer CLI documentation
-- [skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md](../../skills-pack/.claude/skills/nixtla-skills-bootstrap/SKILL.md) - Bootstrap skill implementation
+- [006-packages/nixtla-claude-skills-installer/README.md](../../006-packages/nixtla-claude-skills-installer/README.md) - Installer CLI documentation
+- [003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md](../../003-skills/.claude/skills/nixtla-skills-bootstrap/SKILL.md) - Bootstrap skill implementation
 
 ### Strategy & Planning
 - [6767-OD-STRAT-nixtla-claude-skills-strategy.md](../6767-OD-STRAT-nixtla-claude-skills-strategy.md) - Full skills strategy
@@ -644,11 +644,11 @@ Key Features:
 - Bootstrap skill: Conversational interface to installer CLI
 
 Deliverables:
-- packages/nixtla-claude-skills-installer/ (Python package, 533 lines)
+- 006-packages/nixtla-claude-skills-installer/ (Python package, 533 lines)
   - core.py: Skills location, copying, preview logic
   - cli.py: Init/update commands with argparse
   - README.md: User documentation
-- skills-pack/.claude/skills/nixtla-skills-bootstrap/ (405 lines)
+- 003-skills/.claude/skills/nixtla-skills-bootstrap/ (405 lines)
   - Conversational interface to CLI
   - Error handling and troubleshooting
 - Updated architecture docs with Phase 3 details

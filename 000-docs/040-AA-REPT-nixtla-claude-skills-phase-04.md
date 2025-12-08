@@ -86,7 +86,7 @@ Complete the advanced skills that handle fine-tuning, production pipelines, and 
 
 ### 1. Advanced Skill: nixtla-timegpt-finetune-lab (945 lines)
 
-**Location**: `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md`
 
 **Purpose**: Guide users through full TimeGPT fine-tuning workflow - from dataset preparation through job submission, monitoring, and comparison experiments.
 
@@ -154,7 +154,7 @@ fine_tune:
 
 ### 2. Advanced Skill: nixtla-prod-pipeline-generator (1,149 lines)
 
-**Location**: `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md`
 
 **Purpose**: Transform validated experiments into production-ready forecasting pipelines with orchestration, monitoring, and fallback mechanisms.
 
@@ -258,7 +258,7 @@ def detect_drift(df, window_days=30):
 
 ### 3. Advanced Skill: nixtla-usage-optimizer (586 lines)
 
-**Location**: `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md`
+**Location**: `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md`
 
 **Purpose**: Audit Nixtla library usage across projects, identify cost optimization opportunities, recommend routing strategies for TimeGPT vs baselines.
 
@@ -716,9 +716,9 @@ def generate_series(unique_id, base_level, trend_slope, seasonality_amplitude, n
 ### Files Created (Phase 4)
 
 **Skills** (3 files, 2,680 lines):
-1. `skills-pack/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md` (945 lines)
-2. `skills-pack/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md` (1,149 lines)
-3. `skills-pack/.claude/skills/nixtla-usage-optimizer/SKILL.md` (586 lines)
+1. `003-skills/.claude/skills/nixtla-timegpt-finetune-lab/SKILL.md` (945 lines)
+2. `003-skills/.claude/skills/nixtla-prod-pipeline-generator/SKILL.md` (1,149 lines)
+3. `003-skills/.claude/skills/nixtla-usage-optimizer/SKILL.md` (586 lines)
 
 **Demo Project** (5 files):
 4. `demo-project/data/sample_series.csv` (1,095 rows)

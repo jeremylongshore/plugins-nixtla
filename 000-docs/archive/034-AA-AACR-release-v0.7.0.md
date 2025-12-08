@@ -38,7 +38,7 @@ This release captures Phases 3-7 of the Nixtla Baseline Lab plugin development, 
 | File | Old Version | New Version |
 |------|-------------|-------------|
 | `.claude-plugin/marketplace.json` | 0.6.0 | 0.7.0 |
-| `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | 0.1.0 | 0.7.0 |
+| `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | 0.1.0 | 0.7.0 |
 | `README.md` | (already 0.7.0) | 0.7.0 |
 
 ### CHANGELOG.md

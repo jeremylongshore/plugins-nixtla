@@ -396,7 +396,7 @@ Based on Decision Matrix scores:
    - **Effort:** 1-2 hours
 
 3. **Mark Comprehensive Specs as Reference**
-   - Add banner to 051-059 docs: "Note: Content is being migrated to per-plugin 6-doc format. See `000-docs/plugins/[slug]/` for structured docs."
+   - Add banner to 051-059 docs: "Note: Content is being migrated to per-plugin 6-doc format. See `000-docs/005-plugins/[slug]/` for structured docs."
    - **Effort:** 15 minutes
 
 4. **Verify All Links Work**

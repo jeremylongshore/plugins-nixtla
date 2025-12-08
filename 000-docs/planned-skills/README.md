@@ -9,7 +9,7 @@
 
 ```bash
 # Install the skills CLI
-pip install -e packages/nixtla-claude-skills-installer
+pip install -e 006-packages/nixtla-claude-skills-installer
 
 # Install skills into your project
 cd /path/to/your/project
@@ -25,14 +25,14 @@ nixtla-skills update
 
 | Category | Count | Status |
 |----------|-------|--------|
-| **Live Skills** | 8 | Production-ready in `skills-pack/` |
+| **Live Skills** | 8 | Production-ready in `003-skills/` |
 | **Planned Skills** | 8 | Specs only in `000-docs/planned-skills/` |
 
 ---
 
 ## 8 Live Skills (Production Ready)
 
-These skills are implemented and ready to use. Located in `skills-pack/.claude/skills/`.
+These skills are implemented and ready to use. Located in `003-skills/.claude/skills/`.
 
 ### Core Forecasting
 
@@ -65,7 +65,7 @@ These skills are implemented and ready to use. Located in `skills-pack/.claude/s
 ### Source Files
 
 ```
-skills-pack/.claude/skills/
+003-skills/.claude/skills/
 ├── nixtla-timegpt-lab/SKILL.md
 ├── nixtla-experiment-architect/SKILL.md
 ├── nixtla-timegpt-finetune-lab/SKILL.md
@@ -152,7 +152,7 @@ These skills have comprehensive PRD + ARD documentation but no implementation ye
 
 ### To Work on a LIVE Skill
 
-1. Navigate to `skills-pack/.claude/skills/nixtla-{skill-name}/`
+1. Navigate to `003-skills/.claude/skills/nixtla-{skill-name}/`
 2. Edit `SKILL.md` (the skill definition)
 3. Test by running `nixtla-skills init` in a test project
 4. Run smoke tests: `python tests/test_skills_installer_e2e.py`
@@ -162,10 +162,10 @@ These skills have comprehensive PRD + ARD documentation but no implementation ye
 1. Read the PRD: `000-docs/planned-skills/prediction-markets/nixtla-{skill}/PRD.md`
 2. Read the ARD: `000-docs/planned-skills/prediction-markets/nixtla-{skill}/ARD.md`
 3. Copy the SKILL.md frontmatter from PRD Section "SKILL.md Frontmatter Example"
-4. Create: `skills-pack/.claude/skills/nixtla-{skill}/SKILL.md`
-5. Implement scripts in `skills-pack/.claude/skills/nixtla-{skill}/scripts/`
-6. Add references in `skills-pack/.claude/skills/nixtla-{skill}/references/`
-7. Update `skills-pack/README.md` to include the new skill
+4. Create: `003-skills/.claude/skills/nixtla-{skill}/SKILL.md`
+5. Implement scripts in `003-skills/.claude/skills/nixtla-{skill}/scripts/`
+6. Add references in `003-skills/.claude/skills/nixtla-{skill}/references/`
+7. Update `003-skills/README.md` to include the new skill
 
 ### To Create a NEW Planned Skill
 
@@ -190,8 +190,8 @@ These skills have comprehensive PRD + ARD documentation but no implementation ye
 
 ## Quick Links
 
-- **Live Skills**: `skills-pack/.claude/skills/`
-- **Skills Installer**: `packages/nixtla-claude-skills-installer/`
+- **Live Skills**: `003-skills/.claude/skills/`
+- **Skills Installer**: `006-packages/nixtla-claude-skills-installer/`
 - **Smoke Tests**: `tests/test_skills_installer_e2e.py`
 - **CI Workflow**: `.github/workflows/skills-installer-ci.yml`
 

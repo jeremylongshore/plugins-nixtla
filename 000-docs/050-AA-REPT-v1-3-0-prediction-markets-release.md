@@ -35,7 +35,7 @@ Released **v1.3.0 - Prediction Markets Vertical Launch**, establishing Nixtla Ti
 
 ### Repository Organization
 - Moved AAR files to 000-docs/ root (Doc-Filing v3.0 compliance)
-- Renamed `000-docs/plugins/` → `000-docs/planned-plugins/`
+- Renamed `000-docs/005-plugins/` → `000-docs/planned-005-plugins/`
 - Created `000-docs/planned-skills/prediction-markets/` vertical
 - Organized planned-plugins by category (internal-efficiency, business-growth, vertical-defi)
 

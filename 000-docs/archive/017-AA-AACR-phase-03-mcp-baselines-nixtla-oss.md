@@ -12,10 +12,10 @@ related_docs:
   - 016-AA-AACR-phase-02-manifest-and-mcp.md
   - 6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md
   - 6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
-  - plugins/nixtla-baseline-lab/agents/nixtla-baseline-analyst.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/agents/nixtla-baseline-analyst.md
 last_updated: 2025-11-24
 ---
 
@@ -53,7 +53,7 @@ Phase 3 implemented the core MCP server using real Nixtla open-source libraries 
 
 ## II. Changes Made
 
-### 2.1 Dependencies: `scripts/requirements.txt`
+### 2.1 Dependencies: `004-scripts/requirements.txt`
 
 Created Python requirements file with minimal, focused dependencies:
 
@@ -73,7 +73,7 @@ numpy>=1.24.0
 - Commented optional dependencies (matplotlib, jupyter) for future phases
 - Added header explaining purpose and usage
 
-### 2.2 MCP Server Implementation: `scripts/nixtla_baseline_mcp.py`
+### 2.2 MCP Server Implementation: `004-scripts/nixtla_baseline_mcp.py`
 
 Implemented complete MCP server with real Nixtla integration:
 
@@ -85,7 +85,7 @@ Implemented complete MCP server with real Nixtla integration:
 
 **Data Loading**:
 - Uses `datasetsforecast.m4.M4.load()` to fetch M4 Daily dataset
-- Stores data in `plugins/nixtla-baseline-lab/data/` directory
+- Stores data in `005-plugins/nixtla-baseline-lab/data/` directory
 - Samples first `series_limit` series to control runtime
 - Splits into train/test sets (last `horizon` points for testing)
 
@@ -204,24 +204,24 @@ Replaced stub with detailed strategic analysis framework:
 
 ### Created Files
 
-- `plugins/nixtla-baseline-lab/scripts/requirements.txt` - Python dependencies
-- `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` - MCP server (300+ lines)
+- `005-plugins/nixtla-baseline-lab/scripts/requirements.txt` - Python dependencies
+- `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` - MCP server (300+ lines)
 - `000-docs/017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md` - This AAR
 
 ### Modified Files
 
-- `plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md` - Replaced stub with real workflow
-- `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - Added step-by-step instructions
-- `plugins/nixtla-baseline-lab/agents/nixtla-baseline-analyst.md` - Added strategic analysis framework
+- `005-plugins/nixtla-baseline-lab/commands/nixtla-baseline-m4.md` - Replaced stub with real workflow
+- `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` - Added step-by-step instructions
+- `005-plugins/nixtla-baseline-lab/agents/nixtla-baseline-analyst.md` - Added strategic analysis framework
 
 ### File Permissions
 
-- Made `scripts/nixtla_baseline_mcp.py` executable: `chmod +x`
+- Made `004-scripts/nixtla_baseline_mcp.py` executable: `chmod +x`
 
 ### Directory Structure After Phase 3
 
 ```
-plugins/nixtla-baseline-lab/
+005-plugins/nixtla-baseline-lab/
 ├── .claude-plugin/
 │   └── plugin.json              ✅ Phase 2
 ├── commands/

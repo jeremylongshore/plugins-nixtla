@@ -524,7 +524,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: pip install -e plugins/nixtla-search-to-slack
+      - run: pip install -e 005-plugins/nixtla-search-to-slack
       - run: python -m nixtla_search_to_slack --topic nixtla-core
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}

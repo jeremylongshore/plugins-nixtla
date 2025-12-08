@@ -346,7 +346,7 @@ Skill is already compliant. Splitting would be premature optimization and could:
 
 **Commands**:
 ```bash
-cd /home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/nixtla-skills-bootstrap
+cd /home/jeremy/000-projects/nixtla/003-skills/.claude/skills/nixtla-skills-bootstrap
 # Backup first
 cp SKILL.md SKILL.md.backup
 # Apply fix (use Edit tool)

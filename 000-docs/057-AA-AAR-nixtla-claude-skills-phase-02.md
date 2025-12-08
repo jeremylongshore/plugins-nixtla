@@ -65,7 +65,7 @@ Implement 3 core Nixtla skills with production-ready SKILL.md files that provide
 
 ### 1. nixtla-timegpt-lab Implementation
 
-**File**: `skills-pack/.claude/skills/nixtla-timegpt-lab/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-timegpt-lab/SKILL.md`
 
 **Key Features**:
 - **Mode skill** (transforms Claude's behavior for entire session)
@@ -90,7 +90,7 @@ Implement 3 core Nixtla skills with production-ready SKILL.md files that provide
 
 ### 2. nixtla-experiment-architect Implementation
 
-**File**: `skills-pack/.claude/skills/nixtla-experiment-architect/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-experiment-architect/SKILL.md`
 
 **Key Features**:
 - **Gathers requirements** (data source, target, horizon, frequency)
@@ -121,7 +121,7 @@ Implement 3 core Nixtla skills with production-ready SKILL.md files that provide
 
 ### 3. nixtla-schema-mapper Implementation
 
-**File**: `skills-pack/.claude/skills/nixtla-schema-mapper/SKILL.md`
+**File**: `003-skills/.claude/skills/nixtla-schema-mapper/SKILL.md`
 
 **Key Features**:
 - **Samples and analyzes data** (first 100 rows)
@@ -282,7 +282,7 @@ Implement 3 core Nixtla skills with production-ready SKILL.md files that provide
 
 1. **Commit Phase 2 Work**:
    ```bash
-   git add skills-pack/.claude/skills/nixtla-*/SKILL.md 000-docs/057-AA-AAR-nixtla-claude-skills-phase-02.md
+   git add 003-skills/.claude/skills/nixtla-*/SKILL.md 000-docs/057-AA-AAR-nixtla-claude-skills-phase-02.md
    git commit -m "feat(nixtla-skills): implement 3 core skills (timegpt-lab, experiment-architect, schema-mapper)"
    git push origin main
    ```

@@ -99,12 +99,12 @@ This educational introduction should:
 ## 🔄 Documentation Updates
 
 ### Files Modified
-1. `/plugins/nixtla-search-to-slack/SETUP_GUIDE.md`
+1. `/005-plugins/nixtla-search-to-slack/SETUP_GUIDE.md`
    - Added 155 lines of educational content
    - Placed before technical instructions
    - Maintained existing setup steps
 
-2. `/plugins/nixtla-search-to-slack/README.md`
+2. `/005-plugins/nixtla-search-to-slack/README.md`
    - Updated to highlight educational section
    - Added emphasis on "no AI knowledge required"
    - Directed users to start with overview

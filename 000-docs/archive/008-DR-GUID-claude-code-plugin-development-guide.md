@@ -534,7 +534,7 @@ Create `hooks/config.json`:
 }
 ```
 
-Create executable script `scripts/post-tool.sh`:
+Create executable script `004-scripts/post-tool.sh`:
 
 ```bash
 #!/bin/bash
@@ -592,7 +592,7 @@ Edit `.claude-plugin/marketplace.json`:
   "plugins": [
     {
       "name": "my-awesome-plugin",
-      "source": "./plugins/my-awesome-plugin",
+      "source": "./005-plugins/my-awesome-plugin",
       "description": "Does awesome things",
       "version": "1.0.0",
       "category": "productivity",
@@ -621,7 +621,7 @@ For richer marketplace features, create `marketplace.extended.json`:
   "plugins": [
     {
       "name": "my-awesome-plugin",
-      "source": "./plugins/my-awesome-plugin",
+      "source": "./005-plugins/my-awesome-plugin",
       "description": "Does awesome things",
       "version": "1.0.0",
       "category": "productivity",

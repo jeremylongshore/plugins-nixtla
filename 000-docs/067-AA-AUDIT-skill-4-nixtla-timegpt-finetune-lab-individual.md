@@ -416,7 +416,7 @@ nixtla-timegpt-finetune-lab/
 
 **Commands**:
 ```bash
-cd /home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/nixtla-timegpt-finetune-lab
+cd /home/jeremy/000-projects/nixtla/003-skills/.claude/skills/nixtla-timegpt-finetune-lab
 # Backup first
 cp SKILL.md SKILL.md.backup
 # Apply fix (use Edit tool)
@@ -437,7 +437,7 @@ head -10 SKILL.md | grep "^[a-z-]*:" | wc -l
 
 **Commands**:
 ```bash
-cd /home/jeremy/000-projects/nixtla/skills-pack/.claude/skills/nixtla-timegpt-finetune-lab
+cd /home/jeremy/000-projects/nixtla/003-skills/.claude/skills/nixtla-timegpt-finetune-lab
 mkdir -p resources/TEMPLATES
 
 # Extract content to resource files

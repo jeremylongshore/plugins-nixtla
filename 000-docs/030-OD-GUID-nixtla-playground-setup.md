@@ -82,7 +82,7 @@ Once GitHub secrets are configured:
 
 ```bash
 # Commit and push the new plugin
-git add plugins/nixtla-bigquery-forecaster
+git add 005-plugins/nixtla-bigquery-forecaster
 git add .github/workflows/deploy-bigquery-forecaster.yml
 git commit -m "feat: add Nixtla BigQuery Forecaster plugin with GCP deployment"
 git push origin main
@@ -112,7 +112,7 @@ cd /home/jeremy/000-projects/nixtla
 source nixtla-playground-config.env
 
 # Test BigQuery connector
-cd plugins/nixtla-bigquery-forecaster
+cd 005-plugins/nixtla-bigquery-forecaster
 python src/bigquery_connector.py
 ```
 

@@ -220,7 +220,7 @@ skill-name/
 
 | Directory | Loaded Into Context? | Token Cost |
 |-----------|---------------------|------------|
-| `scripts/` | No (executed via Bash) | **None** |
+| `004-scripts/` | No (executed via Bash) | **None** |
 | `references/` | Yes (via Read tool) | **High** |
 | `assets/` | No (path reference only) | **None** |
 

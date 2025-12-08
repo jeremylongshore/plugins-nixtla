@@ -43,7 +43,7 @@ This phase focuses on **usability enhancements** and **flexibility** while maint
 
 ### 1. Forecast Visualization (PNG Plots)
 
-**Modified**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~150 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~150 lines)
 
 **Added Dependencies**: `matplotlib>=3.7.0` (optional)
 
@@ -102,7 +102,7 @@ def run_baselines(
 
 ### 2. Custom CSV Dataset Support
 
-**Modified**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~70 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~70 lines)
 
 **Tool Schema Update**:
 - Added `dataset_type` parameter (string, default "m4", enum: ["m4", "csv"])
@@ -145,7 +145,7 @@ series_2,2024-01-01,200
 - Summary shows "Dataset: Custom CSV" instead of "Dataset: M4 Daily"
 - Same models and metrics (SeasonalNaive, AutoETS, AutoTheta)
 
-**Created**: `plugins/nixtla-baseline-lab/tests/data/example_timeseries.csv`
+**Created**: `005-plugins/nixtla-baseline-lab/tests/data/example_timeseries.csv`
 - 3 series (series_1, series_2, series_3)
 - 21 days each
 - Synthetic trend data for testing
@@ -165,7 +165,7 @@ Result: ✅ GOLDEN TASK PASSED (AutoETS: 1.45% sMAPE, 0.111 MASE)
 
 ### 3. Golden Task Harness Parametrization
 
-**Modified**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (+~120 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (+~120 lines)
 
 **Added argparse Module**: CLI argument parsing
 
@@ -244,7 +244,7 @@ options:
 
 ### 4. README Documentation
 
-**Modified**: `plugins/nixtla-baseline-lab/README.md` (+~110 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/README.md` (+~110 lines)
 
 **New Section**: "Forecast Visualizations" (after "Proof It Works")
 - Explains `enable_plots=true` parameter
@@ -274,9 +274,9 @@ options:
 ### 5. Version Synchronization
 
 **Updated Files**:
-1. `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`: `"version": "0.5.0"`
+1. `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`: `"version": "0.5.0"`
 2. `.claude-plugin/marketplace.json`: `"version": "0.5.0"`
-3. `plugins/nixtla-baseline-lab/README.md`: `**Version**: 0.5.0 (Phase 7)`
+3. `005-plugins/nixtla-baseline-lab/README.md`: `**Version**: 0.5.0 (Phase 7)`
 
 **Consistency**: All 3 files now show Phase 7 version
 
@@ -285,32 +285,32 @@ options:
 ## Files Touched
 
 ### Modified (7 files):
-1. `plugins/nixtla-baseline-lab/scripts/requirements.txt`
+1. `005-plugins/nixtla-baseline-lab/scripts/requirements.txt`
    - Uncommented `matplotlib>=3.7.0`
-2. `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+2. `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
    - Added `enable_plots`, `dataset_type`, `csv_path` parameters
    - Implemented `_generate_forecast_plots()` method
    - Added CSV loading and validation logic
    - Dataset-specific output filenames
    - Test mode `--enable-plots` flag support
-3. `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
+3. `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py`
    - Added argparse for CLI arguments
    - Updated `run_mcp_test()` to build dynamic test script
    - Updated `validate_csv()` to accept series_limit
    - Updated `validate_summary()` for flexible dataset names
-4. `plugins/nixtla-baseline-lab/README.md`
+4. `005-plugins/nixtla-baseline-lab/README.md`
    - Added "Forecast Visualizations" section
    - Added "Bring Your Own Data (CSV)" section
    - Added "Golden Task Flexibility" subsection
    - Updated version to 0.5.0
-5. `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`
+5. `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`
    - Version: 0.4.0 → 0.5.0
 6. `.claude-plugin/marketplace.json`
    - Version: 0.4.0 → 0.5.0
-7. `plugins/nixtla-baseline-lab/tests/data/` (directory created)
+7. `005-plugins/nixtla-baseline-lab/tests/data/` (directory created)
 
 ### Created (2 files):
-1. `plugins/nixtla-baseline-lab/tests/data/example_timeseries.csv`
+1. `005-plugins/nixtla-baseline-lab/tests/data/example_timeseries.csv`
    - 3 series, 21 days each
    - Example for CSV dataset testing
 2. `000-docs/021-AA-AACR-phase-07-visualization-csv-parametrization.md`
@@ -389,7 +389,7 @@ except ImportError:
 
 **Test**: Run with `--enable-plots` flag
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 source .venv-nixtla-baseline/bin/activate
 pip install matplotlib
 python3 scripts/nixtla_baseline_mcp.py test --enable-plots
@@ -463,9 +463,9 @@ GOLDEN TASK PASSED
 
 **Test**: Grep for version strings
 ```bash
-grep -r "0.5.0" plugins/nixtla-baseline-lab/.claude-plugin/
+grep -r "0.5.0" 005-plugins/nixtla-baseline-lab/.claude-plugin/
 grep -r "0.5.0" .claude-plugin/
-grep "Version.*0.5.0" plugins/nixtla-baseline-lab/README.md
+grep "Version.*0.5.0" 005-plugins/nixtla-baseline-lab/README.md
 ```
 
 **Expected**: All 3 files show 0.5.0

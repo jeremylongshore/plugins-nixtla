@@ -60,7 +60,7 @@ nixtla/                                    Root repository folder
 │   ├── 052-058-AA-AAR-*.md                📖 AFTER-ACTION REPORTS (7 files)
 │   │   (Located at root of 000-docs, not in subfolder)
 │   │
-│   ├── plugins/                           🔌 PER-PLUGIN DOCS (60 files)
+│   ├── 005-plugins/                           🔌 PER-PLUGIN DOCS (60 files)
 │   │   │                                  Each plugin has 6 standardized docs:
 │   │   │                                  01-BUSINESS-CASE, 02-PRD, 03-ARCHITECTURE,
 │   │   │                                  04-USER-JOURNEY, 05-TECHNICAL-SPEC, 06-STATUS
@@ -85,7 +85,7 @@ nixtla/                                    Root repository folder
 │   │
 │   └── archive/                           🗄️  Historical/deprecated docs
 │
-├── plugins/                               🔌 PLUGIN SOURCE CODE (3 working)
+├── 005-plugins/                               🔌 PLUGIN SOURCE CODE (3 working)
 │   │
 │   ├── nixtla-baseline-lab/              ✅ v1.1.0 - PRODUCTION READY
 │   │   ├── .claude-plugin/               🤖 Plugin metadata
@@ -219,9 +219,9 @@ All numbered docs follow: `NNN-CC-ABCD-description.md`
 
 **Plugin Development**:
 1. `000-docs/009-017-AT-ARCH-plugin-*.md` (9 comprehensive specs)
-2. `plugins/nixtla-baseline-lab/` (Production reference implementation)
+2. `005-plugins/nixtla-baseline-lab/` (Production reference implementation)
 3. `000-docs/dev-planning-templates/` (ARD/PRD templates)
-4. `scripts/new-plugin.sh` (Create new plugin)
+4. `004-scripts/new-plugin.sh` (Create new plugin)
 
 ### For Documentation Contributors
 
@@ -260,11 +260,11 @@ find 000-docs/ -name "*.md" -type f | wc -l
 | `000-docs/` | All documentation | Everyone |
 | `000-docs/global/` | Executive materials | Decision makers |
 | `000-docs/052-058-*` | Implementation AARs | Project managers |
-| `000-docs/plugins/` | Per-plugin docs | Engineers, Max |
+| `000-docs/005-plugins/` | Per-plugin docs | Engineers, Max |
 | `000-docs/archive/` | Historical docs | Reference only |
-| `plugins/` | Working plugin code | Engineers |
+| `005-plugins/` | Working plugin code | Engineers |
 | `000-docs/dev-planning-templates/` | ARD/PRD templates | Plugin developers |
-| `scripts/` | Build/validate tools | DevOps, engineers |
+| `004-scripts/` | Build/validate tools | DevOps, engineers |
 | `.claude/` | Claude Code config | Claude Code users |
 
 ---

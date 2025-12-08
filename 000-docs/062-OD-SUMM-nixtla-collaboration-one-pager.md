@@ -171,7 +171,7 @@ git clone https://github.com/intent-solutions-io/plugins-nixtla.git
 cd plugins-nixtla
 
 # Setup baseline lab
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt

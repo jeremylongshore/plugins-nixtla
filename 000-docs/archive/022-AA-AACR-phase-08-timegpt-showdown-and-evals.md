@@ -43,7 +43,7 @@ This phase adds TimeGPT comparison as an **optional, non-breaking feature** for 
 
 ### 1. TimeGPT Client Module
 
-**Created**: `plugins/nixtla-baseline-lab/scripts/timegpt_client.py` (143 lines)
+**Created**: `005-plugins/nixtla-baseline-lab/scripts/timegpt_client.py` (143 lines)
 
 **Purpose**: Encapsulate TimeGPT API calls with clean error handling
 
@@ -72,7 +72,7 @@ class TimeGPTClient:
 
 ### 2. MCP Server Integration
 
-**Modified**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~200 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~200 lines)
 
 **Tool Schema Updates**:
 - Added `include_timegpt` parameter (boolean, default False)
@@ -184,7 +184,7 @@ Not a comprehensive benchmark. Results may vary on full dataset.
 
 ### 4. Skill Enhancement
 
-**Modified**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` (+~45 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` (+~45 lines)
 
 **New Section**: "TimeGPT Showdown (Optional)"
 
@@ -210,7 +210,7 @@ TimeGPT Comparison (Limited Sample):
 
 ### 5. Golden Task Harness Enhancement
 
-**Modified**: `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (+~30 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (+~30 lines)
 
 **New Argument**:
 ```python
@@ -243,7 +243,7 @@ python3 tests/run_baseline_m4_smoke.py --include-timegpt
 
 ### 6. Dependencies
 
-**Modified**: `plugins/nixtla-baseline-lab/scripts/requirements.txt` (+2 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/scripts/requirements.txt` (+2 lines)
 
 **Addition**:
 ```txt
@@ -259,7 +259,7 @@ nixtla>=0.5.0
 
 ### 7. README Documentation
 
-**Modified**: `plugins/nixtla-baseline-lab/README.md` (+~90 lines)
+**Modified**: `005-plugins/nixtla-baseline-lab/README.md` (+~90 lines)
 
 **New Section**: "TimeGPT Showdown (Optional)" (after "Bring Your Own Data")
 
@@ -283,23 +283,23 @@ nixtla>=0.5.0
 ### 8. Version Synchronization
 
 **Updated Files**:
-1. `plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`: `"version": "0.6.0"`
+1. `005-plugins/nixtla-baseline-lab/.claude-plugin/plugin.json`: `"version": "0.6.0"`
 2. `.claude-plugin/marketplace.json`: `"version": "0.6.0"`
-3. `plugins/nixtla-baseline-lab/README.md`: `**Version**: 0.6.0 (Phase 8)`
+3. `005-plugins/nixtla-baseline-lab/README.md`: `**Version**: 0.6.0 (Phase 8)`
 
 ---
 
 ## Files Touched
 
 ### Modified (5 files):
-1. `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~200 lines)
-2. `plugins/nixtla-baseline-lab/scripts/requirements.txt` (+2 lines)
-3. `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (+~30 lines)
-4. `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` (+~45 lines)
-5. `plugins/nixtla-baseline-lab/README.md` (+~90 lines)
+1. `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` (+~200 lines)
+2. `005-plugins/nixtla-baseline-lab/scripts/requirements.txt` (+2 lines)
+3. `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` (+~30 lines)
+4. `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` (+~45 lines)
+5. `005-plugins/nixtla-baseline-lab/README.md` (+~90 lines)
 
 ### Created (2 files):
-1. `plugins/nixtla-baseline-lab/scripts/timegpt_client.py` (143 lines)
+1. `005-plugins/nixtla-baseline-lab/scripts/timegpt_client.py` (143 lines)
 2. `000-docs/022-AA-AACR-phase-08-timegpt-showdown-and-evals.md` (this AAR)
 
 ### Version Files (3 updates):
@@ -625,9 +625,9 @@ After completing Phase 8, we refined the implementation to make the Nixtla TimeG
 ### Files Changed (4)
 
 - `.github/workflows/nixtla-baseline-lab-ci.yml` (+1 line)
-- `plugins/nixtla-baseline-lab/README.md` (+6 lines, -5 lines)
-- `plugins/nixtla-baseline-lab/scripts/requirements.txt` (+2 lines, -2 lines)
-- `plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh` (+14 lines)
+- `005-plugins/nixtla-baseline-lab/README.md` (+6 lines, -5 lines)
+- `005-plugins/nixtla-baseline-lab/scripts/requirements.txt` (+2 lines, -2 lines)
+- `005-plugins/nixtla-baseline-lab/scripts/setup_nixtla_env.sh` (+14 lines)
 
 ### Impact
 

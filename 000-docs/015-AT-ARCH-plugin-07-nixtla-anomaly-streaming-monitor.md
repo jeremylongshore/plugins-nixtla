@@ -149,7 +149,7 @@ PROMETHEUS_PORT=9090
 ### Directory Structure
 
 ```
-plugins/nixtla-anomaly-streaming-monitor/
+005-plugins/nixtla-anomaly-streaming-monitor/
 ├── .claude-plugin/
 │   └── plugin.json
 ├── commands/

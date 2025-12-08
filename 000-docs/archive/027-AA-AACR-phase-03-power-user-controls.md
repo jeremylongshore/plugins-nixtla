@@ -10,9 +10,9 @@ related_docs:
   - 024-AA-STAT-phase-01-already-complete.md
   - 025-AA-STAT-phase-02-metrics-already-complete.md
   - 017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md
-  - plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
-  - plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
-  - plugins/nixtla-baseline-lab/README.md
+  - 005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py
+  - 005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md
+  - 005-plugins/nixtla-baseline-lab/README.md
 last_updated: 2025-11-25
 ---
 
@@ -51,7 +51,7 @@ Phase 3 successfully added **power-user controls** and **demo preset capabilitie
 
 ### 1.1 Power-User Parameters
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Added three new parameters to tool schema** (lines 88-107):
 
@@ -140,7 +140,7 @@ response = {
 
 ### 1.2 Demo Preset Feature
 
-**File**: `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
+**File**: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
 
 **Added demo_preset parameter to schema** (lines 108-113):
 ```python
@@ -173,7 +173,7 @@ if demo_preset == "m4_daily_small":
 
 ### 1.3 Enhanced Skill for Power Users
 
-**File**: `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
+**File**: `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md`
 
 **Added new section** (lines 22-51): "For StatsForecast Power Users"
 
@@ -189,7 +189,7 @@ if demo_preset == "m4_daily_small":
 
 ### 1.4 Demo Flow Documentation
 
-**File**: `plugins/nixtla-baseline-lab/README.md`
+**File**: `005-plugins/nixtla-baseline-lab/README.md`
 
 **Added comprehensive demo section** (lines 149-249): "Nixtla StatsForecast Live Demo"
 
@@ -208,9 +208,9 @@ if demo_preset == "m4_daily_small":
 
 | File | Lines Changed | Purpose |
 |------|---------------|---------|
-| `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | ~100 lines | Added power-user params, demo preset, validation, dynamic model instantiation |
-| `plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` | ~30 lines | Added statsforecast power-user section with disclaimers and examples |
-| `plugins/nixtla-baseline-lab/README.md` | ~100 lines | Added comprehensive demo flow documentation |
+| `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | ~100 lines | Added power-user params, demo preset, validation, dynamic model instantiation |
+| `005-plugins/nixtla-baseline-lab/skills/nixtla-baseline-review/SKILL.md` | ~30 lines | Added statsforecast power-user section with disclaimers and examples |
+| `005-plugins/nixtla-baseline-lab/README.md` | ~100 lines | Added comprehensive demo flow documentation |
 
 ### 2.2 New Files
 

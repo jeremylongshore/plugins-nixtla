@@ -156,7 +156,7 @@ Plugin specifications renumbered from 002-012 to 050-060 range:
 ## Related Documentation
 
 - **Audit Report**: `036-AA-AUDT-directory-structure-audit-and-cleanup-plan.md`
-- **Cleanup Script**: `scripts/cleanup-doc-filing-v3.sh`
+- **Cleanup Script**: `004-scripts/cleanup-doc-filing-v3.sh`
 - **Doc-Filing Standard**: `/home/jeremy/002-command-bible/DOCUMENT-FILING-STANDARD-v3.0.md`
 - **Plugin Specs**: 050-060 series in 000-docs/
 

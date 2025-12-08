@@ -149,7 +149,7 @@ The plugin demonstrates how to build automated content discovery and curation fo
 
 ### Component Structure
 ```
-plugins/nixtla-search-to-slack/
+005-plugins/nixtla-search-to-slack/
 ├── src/nixtla_search_to_slack/
 │   ├── __init__.py
 │   ├── main.py                 # CLI entry point
