@@ -1,13 +1,16 @@
 # Global Master Standard – Claude Skills Specification
 
 **Document ID**: 077-SPEC-MASTER-claude-skills-standard.md
-**Version**: 2.1.0
+**Version**: 2.2.0
 **Status**: AUTHORITATIVE - Single Source of Truth
 **Created**: 2025-12-06
 **Updated**: 2025-12-08
-**Audited Against**: Lee Han Chung Deep Dive (2025-10-26)
+**Audited Against**:
+- Official Anthropic Skills Blog (claude.com/blog/skills) - PRIMARY SOURCE
+- Lee Han Chung Deep Dive (2025-10-26)
 
 **Sources**:
+- [Official Anthropic Skills Blog Post](https://claude.com/blog/skills) ⭐ **PRIMARY SOURCE**
 - [Official Anthropic Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
 - [Official Anthropic Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
 - [Claude Code Skills Documentation](https://code.claude.com/docs/en/skills)
@@ -22,7 +25,41 @@
 
 A Claude Skill is a **filesystem-based capability package** containing instructions, executable code, and resources that Claude can discover and use automatically. Skills are prompt-based context modifiers—NOT executable plugins or slash commands.
 
+**Official Definition** (Anthropic): "Specialized capability packages that extend Claude's functionality for specific tasks. Claude will only access a skill when it's relevant to the task at hand."
+
 **Mental Model**: "Building a skill for an agent is like putting together an onboarding guide for a new hire."
+
+### Four Core Design Principles (Anthropic Official)
+
+Skills are architecturally designed with four foundational attributes:
+
+1. **Composable**
+   - Multiple skills work together seamlessly
+   - Claude automatically identifies and coordinates which skills are needed
+   - No manual orchestration required
+   - **Nixtla Impact**: `nixtla-schema-mapper` + `nixtla-experiment-architect` can chain automatically
+
+2. **Portable**
+   - Same skill format works across ALL platforms:
+     - Claude apps (claude.ai web/mobile)
+     - Claude Code (CLI tool)
+     - Claude API (Messages API)
+   - Write once, deploy everywhere
+   - **Nixtla Impact**: Internal skills work for web users, API customers, and CLI developers
+
+3. **Efficient**
+   - Loads only minimal necessary information when needed
+   - Progressive disclosure pattern (description → full instructions → resources)
+   - Avoids context window bloat
+   - **Nixtla Impact**: 40+ skill portfolio won't overwhelm context if designed properly
+
+4. **Powerful**
+   - Can include executable code for reliable task performance
+   - Pre-written scripts eliminate non-determinism
+   - Combines prompts + execution for complete workflows
+   - **Nixtla Impact**: TimeGPT API calls, pandas transformations, validation scripts all executable
+
+**Production Implication for Nixtla**: These four principles guide ALL architectural decisions. Violating any principle (non-composable, platform-locked, context-heavy, prompt-only) indicates poor skill design.
 
 ### Why Use Skills Instead of Ad-Hoc Prompts?
 
@@ -139,6 +176,20 @@ Skills use specific XML tags for message formatting:
 - Multiple skill invocations in one session stack context linearly
 - **Context budget management is critical** (see Section 4 for limits)
 
+#### Chain-of-Thought Visibility (UX Insight)
+
+**OFFICIAL ANTHROPIC**: "Users can view skills in Claude's chain-of-thought output while it works."
+
+When Claude invokes skills, users see them in the reasoning trace/thinking blocks. This provides:
+- **Transparency**: Users know which skills are active
+- **Debuggability**: Developers can trace skill activation patterns
+- **Trust**: Users understand Claude's decision-making process
+
+**Nixtla Customer Impact**:
+- TimeGPT customers will SEE when `nixtla-experiment-architect` activates
+- Internal teams can debug skill selection by reviewing chain-of-thought
+- Enterprise admins can audit which skills employees trigger
+
 ---
 
 ## 2. Folder & Discovery Layout
@@ -186,6 +237,116 @@ skill-name/
 | `assets/` | Templates, configs, static files | No (path reference only) | None |
 
 **Key Insight**: Scripts execute without loading code into context. Only script OUTPUT consumes tokens.
+
+---
+
+### Platform-Specific Implementation & Distribution
+
+#### Claude Apps (claude.ai, mobile)
+
+**Availability**: Pro, Max, Team, and Enterprise users
+
+**Installation Methods**:
+1. **Official Skill-Creator Tool** (Anthropic Recommended)
+   - Use the built-in `skill-creator` skill for interactive guidance
+   - No manual file editing required
+   - Provides step-by-step skill creation workflow
+   - Available via slash command: `/skill-creator`
+
+2. **Manual Installation**:
+   - Create `.claude/skills/skill-name/SKILL.md` structure
+   - Upload to project or personal workspace
+
+**Admin Controls** (Team/Enterprise):
+- Admins must **enable skills organization-wide** via Settings
+- Organization-level toggle controls all member access
+- **NIXTLA ENTERPRISE NOTE**: Customers need admin approval before deploying skills
+
+**Official Pre-built Skills** (Anthropic-provided):
+- Excel processing
+- PowerPoint manipulation
+- Word document editing
+- Fillable PDF handling
+
+**Nixtla Strategy**: Leverage pre-built skills where possible; avoid reinventing document processing.
+
+---
+
+#### Claude API (Messages API)
+
+**⚠️ CRITICAL FOR NIXTLA API INTEGRATIONS**:
+
+**New `/v1/skills` Endpoint**:
+- Programmatic skill control, versioning, and management
+- Separate from Messages API calls
+- Enables automated skill deployment and updates
+
+**Code Execution Tool Requirement**:
+- Skills with executable scripts **require Code Execution Tool beta**
+- Must be enabled in API configuration
+- Provides secure sandbox for script execution
+- **BLOCKER**: Nixtla's TimeGPT/pandas/validation scripts won't work without this beta feature
+
+**Implementation Pattern** (Nixtla API Integration):
+```python
+# 1. Enable Code Execution Tool beta in API settings
+# 2. Deploy skills via /v1/skills endpoint
+# 3. Reference skills in Messages API calls
+
+import anthropic
+
+client = anthropic.Anthropic(api_key="...")
+
+# Deploy skill (one-time)
+skill_response = client.skills.create(
+    skill_content=skill_md_content,
+    version="1.0.0"
+)
+
+# Use skill in conversation
+message = client.messages.create(
+    model="claude-sonnet-4-20250514",
+    max_tokens=4096,
+    messages=[{"role": "user", "content": "Map my data to Nixtla schema"}],
+    # Skills automatically discovered and invoked
+)
+```
+
+**Production Requirements for Nixtla**:
+1. Request Code Execution Tool beta access from Anthropic
+2. Implement `/v1/skills` deployment automation
+3. Version all skills semantically (1.0.0, 1.1.0, etc.)
+4. Test scripts in sandbox environment before production
+
+---
+
+#### Claude Code (CLI)
+
+**Installation Methods**:
+1. **Marketplace Plugins** (Anthropic Official):
+   - Install via `anthropics/skills` marketplace
+   - Managed updates and versioning
+   - **NIXTLA DISTRIBUTION**: Consider publishing nixtla-skills as marketplace plugin
+
+2. **Manual Installation**:
+   - Place skills in `~/.claude/skills/` (personal, all projects)
+   - Place skills in `.claude/skills/` (project-specific)
+   - **Version control friendly**: Commit `.claude/skills/` to git repos
+
+**Priority Hierarchy**:
+```
+~/.claude/skills/          Priority 1 (lowest)
+.claude/skills/            Priority 2
+Plugin skills/             Priority 3
+Built-in skills            Priority 4 (highest)
+```
+
+Later sources override earlier ones when names conflict.
+
+**Nixtla Distribution Strategy**:
+- Primary: Project-specific (`.claude/skills/nixtla-*/`)
+- Fallback: Personal installation (`~/.claude/skills/nixtla-*/`)
+- Future: Marketplace plugin for external distribution
 
 ---
 
@@ -1446,6 +1607,75 @@ When skills fail unexpectedly, check in this order:
 ---
 
 ## Changelog
+
+### Version 2.2.0 (2025-12-08) - Official Anthropic Blog Audit
+
+**Audited Against**: [Official Anthropic Skills Blog](https://claude.com/blog/skills) - PRIMARY SOURCE OF TRUTH
+
+**CRITICAL ADDITIONS (Priority 1)**:
+
+1. **Four Core Design Principles** (Executive Summary)
+   - Composable: Multiple skills work together automatically
+   - Portable: Same format across ALL platforms (apps/API/Code)
+   - Efficient: Progressive disclosure, minimal context loading
+   - Powerful: Executable code + prompts for complete workflows
+   - **Nixtla Impact**: Architectural philosophy for all skill design decisions
+
+2. **`/v1/skills` API Endpoint** (Section 2)
+   - New programmatic skill control endpoint
+   - Versioning and management capabilities
+   - Separate from Messages API calls
+   - **CRITICAL**: Required for Nixtla API integrations
+
+3. **Code Execution Tool Beta Requirement** (Section 2)
+   - **BLOCKER**: Skills with scripts require this beta feature
+   - Must be enabled in API configuration
+   - Provides secure sandbox for script execution
+   - **Nixtla Impact**: TimeGPT/pandas/validation scripts won't work without it
+
+4. **Official Pre-built Anthropic Skills** (Section 2)
+   - Excel, PowerPoint, Word, Fillable PDFs
+   - **Nixtla Strategy**: Leverage these instead of reinventing document processing
+
+5. **Skill-Creator Interactive Tool** (Section 2)
+   - Official Anthropic tool for guided skill creation
+   - No manual file editing required
+   - Available via `/skill-creator` command
+   - **Nixtla Adoption**: Use for rapid prototyping
+
+6. **Enterprise Admin Controls** (Section 2)
+   - Team/Enterprise admins must enable skills organization-wide
+   - Settings toggle at organization level
+   - **Critical for Nixtla Enterprise Customers**: Requires admin approval
+
+7. **Chain-of-Thought Visibility** (Section 1)
+   - Users see skills in Claude's reasoning trace
+   - Transparency, debuggability, trust
+   - **Nixtla Impact**: Customers can audit which skills trigger
+
+8. **Marketplace Plugin Distribution** (Section 2)
+   - `anthropics/skills` marketplace for Claude Code
+   - Managed updates and versioning
+   - **Future Nixtla Strategy**: Publish as marketplace plugin
+
+**API Integration Example Added**:
+```python
+# Deploy via /v1/skills endpoint
+skill_response = client.skills.create(
+    skill_content=skill_md_content,
+    version="1.0.0"
+)
+```
+
+**Production Requirements Documented**:
+1. Request Code Execution Tool beta access
+2. Implement `/v1/skills` deployment automation
+3. Version all skills semantically
+4. Test scripts in sandbox before production
+
+**Status**: Complete alignment with official Anthropic sources
+
+---
 
 ### Version 2.1.0 (2025-12-08) - Lee Han Chung Audit
 
