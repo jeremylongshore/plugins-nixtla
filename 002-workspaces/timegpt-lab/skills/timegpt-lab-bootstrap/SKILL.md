@@ -1,0 +1,286 @@
+---
+name: nixtla-timegpt-lab-bootstrap
+description: |
+  Guides setup and configuration of the TimeGPT lab environment for local development and API experimentation. Inspects environment documentation, validates dependencies, and provides step-by-step setup instructions for Python environment, API key configuration, and package installation. Use when initializing TimeGPT lab for the first time, troubleshooting environment issues, or onboarding new developers to TimeGPT workflows. Trigger with "set up timegpt lab", "configure timegpt environment", "timegpt env help", "validate timegpt setup".
+allowed-tools: "Read,Glob,Grep"
+version: "0.1.0"
+---
+
+# Nixtla TimeGPT Lab Bootstrap
+
+Assists with setting up and validating the TimeGPT lab environment. Provides guidance on Python dependencies, API key configuration, and environment validation without making external API calls.
+
+## Overview
+
+This skill helps developers configure their local TimeGPT lab environment correctly. It inspects the lab's setup documentation, validation scripts, and configuration files to provide actionable setup instructions. The skill focuses on environment readiness and does not interact with the TimeGPT API itself—that functionality will be added in later phases. It serves as the entry point for new developers joining the TimeGPT lab and as a troubleshooting aid for environment-related issues.
+
+Key capabilities:
+- Inspects `docs/timegpt-env-setup.md` for canonical setup instructions
+- Reviews `scripts/validate_env.py` to understand validation requirements
+- Generates step-by-step setup guidance tailored to the user's context
+- Identifies common configuration pitfalls and provides solutions
+- Does NOT call the TimeGPT API or execute any network operations
+
+## Prerequisites
+
+**For this skill to be useful, the user needs**:
+- Python 3.9+ installed on their local machine
+- Access to install Python packages (`pip`)
+- A valid Nixtla TimeGPT API key (obtainable from https://dashboard.nixtla.io/)
+- Basic familiarity with command-line operations
+
+**Required files** (created in Phase 3):
+- `{baseDir}/docs/timegpt-env-setup.md` - Setup documentation
+- `{baseDir}/scripts/validate_env.py` - Environment validation script
+- `{baseDir}/.env.example` - Example environment configuration
+
+## Instructions
+
+When this skill is invoked, follow these steps:
+
+### Step 1: Inspect Setup Documentation
+
+Read the canonical setup guide:
+
+```
+{baseDir}/docs/timegpt-env-setup.md
+```
+
+Extract:
+- Required Python version(s)
+- Installation commands for dependencies
+- Environment variable requirements (especially `NIXTLA_TIMEGPT_API_KEY`)
+- Common troubleshooting scenarios
+
+### Step 2: Review Validation Script
+
+Read the environment validation script:
+
+```
+{baseDir}/scripts/validate_env.py
+```
+
+Understand what checks it performs:
+- Python version validation
+- Environment variable presence
+- Package installation status
+
+### Step 3: Generate Setup Guidance
+
+Based on the user's request, provide tailored instructions:
+
+**For first-time setup**:
+1. Python environment creation and activation
+2. Dependency installation (`pip install nixtla utilsforecast pandas`)
+3. API key configuration (using `.env` file or shell export)
+4. Running `validate_env.py` to confirm readiness
+
+**For troubleshooting**:
+1. Identify the specific error from validation output
+2. Provide targeted fix (install package, set env var, upgrade Python)
+3. Suggest re-running `validate_env.py` to confirm resolution
+
+**For onboarding**:
+1. Explain the purpose of the TimeGPT lab (API experimentation, workflow development)
+2. Walkthrough of directory structure (`skills/`, `scripts/`, `data/`, `reports/`, `docs/`)
+3. Next steps after environment is validated
+
+### Step 4: Safety Guardrails
+
+- **DO NOT** suggest committing `.env` files or API keys to git
+- **DO NOT** claim the skill can make API calls (it cannot in this phase)
+- **DO NOT** provide placeholder or example API keys that could be confused with real keys
+- **DO** remind users that `validate_env.py` is safe to run (no network calls)
+- **DO** defer to official Nixtla documentation for API usage patterns
+
+## Output
+
+The primary output of this skill is **guidance text** formatted as markdown or plain text:
+
+- **Setup Instructions**: Step-by-step commands to configure the environment
+- **Troubleshooting Advice**: Targeted solutions for specific validation failures
+- **Environment Status Summary**: Interpretation of `validate_env.py` output
+- **Next Steps**: Pointers to relevant documentation or scripts for further exploration
+
+Example output format:
+
+```markdown
+## TimeGPT Lab Setup Instructions
+
+### 1. Create Python Virtual Environment
+
+cd 002-workspaces/timegpt-lab
+python3 -m venv .venv-timegpt
+source .venv-timegpt/bin/activate
+
+### 2. Install Dependencies
+
+pip install nixtla>=0.5.0 utilsforecast pandas
+
+### 3. Configure API Key
+
+cp .env.example .env
+# Edit .env and set NIXTLA_TIMEGPT_API_KEY=your_actual_key_here
+
+### 4. Validate Environment
+
+python scripts/validate_env.py
+
+Expected output: All checks should show ✓ (green checkmarks)
+
+### 5. Next Steps
+
+- Review docs/timegpt-env-setup.md for detailed explanations
+- Explore scripts/ directory for TimeGPT workflows
+- Run smoke tests when implemented (scripts/timegpt_smoke_placeholder.py)
+```
+
+## Error Handling
+
+### Missing Environment Variable
+
+**Symptom**: `validate_env.py` shows `✗ NIXTLA_TIMEGPT_API_KEY environment variable NOT set`
+
+**Solution**:
+
+```bash
+# Option 1: Export in current shell
+export NIXTLA_TIMEGPT_API_KEY="your_key_here"
+
+# Option 2: Use .env file (recommended)
+cp .env.example .env
+# Edit .env and add your key
+```
+
+### Import Errors
+
+**Symptom**: `ImportError: No module named 'nixtla'`
+
+**Solution**:
+
+```bash
+pip install nixtla utilsforecast pandas
+```
+
+### Python Version Too Old
+
+**Symptom**: `validate_env.py` shows `✗ Python 3.8.x (unsupported)`
+
+**Solution**:
+
+```bash
+# Upgrade Python to 3.9+ using your package manager
+# Example (Ubuntu/Debian):
+sudo apt update
+sudo apt install python3.10
+
+# Recreate virtual environment with new Python version
+python3.10 -m venv .venv-timegpt
+source .venv-timegpt/bin/activate
+```
+
+### File Not Found Errors
+
+**Symptom**: Skill cannot locate `docs/timegpt-env-setup.md` or `scripts/validate_env.py`
+
+**Solution**: Ensure Phase 3 was completed successfully. These files should have been created during TimeGPT lab bootstrap. If missing, re-run Phase 3 or contact the repository maintainer.
+
+## Examples
+
+### Example 1: First-Time Setup Request
+
+**User Input**: "How do I set up the TimeGPT lab environment?"
+
+**Skill Behavior**:
+1. Read `docs/timegpt-env-setup.md`
+2. Extract step-by-step setup instructions
+3. Format as a clear, actionable guide
+4. Include validation command at the end
+
+**Output**: Step-by-step markdown guide (see "Output" section above)
+
+### Example 2: Troubleshooting Validation Failure
+
+**User Input**: "validate_env.py is failing with missing nixtla package"
+
+**Skill Behavior**:
+1. Identify the specific error (missing package)
+2. Provide targeted fix: `pip install nixtla`
+3. Suggest re-running validation to confirm
+
+**Output**:
+
+```markdown
+## Troubleshooting: Missing nixtla Package
+
+The error indicates the `nixtla` package is not installed in your current Python environment.
+
+**Fix**:
+
+pip install nixtla>=0.5.0 utilsforecast pandas
+
+**Verify**:
+
+python scripts/validate_env.py
+
+All checks should now pass with ✓ symbols.
+```
+
+### Example 3: Onboarding New Developer
+
+**User Input**: "What is the TimeGPT lab and how do I get started?"
+
+**Skill Behavior**:
+1. Explain the purpose of the lab (API experimentation, workflow development)
+2. Describe the directory structure
+3. Provide setup instructions
+4. Point to next steps
+
+**Output**:
+
+```markdown
+## Welcome to TimeGPT Lab
+
+The TimeGPT lab is a workspace for experimenting with Nixtla's TimeGPT API and developing forecasting workflows.
+
+**Directory Structure**:
+- skills/: Claude Skills for TimeGPT workflows
+- scripts/: Python scripts for API experiments
+- data/: Sample datasets and experiment data
+- reports/: Generated forecasts and analysis
+- docs/: Setup guides and best practices
+
+**Getting Started**:
+1. Follow setup instructions: docs/timegpt-env-setup.md
+2. Run environment validation: python scripts/validate_env.py
+3. Explore example scripts in scripts/ directory
+
+**Next Steps After Setup**:
+- Review TimeGPT documentation: https://docs.nixtla.io/
+- Run smoke tests (when implemented)
+- Design your first forecasting experiment
+```
+
+## Resources
+
+**Internal References** (use `{baseDir}` for portability):
+- Setup Guide: `{baseDir}/docs/timegpt-env-setup.md`
+- Validation Script: `{baseDir}/scripts/validate_env.py`
+- Environment Example: `{baseDir}/.env.example`
+- Workspace Standards: `{baseDir}/../.directory-standards.md` (in 002-workspaces root)
+
+**External References**:
+- Nixtla TimeGPT Documentation: https://docs.nixtla.io/
+- Nixtla Dashboard (API keys): https://dashboard.nixtla.io/
+- Nixtla SDK GitHub: https://github.com/Nixtla/nixtla
+
+**Related Skills** (future):
+- `nixtla-timegpt-forecaster`: Execute TimeGPT forecasts (Phase 4+)
+- `nixtla-schema-mapper`: Transform data to Nixtla schema
+- `nixtla-experiment-architect`: Design forecasting experiments
+
+---
+
+**Skill Version**: 0.1.0 (Bootstrap - Environment Setup Only)
+**Phase**: 3 (TimeGPT Lab Bootstrap)
+**Status**: Lab-only skill, not yet promoted to 003-skills/
