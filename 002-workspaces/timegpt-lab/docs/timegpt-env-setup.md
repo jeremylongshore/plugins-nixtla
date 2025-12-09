@@ -304,6 +304,45 @@ The experiment harness is designed for controlled cost:
 4. **Compare**: Review comparative analysis to see which horizon performs best
 5. **Optimize**: Disable poorly-performing experiments, focus on promising configs
 
+## CI/CD Integration (Optional)
+
+### GitHub Actions: Weekly Real-API Smoke Test
+
+**Optional workflow** for automated weekly TimeGPT testing using GitHub Actions secrets.
+
+**Workflow file**: `.github/workflows/timegpt-real-smoke.yml`
+
+**Trigger**:
+- **Scheduled**: Sundays at 02:00 UTC (weekly cron)
+- **Manual**: Via GitHub Actions UI (workflow_dispatch)
+
+**Setup**:
+
+1. **Obtain TimeGPT API key** from https://dashboard.nixtla.io
+
+2. **Add GitHub Actions secret**:
+   - Go to: `Settings → Secrets and variables → Actions → New repository secret`
+   - Name: `NIXTLA_TIMEGPT_API_KEY`
+   - Value: `your-timegpt-api-key`
+
+3. **Workflow behavior**:
+   - ✅ If secret configured: Runs real TimeGPT API calls, uploads results as artifacts
+   - ⚠️  If secret missing: Skips gracefully with informative message (no error)
+
+**Outputs** (uploaded as workflow artifacts):
+- `timegpt-forecast-results`: CSV with forecast metrics
+- `timegpt-summary-report`: Markdown summary
+- `ci-status-summary`: CI run status with preview
+
+**Cost considerations**:
+- Weekly runs = ~4 API calls/month (2 experiments × 1 run/week)
+- Each run uses tiny sample dataset (2 series, 90 days)
+- Manual runs via workflow_dispatch do NOT count against cron schedule
+
+**Disabling**:
+- To pause: Remove the `NIXTLA_TIMEGPT_API_KEY` secret (workflow will skip automatically)
+- To stop: Delete `.github/workflows/timegpt-real-smoke.yml`
+
 ## Next Steps
 
 Once your environment is validated and experiments are running:
@@ -312,6 +351,7 @@ Once your environment is validated and experiments are running:
 2. **Iterate on configs**: Add/modify experiments in `experiments/timegpt_experiments.json`
 3. **Compare TimeGPT vs baselines**: Design experiments comparing TimeGPT with StatsForecast models
 4. **Create custom datasets**: Add your own time series data to `data/`
+5. **Optional CI setup**: Configure GitHub Actions secret for weekly real-API testing
 
 ## Security Reminders
 

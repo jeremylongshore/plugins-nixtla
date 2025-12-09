@@ -231,7 +231,7 @@ elif estimated_tokens > 2500:
 | Field | Required? | Validation | Source |
 |-------|-----------|------------|--------|
 | `name` | ✅ YES | Regex, length, reserved words | Anthropic + v2.3.0 |
-| `description` | ⚠️  OR when_to_use | Length, third-person, plain text | Lee + v2.3.0 |
+| `description` | ⚠️  OR when_to_use | ≤200 chars, third-person, plain text | Support Article |
 | `when_to_use` | ⚠️  OR description | Deprecated warning | Lee (Oct 2025) |
 | `allowed-tools` | ✅ YES | Non-empty, scoped syntax, hyphen | Lee + v2.3.0 |
 | `version` | Recommended | String type | v2.3.0 |
