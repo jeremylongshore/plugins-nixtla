@@ -1,10 +1,11 @@
 # Global Master Standard – Claude Skills Specification
 
 **Document ID**: 077-SPEC-MASTER-claude-skills-standard.md
-**Version**: 2.0.0
+**Version**: 2.1.0
 **Status**: AUTHORITATIVE - Single Source of Truth
 **Created**: 2025-12-06
-**Updated**: 2025-12-06
+**Updated**: 2025-12-08
+**Audited Against**: Lee Han Chung Deep Dive (2025-10-26)
 
 **Sources**:
 - [Official Anthropic Agent Skills Overview](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
@@ -86,6 +87,57 @@ tools: [
 **User-Invoked (Manual)**:
 - Type `/skill-name` to explicitly invoke a skill
 - Required when `disable-model-invocation: true`
+
+### Message Injection Architecture
+
+**CRITICAL FOR NIXTLA INTERNAL TEAMS**: Understanding how skills inject into conversations ensures predictable behavior in production workflows.
+
+When a skill is invoked, it injects **two user messages** into the conversation:
+
+#### Message 1: Metadata Message (Visible to User)
+```javascript
+{
+  role: "user",
+  isMeta: false,  // Visible in UI
+  content: [
+    {
+      type: "text",
+      text: "<command-message>skill-name is loading...</command-message>"
+    }
+  ]
+}
+```
+
+**Purpose**: Provides transparent UI feedback that a skill is executing.
+
+#### Message 2: Skill Prompt Message (Hidden from User)
+```javascript
+{
+  role: "user",
+  isMeta: true,   // Hidden from UI, sent to API only
+  content: [
+    {
+      type: "text",
+      text: "[Full SKILL.md content with {baseDir} substitutions]"
+    }
+  ]
+}
+```
+
+**Purpose**: Injects skill instructions directly into Claude's context for reasoning.
+
+#### XML Tag Structure
+
+Skills use specific XML tags for message formatting:
+- `<command-message>` - Wraps the visible status indicator
+- `<command-name>` - Contains the skill name for tracking
+- `<available_skills>` - Lists all discoverable skills in Skill tool description
+
+**Production Impact for Nixtla**:
+- Skills don't pollute conversation history visible to users
+- Skill instructions consume context budget (tracked via `isMeta: true` messages)
+- Multiple skill invocations in one session stack context linearly
+- **Context budget management is critical** (see Section 4 for limits)
 
 ---
 
@@ -214,13 +266,46 @@ name: claude-helper            # Bad - reserved word
 
 **Type**: string
 **Required**: YES
-**Max Length**: 1024 characters
+**Max Length**: 1024 characters per skill
 **Constraints**:
 - Must be non-empty
 - No XML tags
 - Must use **third person** voice (injected into system prompt)
+- **CRITICAL BUDGET LIMIT**: All skill descriptions combined have a 15,000-character context budget
 
 **Purpose**: Primary signal for Claude's skill selection. Claude uses this to decide when to activate the skill.
+
+**⚠️ PRODUCTION CONSTRAINT FOR NIXTLA TEAMS**:
+
+The Skill tool's description field has a **15,000-character token budget** across ALL skills in the workspace. If your combined skill descriptions exceed this limit, Claude will silently filter out skills, causing unpredictable skill discovery failures.
+
+**Critical Formula**:
+```
+(Number of Skills) × (Avg Chars per Description) < 15,000 chars
+```
+
+**Best Practices for Scaling Skill Portfolios**:
+- **Target 300-400 characters per skill** (not the 1024 maximum)
+- **Monitor total character count** across all skill descriptions in workspace
+- Verbose descriptions don't improve intent matching—specificity does
+- If skills stop activating unexpectedly, audit total description length first
+
+**Scaling Examples**:
+```
+10 skills × 400 chars = 4,000 chars   (✅ safe, 11,000 chars headroom)
+20 skills × 400 chars = 8,000 chars   (✅ safe, 7,000 chars headroom)
+30 skills × 400 chars = 12,000 chars  (⚠️ risky, approaching limit)
+40 skills × 400 chars = 16,000 chars  (❌ exceeds budget, filtering likely)
+
+20 skills × 750 chars = 15,000 chars  (⚠️ at limit exactly, no headroom)
+30 skills × 500 chars = 15,000 chars  (⚠️ at limit exactly, no headroom)
+```
+
+**Production Monitoring for Nixtla**:
+```bash
+# Audit total description length across all skills
+find .claude/skills/nixtla-*/SKILL.md -exec grep -A 5 '^description:' {} \; | wc -c
+```
 
 **Formula**:
 ```
@@ -437,12 +522,25 @@ This skill produces:
 | Guideline | Requirement |
 |-----------|-------------|
 | **Size Limit** | Keep SKILL.md body under **500 lines** |
+| **Word Count** | Target ~1,500-2,500 words, **max 5,000 words** to avoid context saturation |
 | **Token Budget** | Target ~2,500 tokens, max 5,000 tokens |
 | **Language** | Use **imperative voice** ("Analyze data", not "You should analyze") |
 | **Paths** | Always use `{baseDir}` variable, NEVER hardcode absolute paths |
 | **Examples** | Include at least **2-3 concrete examples** with input/output |
 | **Error Handling** | Document **4+ common failures** with solutions |
 | **Voice** | Third person in descriptions, imperative in instructions |
+
+**⚠️ NIXTLA PRODUCTION GUIDANCE**: The 5,000-word limit prevents context window saturation. Symptoms of oversized SKILL.md files include:
+- Skills randomly failing to complete workflows
+- Partial instruction execution
+- Claude "forgetting" later sections of skill instructions
+- Increased token costs per skill invocation
+
+**For production skill portfolios at scale**: Aim for 1,500-2,000 words per SKILL.md to leave headroom for:
+- Multiple skill invocations in one session
+- User conversation context
+- Tool output accumulation
+- Growing skill count over time
 
 ### Progressive Disclosure Patterns
 
@@ -499,6 +597,20 @@ SKILL.md → examples.md
 ### Choosing `allowed-tools` Conservatively
 
 **Principle of Least Privilege**: Grant ONLY tools the skill actually needs.
+
+**⚠️ CRITICAL FOR NIXTLA PRODUCTION SKILLS**: Tool permissions are **scoped to skill execution only** and **automatically revert** when the skill completes. This temporary escalation pattern ensures:
+- Skills can't permanently expand Claude's attack surface
+- Tool permissions return to user-controlled defaults after execution
+- Multiple skill invocations in one session maintain isolation
+
+**Lifecycle Example**:
+```
+1. User session starts → Standard tool permissions active
+2. nixtla-experiment-architect invokes → allowed-tools: "Read,Write,Bash(python:*),Grep,Glob"
+3. Skill executes experiments → Pre-approved tools available without prompts
+4. Skill completes → Permissions revert to standard session defaults
+5. Next skill invocation → New temporary permission scope
+```
 
 **Good Examples**:
 ```yaml
@@ -1041,6 +1153,275 @@ Run through this checklist every time you create or update a skill:
 
 ---
 
+## 14. Validation & Error Handling
+
+### Five Skill Tool Validation Error Codes
+
+When skills fail to invoke, Claude's Skill tool returns one of five error codes:
+
+#### Error 1: Empty Command Input
+**Symptom**: Skill tool called without `command` parameter
+```javascript
+{ error: "Empty command input" }
+```
+**Cause**: Missing or null `command` field in Skill tool invocation
+**Fix**: Ensure Claude passes valid skill name (e.g., `command: "nixtla-schema-mapper"`)
+
+#### Error 2: Unknown/Unavailable Skill
+**Symptom**: Skill name not found in discovered skills list
+```javascript
+{ error: "Unknown skill: foo-bar" }
+```
+**Cause**:
+- Skill not in `.claude/skills/` directory
+- SKILL.md filename incorrect (must be `SKILL.md`, case-sensitive on some systems)
+- Frontmatter `name` field doesn't match directory name
+**Fix**: Verify skill installation, check directory/file naming
+
+#### Error 3: Skill File Loading Failure
+**Symptom**: SKILL.md exists but can't be parsed
+```javascript
+{ error: "Failed to load skill: invalid-yaml" }
+```
+**Cause**:
+- Malformed YAML frontmatter (missing `---` delimiters, invalid syntax)
+- File encoding issues (non-UTF-8 characters)
+- Permission errors (file not readable)
+**Fix**: Validate YAML syntax, check file permissions, ensure UTF-8 encoding
+
+#### Error 4: Model Invocation Disabled
+**Symptom**: Skill has `disable-model-invocation: true` but was auto-triggered
+```javascript
+{ error: "Model invocation disabled for skill: deploy-production" }
+```
+**Cause**: Claude attempted auto-activation on a manual-only skill
+**Fix**: User must invoke manually via `/skill-name` slash command
+
+#### Error 5: Non-Prompt-Based Skill Type
+**Symptom**: Skill type not supported (experimental/future feature)
+```javascript
+{ error: "Skill type not supported: executable" }
+```
+**Cause**: Attempting to use experimental skill types beyond standard prompt-based skills
+**Fix**: Use only standard prompt-based skills with SKILL.md structure
+
+### Progressive Testing Workflow for Nixtla Skills
+
+Follow this 5-step progression when validating new skills:
+
+#### Step 1: Validate Frontmatter YAML Structure
+```bash
+# Test YAML parsing
+python -c "import yaml; yaml.safe_load(open('.claude/skills/nixtla-*/SKILL.md').read().split('---')[1])"
+```
+**Validates**: Syntax correctness, required fields (`name`, `description`)
+
+#### Step 2: Test Prompt Injection with Minimal Workflow
+- Invoke skill manually: `/nixtla-skill-name`
+- Check `<command-message>` appears in UI
+- Verify skill instructions load without truncation
+- Confirm skill completes without errors
+
+**Validates**: Message injection, context loading, basic execution
+
+#### Step 3: Verify Tool Permissions Enforcement
+- Test that `allowed-tools` grants expected permissions
+- Verify disallowed tools still require user approval
+- Confirm permissions revert after skill completion
+
+**Validates**: Security scoping, temporary escalation
+
+#### Step 4: Execute Full Workflow with Bundled Resources
+- Test `{baseDir}` path substitutions
+- Execute bundled `scripts/` via Bash tool
+- Load `references/` docs via Read tool
+- Verify `assets/` templates accessible
+
+**Validates**: Resource loading, script execution, path resolution
+
+#### Step 5: Confirm Context Injection Behavior
+- Monitor token usage during skill execution
+- Test multiple skill invocations in one session
+- Verify no context pollution between invocations
+- Check skill doesn't interfere with other skills
+
+**Validates**: Context isolation, budget management, multi-skill compatibility
+
+---
+
+## 15. Anti-Patterns & Common Mistakes
+
+### Critical Anti-Patterns for Nixtla Production Skills
+
+#### Anti-Pattern 1: Hardcoded Absolute Paths
+❌ **BAD**:
+```markdown
+Run: `python /home/user/nixtla-skills/scripts/analyze.py`
+See: `/Users/max/projects/nixtla/docs/API_REFERENCE.md`
+```
+
+✅ **GOOD**:
+```markdown
+Run: `python {baseDir}/scripts/analyze.py`
+See: `{baseDir}/references/API_REFERENCE.md`
+```
+
+**Why this fails**: Breaks portability across different installations, team members, CI/CD environments.
+
+---
+
+#### Anti-Pattern 2: Embedding 10,000+ Word Reference Material
+❌ **BAD**:
+```markdown
+## TimeGPT API Reference
+
+[5,000 words of API documentation embedded in SKILL.md]
+[Another 3,000 words of examples]
+[2,000 more words of troubleshooting]
+```
+
+✅ **GOOD**:
+```markdown
+## TimeGPT API Reference
+
+See: `{baseDir}/references/TIMEGPT_API.md` for complete API documentation.
+
+Quick examples:
+- [2-3 minimal examples, 200 words total]
+
+For troubleshooting: `{baseDir}/references/TROUBLESHOOTING.md`
+```
+
+**Why this fails**: Context saturation, partial instruction execution, increased costs.
+
+---
+
+#### Anti-Pattern 3: Generic "Helps With Tasks" Descriptions
+❌ **BAD**:
+```yaml
+description: Helps with time-series forecasting tasks and data analysis.
+```
+
+✅ **GOOD**:
+```yaml
+description: |
+  Transforms user data into Nixtla-ready schema (unique_id, ds, y columns).
+  Generates pandas/SQL transformation code and creates schema documentation.
+  Use when onboarding new datasets, mapping client data, or preparing forecasts.
+  Trigger with "map my data to Nixtla format", "prepare data for TimeGPT".
+```
+
+**Why this fails**: Vague triggers prevent accurate intent matching by Claude.
+
+---
+
+#### Anti-Pattern 4: Combining Metadata and Skill Prompt into Single Message
+❌ **BAD** (internal implementation):
+```javascript
+{
+  role: "user",
+  isMeta: false,  // Trying to show both UI message AND skill content
+  content: "<command-message>Loading...</command-message>\n\n[Full SKILL.md]"
+}
+```
+
+✅ **GOOD**:
+```javascript
+// Message 1: UI indicator
+{ role: "user", isMeta: false, content: "<command-message>..." }
+// Message 2: Hidden skill content
+{ role: "user", isMeta: true, content: "[Full SKILL.md]" }
+```
+
+**Why this fails**: Pollutes user's conversation view, violates transparency requirements.
+
+---
+
+#### Anti-Pattern 5: Overly Permissive Tool Access
+❌ **BAD**:
+```yaml
+# Schema mapping skill that only reads files
+allowed-tools: "Bash,Read,Write,Edit,Glob,Grep,WebSearch,Task,Agent"
+```
+
+✅ **GOOD**:
+```yaml
+# Schema mapping skill - read-only analysis
+allowed-tools: "Read,Glob,Grep"
+```
+
+**Why this fails**: Unnecessary attack surface, violates principle of least privilege.
+
+---
+
+#### Anti-Pattern 6: Unscoped Bash Access
+❌ **BAD**:
+```yaml
+# Experiment runner
+allowed-tools: "Bash,Read,Write"  # Any bash command allowed!
+```
+
+✅ **GOOD**:
+```yaml
+# Experiment runner - Python scripts only
+allowed-tools: "Bash(python:*),Bash(pip:*),Read,Write,Grep"
+```
+
+**Why this fails**: Opens door to arbitrary command execution.
+
+---
+
+#### Anti-Pattern 7: Missing Trigger Phrases
+❌ **BAD**:
+```yaml
+description: Analyzes prediction markets using TimeGPT forecasting.
+```
+
+✅ **GOOD**:
+```yaml
+description: |
+  Analyzes Polymarket contracts using TimeGPT forecasting.
+  Use when forecasting prediction markets or analyzing contract odds.
+  Trigger with "forecast Polymarket", "analyze prediction market prices".
+```
+
+**Why this fails**: Claude doesn't know which user phrases should activate the skill.
+
+---
+
+#### Anti-Pattern 8: Exceeding Description Budget
+❌ **BAD** (40 skills × 600 chars = 24,000 chars):
+```yaml
+description: |
+  [600 character verbose description per skill]
+  [Result: Silent skill filtering, random activation failures]
+```
+
+✅ **GOOD** (40 skills × 350 chars = 14,000 chars):
+```yaml
+description: |
+  [350 character focused description per skill]
+  [Result: All skills discoverable, reliable activation]
+```
+
+**Why this fails**: Exceeds 15,000-char budget, causes silent filtering.
+
+---
+
+### Production Debugging Checklist for Nixtla
+
+When skills fail unexpectedly, check in this order:
+
+1. **Description budget**: `find .claude/skills/nixtla-*/SKILL.md -exec grep -A 5 '^description:' {} \; | wc -c`
+2. **Frontmatter validity**: YAML parses correctly, required fields present
+3. **Path references**: All `{baseDir}` substitutions resolve
+4. **SKILL.md size**: Under 500 lines / 5,000 words
+5. **Tool permissions**: `allowed-tools` includes necessary tools only
+6. **Error code**: Check which of 5 validation errors is occurring
+7. **Context saturation**: Too many skills invoked in one session
+
+---
+
 ## References
 
 ### Official Anthropic Documentation
@@ -1058,9 +1439,41 @@ Run through this checklist every time you create or update a skill:
 
 ---
 
-**Last Updated**: 2025-12-06
+**Last Updated**: 2025-12-08
 **Maintained By**: Intent Solutions (Jeremy Longshore)
 **Status**: AUTHORITATIVE - Single Source of Truth for Claude Skills Development
+
+---
+
+## Changelog
+
+### Version 2.1.0 (2025-12-08) - Lee Han Chung Audit
+
+**Audited Against**: [Lee Han Chung Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)
+
+**Critical Additions**:
+1. **Message Injection Architecture** (Section 1) - Details on `isMeta` true/false pattern, XML tags
+2. **15,000-Char Description Budget** (Section 4) - Production constraint with scaling formulas
+3. **Permissions Revert Lifecycle** (Section 6) - Temporary escalation clarification
+4. **5,000-Word SKILL.md Limit** (Section 5) - Context saturation prevention
+5. **Five Validation Error Codes** (Section 14) - Complete error handling guide
+6. **Progressive Testing Workflow** (Section 14) - 5-step validation process
+7. **Eight Critical Anti-Patterns** (Section 15) - Production debugging checklist
+
+**Nixtla Production Enhancements**:
+- Scalable skill portfolio guidance (removed hardcoded 11-skill assumption)
+- Production monitoring bash commands
+- Context budget formulas for growing skill counts
+- Lifecycle examples with nixtla-specific skill names
+
+**Status**: Production-ready for Nixtla internal team deployment
+
+### Version 2.0.0 (2025-12-06) - Initial Consolidation
+
+**Changes**:
+- Consolidated 4 separate standards into single 65KB reference
+- Added Appendix A (Frontmatter Schema), B (Authoring Guide), C (Nixtla Strategy)
+- Created navigation README for skills-schema folder
 
 
 ---
