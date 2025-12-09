@@ -6,5 +6,12 @@
         "url": "https://github.com/intent-solutions-io/plugins-nixtla.git"
       }
     }
-  }
+  },
+  "hooks": {
+    "post-compact": ".claude/hooks/post-compact.sh"
+  },
+  "readAfterCompact": [
+    "scripts/validate_skills.py",
+    "000-docs/skills-schema/SKILLS-STANDARD-COMPLETE.md"
+  ]
 }

@@ -10,11 +10,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Claude Skills – SKILL.md Structure Reference
 
-All Claude Skills in this repository **must conform** to the canonical skills standard documented in:
+All Claude Skills in this repository **must conform** to the canonical skills standard:
 
-- **Master Standard**: `{baseDir}/000-docs/077-SPEC-MASTER-claude-skills-standard.md`
-- **Authoring Guide**: `{baseDir}/000-docs/6767-n-DR-GUID-claude-skills-authoring-guide.md`
-- **Frontmatter Schema**: `{baseDir}/000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md`
+- **📘 Master Standard**: `000-docs/skills-schema/SKILLS-STANDARD-COMPLETE.md` (v2.3.0 ENGINEERING-COMPLETE)
+  - Audited against: Lee Han Chung (Oct 2025), Anthropic Platform Docs, Official Blog, Engineering Blog
+  - Complete specification: frontmatter fields, body structure, best practices
+  - Includes Appendices: Schema Reference, Authoring Guide, Nixtla Strategy
+
+### Automated Validation
+
+**All skills are validated automatically**:
+```bash
+# Run validator locally
+python scripts/validate_skills.py
+
+# CI/CD: Runs on every push/PR
+# See: .github/workflows/skills-validation.yml
+```
+
+**Validator enforces**:
+- Description: ≤1024 chars, third-person voice, plain text
+- Body: ≤5000 words, proper structure
+- Total budget: <15,000 chars across ALL skills
+- Paths: {baseDir} variable (no hardcoded paths)
+- Tools: Proper scoped Bash syntax
+- Version: Semantic versioning recommended
 
 ### SKILL.md Template
 
