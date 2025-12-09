@@ -12,6 +12,6 @@
   },
   "readAfterCompact": [
     "scripts/validate_skills.py",
-    "000-docs/skills-schema/SKILLS-STANDARD-COMPLETE.md"
+    "000-docs/000a-skills-schema/SKILLS-STANDARD-COMPLETE.md"
   ]
 }

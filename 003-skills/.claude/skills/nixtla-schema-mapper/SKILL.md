@@ -1,9 +1,9 @@
 ---
 name: nixtla-schema-mapper
-description: |
-  Analyzes data sources and generates Nixtla-compatible schema transformations. Infers column mappings, creates transformation modules for CSV/SQL/Parquet/dbt sources, generates schema contracts, and validates data quality. Use when user needs data transformation, schema mapping, column inference, or Nixtla format conversion. Trigger with 'map data to Nixtla schema', 'transform CSV for forecasting', 'convert to Nixtla format', 'infer schema'.
+description: Analyzes data sources and generates Nixtla-compatible schema transformations. Infers column mappings, creates transformation modules for CSV/SQL/Parquet/dbt sources, generates schema contracts, and validates data quality. Activates when user needs data transformation, schema mapping, column inference, or Nixtla format conversion.
 allowed-tools: "Read,Write,Glob,Grep,Edit"
 version: "1.1.0"
+license: MIT
 ---
 
 # Nixtla Schema Mapper

@@ -44,8 +44,8 @@ except ImportError:
 # ═══════════════════════════════════════════════════════════
 
 # Discovery paths (Lee Han Chung spec, October 2025)
-PROD_SKILLS_ROOT = Path("skills-pack") / ".claude" / "skills"
-LABS_ROOT = Path("002-workspaces")
+# ONLY production skills in 003-skills - these are LIVE and must be correct
+PROD_SKILLS_ROOT = Path("003-skills") / ".claude" / "skills"
 
 # Anthropic official constraints
 NAME_REGEX = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$")
@@ -147,19 +147,13 @@ def load_skill_file(path: Path) -> Tuple[Dict, str]:
 
 
 def iter_skill_files() -> List[Tuple[Path, bool]]:
-    """Yield (path, is_prod) pairs for all SKILL.md files."""
+    """Yield (path, is_prod) pairs for PRODUCTION SKILL.md files ONLY."""
     results: List[Tuple[Path, bool]] = []
 
-    # Production skills
+    # ONLY production skills in 003-skills - these are LIVE and must be correct
     if PROD_SKILLS_ROOT.is_dir():
         for p in PROD_SKILLS_ROOT.rglob("SKILL.md"):
             results.append((p, True))
-
-    # Lab skills under 002-workspaces/**/skills/**/SKILL.md
-    if LABS_ROOT.is_dir():
-        for p in LABS_ROOT.rglob("SKILL.md"):
-            if "skills" in [part.lower() for part in p.parts]:
-                results.append((p, False))
 
     return sorted(results, key=lambda t: str(t[0]))
 
@@ -513,10 +507,9 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     skill_files = iter_skill_files()
     if not skill_files:
-        print("⚠️  No SKILL.md files found under skills-pack/.claude/skills or 002-workspaces/")
-        print("    Checked paths:")
+        print("⚠️  No PRODUCTION SKILL.md files found")
+        print("    Checked path:")
         print(f"      Production: {PROD_SKILLS_ROOT}")
-        print(f"      Labs:       {LABS_ROOT}")
         return 0
 
     print(f"📋 Found {len(skill_files)} SKILL.md files to validate\n")
