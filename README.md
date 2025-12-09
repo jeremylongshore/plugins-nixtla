@@ -2,7 +2,7 @@
 
 Claude Code plugins and AI skills for time-series forecasting with Nixtla's statsforecast and TimeGPT.
 
-**Version**: 1.6.0 | **Status**: Experimental | **Plugins**: 3 | **Skills**: 21
+**Version**: 1.7.0 | **Status**: Experimental | **Plugins**: 3 | **Skills**: 8
 
 ---
 
@@ -14,7 +14,7 @@ Claude Code plugins and AI skills for time-series forecasting with Nixtla's stat
 | **Who** | Business showcase for Nixtla CEO |
 | **Status** | Experimental (not production) |
 | **Stack** | Python 3.10+, statsforecast, TimeGPT API |
-| **Entry Point** | `plugins/nixtla-baseline-lab/` |
+| **Entry Point** | `005-plugins/nixtla-baseline-lab/` |
 
 ---
 
@@ -33,7 +33,7 @@ pip install -e . && pip install -r requirements-dev.txt
 pytest -v --tb=short
 
 # 4. Baseline lab smoke test (90 sec, offline, no API key needed)
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 python tests/run_baseline_m4_smoke.py
@@ -48,17 +48,17 @@ All pass? You're ready. Something failed? See [Troubleshooting](#troubleshooting
 ```
 nixtla/
 ├── 000-docs/                    # ALL documentation (Doc-Filing v3.0)
-│   ├── global/                  #   Executive summaries, DevOps guide
-│   ├── planned-skills/          #   Generated skill specs (21 skills)
+│   ├── 001a-planned-skills/     #   Generated skill specs (prediction markets)
+│   ├── 004a-dev-planning-templates/  #   Development templates
 │   └── archive/                 #   Historical docs
 │
-├── plugins/                     # WORKING PLUGINS (start here)
+├── 003-skills/                  # Claude Skills (AI behavior mods)
+│   └── .claude/skills/          #   8 production skills
+│
+├── 005-plugins/                 # WORKING PLUGINS (start here)
 │   ├── nixtla-baseline-lab/     #   Main showcase - M4 benchmarks
 │   ├── nixtla-bigquery-forecaster/   BigQuery integration
 │   └── nixtla-search-to-slack/  #   Slack notifications
-│
-├── skills-pack/                 # Claude Skills (AI behavior mods)
-│   └── .claude/skills/          #   8 production skills
 │
 ├── packages/                    # Installable packages
 │   └── nixtla-claude-skills-installer/  # CLI: nixtla-skills
@@ -70,16 +70,15 @@ nixtla/
 ├── CLAUDE.md                    # AI assistant instructions
 ├── README.md                    # You are here
 ├── CHANGELOG.md                 # Release history
-└── VERSION                      # Current version: 1.4.1
+└── VERSION                      # Current version: 1.7.0
 ```
 
 ### Entry Points by Role
 
 | Role | Start Here |
 |------|------------|
-| **DevOps/SRE** | [000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md](000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md) |
-| **Developer** | [plugins/nixtla-baseline-lab/](plugins/nixtla-baseline-lab/) |
-| **Stakeholder** | [000-docs/global/000-EXECUTIVE-SUMMARY.md](000-docs/global/000-EXECUTIVE-SUMMARY.md) |
+| **Developer** | [005-plugins/nixtla-baseline-lab/](005-plugins/nixtla-baseline-lab/) |
+| **Plugin Author** | [000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md](000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md) |
 | **Skill Author** | [000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md](000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md) |
 
 ---
@@ -126,8 +125,8 @@ pip install -r requirements-dev.txt
 
 ```bash
 pytest -v                          # All tests
-pytest plugins/ -v                 # Plugin tests only
-pytest --cov=plugins -v            # With coverage
+pytest 005-plugins/ -v             # Plugin tests only
+pytest --cov=005-plugins -v        # With coverage
 python tests/run_baseline_m4_smoke.py  # Baseline lab smoke test
 ```
 
@@ -182,7 +181,7 @@ nixtla-skills --version            # Check version
 ### Quick Start (Baseline Lab)
 
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt
@@ -199,12 +198,10 @@ Runs in ~90 seconds, fully offline, zero API costs.
 
 | Document | Audience | Link |
 |----------|----------|------|
-| DevOps Operations Guide | DevOps/SRE | [003-GUIDE-devops-nixtla-skills-operations.md](000-docs/global/003-GUIDE-devops-nixtla-skills-operations.md) |
-| Executive Summary | Stakeholders | [000-EXECUTIVE-SUMMARY.md](000-docs/global/000-EXECUTIVE-SUMMARY.md) |
 | Plugin Implementation | Developers | [6767-f-OD-GUIDE-enterprise-plugin-implementation.md](000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md) |
 | Skill Frontmatter Schema | Skill Authors | [6767-m-DR-STND-claude-skills-frontmatter-schema.md](000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md) |
 | Skill Authoring Guide | Skill Authors | [6767-n-DR-GUID-claude-skills-authoring-guide.md](000-docs/6767-n-DR-GUID-claude-skills-authoring-guide.md) |
-| Engagement Options | Business | [001-ENGAGEMENT-OPTIONS.md](000-docs/global/001-ENGAGEMENT-OPTIONS.md) |
+| Skill Output Controls | Developers | [099-AA-GUIDE-skill-output-controls.md](000-docs/099-AA-GUIDE-skill-output-controls.md) |
 
 **Doc-Filing System**: `NNN-CC-ABCD-description.md`
 - `PP` = Planning, `AT` = Architecture, `AA` = Audits, `OD` = Overview, `DR` = Reference
