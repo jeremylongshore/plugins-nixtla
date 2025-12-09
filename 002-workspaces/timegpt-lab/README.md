@@ -18,6 +18,31 @@ Experiments with Nixtla's TimeGPT (API usage, forecasting, anomaly detection, pr
 4. **Benchmark TimeGPT** against StatsForecast baselines for specific domains
 5. **Create golden datasets** for TimeGPT smoke tests and CI integration
 
+## Cross-Lab Comparison
+
+Compare TimeGPT results against StatsForecast baselines using the aggregator script:
+
+```bash
+# 1. Run TimeGPT experiments (this lab)
+cd 002-workspaces/timegpt-lab
+export NIXTLA_TIMEGPT_API_KEY='your_key_here'
+python scripts/run_experiment.py
+
+# 2. (Optional) Run StatsForecast baselines
+cd ../statsforecast-lab
+python scripts/run_statsforecast_baseline.py
+
+# 3. Generate comparison report
+cd /home/jeremy/000-projects/nixtla
+python 004-scripts/compare_timegpt_vs_statsforecast.py
+```
+
+**Outputs**:
+- CSV: `004-scripts/compare_outputs/timegpt_vs_statsforecast_metrics.csv`
+- Report: `000-docs/091-RA-REPT-timegpt-vs-statsforecast-baseline.md`
+
+The aggregator handles missing StatsForecast results gracefully (generates TimeGPT-only report with PENDING status). Re-run after StatsForecast baseline is generated to get full comparison.
+
 ## Environment Setup
 
 ```bash

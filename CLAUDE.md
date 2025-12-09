@@ -306,3 +306,4 @@ Recent extractions (Dec 2025):
 - nixtla-arbitrage-detector, nixtla-batch-forecaster
 
 See git log for extraction commit pattern: `fix(skills): extract {skill} embedded code to scripts`
+- after every compact you are to read 000-docs/skills-schema/SKILLS-STANDARD-COMPLETE.md
