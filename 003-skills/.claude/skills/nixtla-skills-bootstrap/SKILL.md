@@ -1,9 +1,9 @@
 ---
 name: nixtla-skills-bootstrap
-description: |
-  Installs and updates Nixtla Skills in current project using nixtla-skills CLI. Manages skill installation, updates existing skills, and guides through setup process. Use when user needs to install Nixtla skills, update skills to latest version, or set up Nixtla environment. Trigger with 'install Nixtla skills', 'update skills', 'set up Nixtla', 'bootstrap skills'.
+description: Installs and updates Nixtla Skills in current project using nixtla-skills CLI. Manages skill installation, updates existing skills, and guides through setup process. Activates when user needs to install Nixtla skills, update skills to latest version, or set up Nixtla environment.
 allowed-tools: "Read,Glob,Grep"
 version: "1.0.0"
+license: MIT
 ---
 
 # Nixtla Skills Bootstrap
