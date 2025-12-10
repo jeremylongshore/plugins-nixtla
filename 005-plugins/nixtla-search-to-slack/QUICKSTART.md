@@ -1,6 +1,6 @@
 # Quickstart
 
-**Requires**: SerpAPI key, Slack webhook, OpenAI/Anthropic API key
+**Requires**: SerpAPI key, Slack webhook, Anthropic API key
 
 ```bash
 # Setup
@@ -31,7 +31,7 @@ Search web/GitHub → AI summarizes → Posts to Slack
 |-----|---------|-----------|
 | `SERPAPI_KEY` | Web search | serpapi.com |
 | `SLACK_WEBHOOK_URL` | Slack posting | api.slack.com |
-| `OPENAI_API_KEY` | AI summaries | platform.openai.com |
+| `ANTHROPIC_API_KEY` | AI summaries | console.anthropic.com |
 
 ## Test Without API Keys
 
