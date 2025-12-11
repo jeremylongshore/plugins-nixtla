@@ -5,11 +5,11 @@ name: Plugin Validator
 on:
   push:
     paths:
-      - 'plugins/**'
+      - '005-plugins/**'
       - '.github/workflows/plugin-validator.yml'
   pull_request:
     paths:
-      - 'plugins/**'
+      - '005-plugins/**'
   workflow_dispatch:
     inputs:
       plugin_name:
@@ -37,7 +37,7 @@ jobs:
             echo "matrix={\"plugin\":[\"${{ inputs.plugin_name }}\"]}" >> $GITHUB_OUTPUT
           else
             plugins=""
-            for dir in plugins/*/; do
+            for dir in 005-plugins/*/; do
               if [ -d "$dir" ]; then
                 plugin=$(basename "$dir")
                 plugins="$plugins $plugin"
@@ -69,7 +69,7 @@ jobs:
 
       - name: Check .claude-plugin/plugin.json exists
         run: |
-          plugin_json="plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
           if [ ! -f "$plugin_json" ]; then
             echo "::error::REQUIRED: .claude-plugin/plugin.json not found"
             exit 1
@@ -78,7 +78,7 @@ jobs:
 
       - name: Validate JSON syntax
         run: |
-          plugin_json="plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
           if ! jq empty "$plugin_json" 2>/dev/null; then
             echo "::error::Invalid JSON syntax in plugin.json"
             exit 1
@@ -87,7 +87,7 @@ jobs:
 
       - name: Validate required field - name
         run: |
-          plugin_json="plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
           name=$(jq -r '.name // empty' "$plugin_json")
           if [ -z "$name" ]; then
             echo "::error::REQUIRED field 'name' is missing"
@@ -100,7 +100,7 @@ jobs:
 
       - name: Validate recommended fields
         run: |
-          plugin_json="plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
           version=$(jq -r '.version // empty' "$plugin_json")
           description=$(jq -r '.description // empty' "$plugin_json")
           [ -z "$version" ] && echo "::warning::Recommended field 'version' is missing"
@@ -127,7 +127,7 @@ jobs:
 
       - name: Check for at least one component
         run: |
-          plugin_dir="plugins/${{ matrix.plugin }}"
+          plugin_dir="005-plugins/${{ matrix.plugin }}"
           has_component=false
           found=""
           for component in commands agents skills hooks scripts; do
@@ -148,7 +148,7 @@ jobs:
 
       - name: Check README.md exists
         run: |
-          readme="plugins/${{ matrix.plugin }}/README.md"
+          readme="005-plugins/${{ matrix.plugin }}/README.md"
           if [ ! -f "$readme" ]; then
             echo "::warning::README.md not found (recommended)"
           else
@@ -169,7 +169,7 @@ jobs:
 
       - name: Validate command files
         run: |
-          commands_dir="plugins/${{ matrix.plugin }}/commands"
+          commands_dir="005-plugins/${{ matrix.plugin }}/commands"
           if [ ! -d "$commands_dir" ]; then
             echo "No commands/ directory - skipping"
             exit 0
@@ -212,7 +212,7 @@ jobs:
           import yaml
           import glob
 
-          agents_dir = "plugins/${{ matrix.plugin }}/agents"
+          agents_dir = "005-plugins/${{ matrix.plugin }}/agents"
           if not os.path.isdir(agents_dir):
               print("No agents/ directory - skipping")
               sys.exit(0)
@@ -281,7 +281,7 @@ jobs:
           import sys
           import yaml
 
-          skills_dir = "plugins/${{ matrix.plugin }}/skills"
+          skills_dir = "005-plugins/${{ matrix.plugin }}/skills"
           if not os.path.isdir(skills_dir):
               print("No skills/ directory - skipping")
               sys.exit(0)
@@ -354,7 +354,7 @@ jobs:
 
       - name: Validate hooks.json
         run: |
-          hooks_file="plugins/${{ matrix.plugin }}/hooks/hooks.json"
+          hooks_file="005-plugins/${{ matrix.plugin }}/hooks/hooks.json"
           if [ ! -f "$hooks_file" ]; then
             echo "No hooks/hooks.json - skipping"
             exit 0

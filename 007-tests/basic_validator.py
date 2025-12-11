@@ -10,7 +10,7 @@ Usage:
     python tests/basic_validator.py
 
 What it checks:
-    - Critical directories exist (plugins/, 000-docs/, skills-pack/)
+    - Critical directories exist (005-plugins/, 000-docs/, 003-skills/)
     - Expected plugin directories present
     - Claude Skills present
     - Canonical reference docs present
@@ -43,10 +43,10 @@ def get_repo_root() -> Path:
     repo_root = current.parent
 
     # Verify this looks like the right repo
-    if not (repo_root / "plugins").exists():
+    if not (repo_root / "005-plugins").exists():
         raise ValidationError(
             f"Could not find repo root. Current path: {current}\n"
-            f"Expected to find plugins/ directory in parent."
+            f"Expected to find 005-plugins/ directory in parent."
         )
 
     return repo_root
@@ -54,7 +54,7 @@ def get_repo_root() -> Path:
 
 def check_critical_directories(repo_root: Path) -> Tuple[bool, str]:
     """Check that critical top-level directories exist."""
-    required = ["plugins", "000-docs", "skills-pack"]
+    required = ["005-plugins", "000-docs", "003-skills"]
     missing = []
 
     for dir_name in required:
@@ -71,10 +71,10 @@ def check_critical_directories(repo_root: Path) -> Tuple[bool, str]:
 
 def check_plugin_directories(repo_root: Path) -> Tuple[bool, str]:
     """Check that expected plugin directories exist."""
-    plugins_dir = repo_root / "plugins"
+    plugins_dir = repo_root / "005-plugins"
 
     if not plugins_dir.exists():
-        return False, "plugins/ directory not found"
+        return False, "005-plugins/ directory not found"
 
     # Get all plugin directories (exclude __pycache__, __init__.py, README.md)
     plugin_dirs = [
@@ -84,7 +84,7 @@ def check_plugin_directories(repo_root: Path) -> Tuple[bool, str]:
     ]
 
     if len(plugin_dirs) == 0:
-        return False, "No plugin directories found in plugins/"
+        return False, "No plugin directories found in 005-plugins/"
 
     plugins_list = "\n       - ".join(plugin_dirs)
     return True, f"Plugin directories found ({len(plugin_dirs)}):\n       - {plugins_list}"
@@ -92,7 +92,7 @@ def check_plugin_directories(repo_root: Path) -> Tuple[bool, str]:
 
 def check_claude_skills(repo_root: Path) -> Tuple[bool, str]:
     """Check that Claude Skills are present."""
-    skills_dir = repo_root / "skills-pack" / ".claude" / "skills"
+    skills_dir = repo_root / "003-skills" / ".claude" / "skills"
 
     if not skills_dir.exists():
         return False, f"Skills directory not found at: {skills_dir}"
@@ -103,12 +103,12 @@ def check_claude_skills(repo_root: Path) -> Tuple[bool, str]:
     ]
 
     if len(skill_dirs) == 0:
-        return False, "No Claude Skills found in skills-pack/.claude/skills/"
+        return False, "No Claude Skills found in 003-skills/.claude/skills/"
 
-    # Expected 8 skills based on repo status
-    expected_count = 8
-    if len(skill_dirs) != expected_count:
-        return False, f"Expected {expected_count} skills, found {len(skill_dirs)}"
+    # Dynamic skill count - at least 8 (original core skills)
+    min_expected = 8
+    if len(skill_dirs) < min_expected:
+        return False, f"Expected at least {min_expected} skills, found {len(skill_dirs)}"
 
     skills_list = "\n       - ".join(sorted(skill_dirs))
     return True, f"Claude Skills found ({len(skill_dirs)}):\n       - {skills_list}"
