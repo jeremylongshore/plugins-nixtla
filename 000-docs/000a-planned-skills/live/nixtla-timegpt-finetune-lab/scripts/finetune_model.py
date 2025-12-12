@@ -10,7 +10,6 @@ import pickle
 from typing import Dict
 
 import pandas as pd
-
 from nixtla import NixtlaClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

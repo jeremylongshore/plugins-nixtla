@@ -1,26 +1,39 @@
-# Planned Plugins Directory
+# Plugins Documentation Directory
 
-This directory contains specifications for **future Claude Code plugins** organized by strategic category.
+This directory contains documentation for both **implemented** and **planned** Claude Code plugins.
 
 ## Directory Structure
 
 ```
-planned-005-plugins/
-├── internal-efficiency/      # Tools for Nixtla's team (33% of roadmap)
-├── business-growth/          # Market expansion tools (58% of roadmap)
-└── vertical-defi/            # DeFi/Crypto vertical (experimental)
+000a-planned-plugins/
+├── implemented/              # Documentation for working plugins
+│   ├── nixtla-baseline-lab/
+│   ├── nixtla-bigquery-forecaster/
+│   └── nixtla-search-to-slack/
+├── internal-efficiency/      # Planned: Tools for Nixtla's team (33% of roadmap)
+├── business-growth/          # Planned: Market expansion tools (58% of roadmap)
+└── nixtla-defi-sentinel/     # Planned: DeFi/Crypto vertical (experimental)
 ```
 
 ---
 
-## Current Status
+## Implemented Plugins
 
-**Implemented Plugins**: 3 (in `/005-plugins/` directory)
-- nixtla-baseline-lab (v0.8.0)
-- nixtla-bigquery-forecaster
-- nixtla-search-to-slack (v0.1.0)
+Working plugins with full documentation in `implemented/`:
 
-**Planned Plugins**: 12 (specifications in this directory)
+| Plugin | Status | Documentation |
+|--------|--------|---------------|
+| **nixtla-baseline-lab** | v0.8.0 | `implemented/nixtla-baseline-lab/` |
+| **nixtla-bigquery-forecaster** | Demo | `implemented/nixtla-bigquery-forecaster/` |
+| **nixtla-search-to-slack** | v0.1.0 MVP | `implemented/nixtla-search-to-slack/` |
+
+Each has 6 standardized docs: Business Case, PRD, Architecture, User Journey, Technical Spec, Status.
+
+---
+
+## Planned Plugins
+
+**Planned Plugins**: 10 (specifications in category directories)
 
 ---
 
@@ -209,6 +222,6 @@ To add a new planned plugin:
 
 ---
 
-**Last Updated**: 2025-12-05
-**Version**: 1.2.0 (Categorized Structure)
+**Last Updated**: 2025-12-12
+**Version**: 1.3.0 (Added Implemented Plugins Documentation)
 **Maintained By**: Intent Solutions × Nixtla

@@ -12,10 +12,9 @@ from typing import Dict, List, Tuple
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from nixtla import NixtlaClient
 from statsforecast import StatsForecast
 from statsforecast.models import AutoARIMA, AutoETS, AutoTheta, SeasonalNaive
-
-from nixtla import NixtlaClient
 
 
 def cross_validate(

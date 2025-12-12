@@ -2,11 +2,12 @@
 """
 validate_skills.py
 
-Nixtla Skills - SKILL.md Validator (v2.3.0 ENGINEERING-COMPLETE)
+Nixtla Skills - SKILL.md Validator (v2.4.0 ANTHROPIC-SPEC-ALIGNED)
 
 Validates Claude SKILL definitions against:
-- Anthropic Agent Skills official specification
-- Lee Han Chung Deep Dive (October 2025 - NEWEST SOURCE)
+- Anthropic Official Claude Code Docs (December 2025)
+- MCP Specification (modelcontextprotocol.io - November 2025)
+- Lee Han Chung Deep Dive (October 2025)
 - Nixtla internal standards (SKILLS-STANDARD-COMPLETE.md v2.3.0)
 
 Usage:
@@ -16,7 +17,13 @@ Exit codes:
   0 = all skills valid (no errors)
   1 = one or more errors
 
-Sources:
+Official Sources (December 2025):
+- https://code.claude.com/docs/en/skills (Agent Skills specification)
+- https://code.claude.com/docs/en/plugins (Plugin specification)
+- https://modelcontextprotocol.io/specification/2025-11-25/server/tools (MCP Tools)
+- https://modelcontextprotocol.io/specification/2025-11-25/server/resources (MCP Resources)
+
+Legacy Sources:
 - https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/
 - https://claude.com/blog/skills
 - https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills
@@ -324,16 +331,21 @@ def validate_allowed_tools(fm: Dict, report: SkillReport) -> None:
 
 
 def validate_optional_fields(fm: Dict, report: SkillReport) -> None:
-    """Validate optional frontmatter fields (Lee + v2.3.0)."""
-    # version (recommended)
+    """Validate optional frontmatter fields per Anthropic official spec (Dec 2025).
+
+    Official spec from code.claude.com/docs/en/skills:
+    - version: OPTIONAL (semver recommended if present)
+    - allowed-tools: OPTIONAL (comma-separated string)
+    - model: OPTIONAL (inherit or specific model ID)
+    - disable-model-invocation: OPTIONAL (boolean)
+
+    NOTE: 'license' is NOT in official Anthropic spec - removed from validation.
+    """
+    # version (optional but recommended)
     if "version" not in fm:
-        report.add_warning("Missing recommended 'version' field (e.g., '1.0.0')")
+        report.add_warning("Missing optional 'version' field (semver recommended: e.g., '1.0.0')")
     elif not isinstance(fm["version"], str):
         report.add_error(f"'version' must be a string, got {type(fm['version']).__name__}")
-
-    # license (recommended)
-    if "license" not in fm:
-        report.add_warning("Missing recommended 'license' field")
 
     # model (Lee: "inherit" or specific model ID)
     if "model" in fm:

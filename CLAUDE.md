@@ -8,6 +8,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Version**: 1.7.0 | **Status**: 3 working plugins + 23 production skills (all at 100% L4 quality)
 
+## Directory Structure
+
+The repository uses numbered prefixes for top-level organization:
+
+```
+000-docs/           # Documentation (AAR system, planned plugins, specs)
+001-htmlcov/        # Test coverage reports
+002-workspaces/     # Demo projects and workspace templates
+003-skills/         # Claude Skills (.claude/skills/nixtla-*/)
+004-scripts/        # Automation scripts (validators, generators)
+005-plugins/        # Plugin implementations (baseline-lab, bigquery-forecaster, search-to-slack)
+006-packages/       # Installable packages (skills-installer)
+007-tests/          # Additional test utilities
+010-archive/        # Archived/deprecated content
+tests/              # pytest test suite (skills tests)
+```
+
 ## Claude Skills – SKILL.md Structure Reference
 
 All Claude Skills in this repository **must conform** to the canonical skills standard:
@@ -89,7 +106,7 @@ Links to external docs, related skills, references.
 ### Skill File Structure
 
 ```
-003-skills/.claude/skills/your-skill-name/
+003-skills/.claude/skills/nixtla-{skill-name}/
 ├── SKILL.md              # Main skill definition (required)
 ├── scripts/              # Extracted Python/shell scripts
 ├── assets/templates/     # Reusable code templates
@@ -126,7 +143,7 @@ Score: 100/100 ✓ (has action verb, "use when", "trigger with", 172 chars, doma
 pytest -v
 
 # Run with coverage
-pytest --cov=plugins --cov=examples --cov-report=term -v
+pytest --cov=005-plugins --cov-report=term -v
 
 # Lint/format checks (must pass CI)
 black --check .
@@ -141,7 +158,7 @@ isort .
 ### Plugin Development (Baseline Lab)
 
 ```bash
-cd plugins/nixtla-baseline-lab
+cd 005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt
@@ -156,9 +173,9 @@ python tests/run_baseline_m4_smoke.py
 ### Skills Pack
 
 ```bash
-pip install -e packages/nixtla-claude-skills-installer
+pip install -e 006-packages/nixtla-claude-skills-installer
 cd /path/to/your/project
-nixtla-skills init    # Install all 8 skills
+nixtla-skills init    # Install all 23 skills
 nixtla-skills update  # Update to latest
 ```
 
@@ -166,13 +183,13 @@ nixtla-skills update  # Update to latest
 
 ```bash
 # Skills installer E2E test
-python tests/test_skills_installer_e2e.py
+python 007-tests/test_skills_installer_e2e.py
 
 # Baseline lab smoke test
-python plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
+python 005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
 
 # Skills compliance validator (strict mode)
-python scripts/validate_skills.py
+python 004-scripts/validate_skills.py
 
 # Skills test suite (L1/L2/L4 quality checks)
 python tests/skills/test_all_skills.py                        # All 23 skills
@@ -184,11 +201,11 @@ python tests/skills/test_all_skills.py --level 4              # L4 quality only
 
 ```bash
 # Generate new skills using Vertex AI Gemini (overnight batch)
-python scripts/overnight_skill_generator.py --dry-run  # Preview only
-python scripts/overnight_skill_generator.py            # Actually generate
+python 004-scripts/overnight_skill_generator.py --dry-run  # Preview only
+python 004-scripts/overnight_skill_generator.py            # Actually generate
 
 # Extract embedded code from skills to scripts/ folders
-python scripts/add_scripts_to_skills.py
+python 004-scripts/add_scripts_to_skills.py
 ```
 
 ## Architecture
@@ -203,21 +220,21 @@ python scripts/add_scripts_to_skills.py
      - 5 core-forecasting: anomaly-detector, cross-validator, exogenous-integrator, timegpt2-migrator, uncertainty-quantifier
      - 10 prediction-markets: polymarket-analyst, market-risk-analyzer, contract-schema-mapper, correlation-mapper, arbitrage-detector, event-impact-modeler, liquidity-forecaster, batch-forecaster, forecast-validator, model-selector
 
-2. **Plugins** (`plugins/*/`)
+2. **Plugins** (`005-plugins/*/`)
    - Complete applications with MCP servers, tests, Python backends
    - Working: nixtla-baseline-lab, nixtla-bigquery-forecaster, nixtla-search-to-slack
 
-3. **Slash Commands** (`plugins/*/commands/*.md`)
+3. **Slash Commands** (`005-plugins/*/commands/*.md`)
    - User-invoked commands like `/nixtla-baseline-m4`
 
 ### Key Source Files
 
 | File | Purpose |
 |------|---------|
-| `plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | MCP server exposing forecasting tools |
-| `plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` | Golden task test harness |
-| `packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py` | Skills installation logic |
-| `skills-pack/.claude/skills/*/SKILL.md` | Individual skill definitions |
+| `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py` | MCP server exposing forecasting tools |
+| `005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py` | Golden task test harness |
+| `006-packages/nixtla-claude-skills-installer/nixtla_skills_installer/core.py` | Skills installation logic |
+| `003-skills/.claude/skills/*/SKILL.md` | Individual skill definitions |
 
 ### MCP Server Pattern
 
@@ -344,9 +361,9 @@ python tests/skills/test_all_skills.py --json          # JSON output
 
 | Component | Python | Location |
 |-----------|--------|----------|
-| Skills installer | 3.8+ | `packages/nixtla-claude-skills-installer/` |
-| Baseline lab | 3.10+ | `plugins/nixtla-baseline-lab/.venv-nixtla-baseline/` |
-| BigQuery forecaster | 3.10+ | `plugins/nixtla-bigquery-forecaster/.venv/` |
+| Skills installer | 3.8+ | `006-packages/nixtla-claude-skills-installer/` |
+| Baseline lab | 3.10+ | `005-plugins/nixtla-baseline-lab/.venv-nixtla-baseline/` |
+| BigQuery forecaster | 3.10+ | `005-plugins/nixtla-bigquery-forecaster/.venv/` |
 
 ## CI/CD Workflows
 
@@ -356,8 +373,9 @@ All in `.github/workflows/`:
 - `nixtla-baseline-lab-ci.yml` - Baseline lab plugin tests
 - `skills-installer-ci.yml` - Skills installer tests
 - `plugin-validator.yml` - Plugin schema validation
-- `gemini-pr-review.yml` - AI code review on PRs
+- `gemini-code-assist-trigger.yml` - Gemini Code Assist PR review trigger
 - `gemini-daily-audit.yml` - Daily automated audit
+- `timegpt-real-smoke.yml` - TimeGPT API integration smoke tests
 - `deploy-bigquery-forecaster.yml` - BigQuery Cloud Functions deployment
 
 ## Critical Messaging
@@ -381,10 +399,10 @@ See `CHANGELOG.md` for full history. Release process:
 
 **New in 1.6+**: Skills must extract embedded Python/shell code to separate files.
 
-- **Scripts location**: `skills-pack/.claude/skills/{skill-name}/scripts/`
-- **Templates location**: `skills-pack/.claude/skills/{skill-name}/assets/templates/`
+- **Scripts location**: `003-skills/.claude/skills/{skill-name}/scripts/`
+- **Templates location**: `003-skills/.claude/skills/{skill-name}/assets/templates/`
 - **Why**: Prevents SKILL.md from becoming unwieldy, enables code reuse
-- **Validator**: `python scripts/validate_skills.py` checks compliance
+- **Validator**: `python 004-scripts/validate_skills.py` checks compliance
 
 Recent extractions (Dec 2025):
 - nixtla-experiment-architect, nixtla-prod-pipeline-generator, nixtla-schema-mapper

@@ -1,6 +1,14 @@
 name: Plugin Validator
 
-# Validates plugins against 099-SPEC-MASTER-claude-code-plugins-standard.md
+# Validates plugins against Anthropic Official Claude Code Plugin Specification (Dec 2025)
+# Source: https://code.claude.com/docs/en/plugins
+# Also: https://modelcontextprotocol.io/specification/2025-11-25/server/tools (MCP Tools)
+#
+# Required plugin.json fields per official spec:
+# - name (required)
+# - description (required)
+# - version (required)
+# - author.name (required)
 
 on:
   push:
@@ -98,20 +106,51 @@ jobs:
           fi
           echo "name: $name"
 
-      - name: Validate recommended fields
+      - name: Validate required field - description
+        run: |
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          description=$(jq -r '.description // empty' "$plugin_json")
+          if [ -z "$description" ]; then
+            echo "::error::REQUIRED field 'description' is missing (per Anthropic spec)"
+            exit 1
+          fi
+          echo "description: $description"
+
+      - name: Validate required field - version
         run: |
           plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
           version=$(jq -r '.version // empty' "$plugin_json")
-          description=$(jq -r '.description // empty' "$plugin_json")
-          [ -z "$version" ] && echo "::warning::Recommended field 'version' is missing"
-          [ -z "$description" ] && echo "::warning::Recommended field 'description' is missing"
-          if [ -n "$version" ]; then
-            if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
-              echo "::warning::Version '$version' doesn't follow semver"
-            fi
+          if [ -z "$version" ]; then
+            echo "::error::REQUIRED field 'version' is missing (per Anthropic spec)"
+            exit 1
           fi
-          echo "version: ${version:-not set}"
-          echo "description: ${description:-not set}"
+          if ! echo "$version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+'; then
+            echo "::warning::Version '$version' doesn't follow semver (recommended: X.Y.Z)"
+          fi
+          echo "version: $version"
+
+      - name: Validate required field - author.name
+        run: |
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          author_name=$(jq -r '.author.name // empty' "$plugin_json")
+          if [ -z "$author_name" ]; then
+            echo "::error::REQUIRED field 'author.name' is missing (per Anthropic spec)"
+            exit 1
+          fi
+          echo "author.name: $author_name"
+
+      - name: Validate optional fields
+        run: |
+          plugin_json="005-plugins/${{ matrix.plugin }}/.claude-plugin/plugin.json"
+          homepage=$(jq -r '.homepage // empty' "$plugin_json")
+          repository=$(jq -r '.repository // empty' "$plugin_json")
+          license=$(jq -r '.license // empty' "$plugin_json")
+          [ -z "$homepage" ] && echo "::notice::Optional field 'homepage' not set"
+          [ -z "$repository" ] && echo "::notice::Optional field 'repository' not set"
+          [ -z "$license" ] && echo "::notice::Optional field 'license' not set"
+          echo "homepage: ${homepage:-not set}"
+          echo "repository: ${repository:-not set}"
+          echo "license: ${license:-not set}"
 
   validate-structure:
     name: Validate Plugin Structure

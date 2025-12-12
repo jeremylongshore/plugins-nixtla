@@ -10,9 +10,8 @@ from typing import Dict
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-
 from nixtla import NixtlaClient
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 

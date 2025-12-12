@@ -68,7 +68,7 @@ jobs:
         run: black --check --diff .
 
       - name: Run isort import checker
-        run: isort --check-only --diff .
+        run: isort --check-only --diff --settings-path pyproject.toml .
 
       - name: Run Flake8 linter
         run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -98,7 +98,7 @@ jobs:
           pip install -r requirements-dev.txt
 
       - name: Run pytest
-        run: pytest --cov=plugins --cov=examples --cov-report=term -v
+        run: pytest --cov=005-plugins --cov=003-skills --cov-report=term -v
 
   validate-plugins:
     name: Validate Plugin Structure
@@ -112,7 +112,7 @@ jobs:
       - name: Validate plugin.json files
         run: |
           echo "Validating plugin.json files..."
-          for plugin_json in $(find plugins -name "plugin.json" 2>/dev/null); do
+          for plugin_json in $(find 005-plugins -name "plugin.json" 2>/dev/null); do
             echo "Checking $plugin_json"
             jq empty "$plugin_json" || exit 1
             jq -e '.name' "$plugin_json" > /dev/null || (echo "Missing 'name' in $plugin_json" && exit 1)

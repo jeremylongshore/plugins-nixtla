@@ -31,8 +31,8 @@ SKILLS_DIR = Path(__file__).parent.parent.parent / "003-skills" / ".claude" / "s
 
 
 @dataclass
-class TestResult:
-    """Result of a single test."""
+class CheckResult:
+    """Result of a single check."""
 
     name: str
     passed: bool
@@ -42,12 +42,12 @@ class TestResult:
 
 
 @dataclass
-class SkillTestReport:
-    """Complete test report for a skill."""
+class SkillCheckReport:
+    """Complete check report for a skill."""
 
     skill_name: str
     timestamp: str
-    results: List[TestResult] = field(default_factory=list)
+    results: List[CheckResult] = field(default_factory=list)
 
     @property
     def passed(self) -> bool:
@@ -101,21 +101,23 @@ def parse_yaml_frontmatter(content: str) -> Optional[dict]:
     return result
 
 
-def test_skill_md_exists(skill_path: Path) -> TestResult:
+def _check_skill_md_exists(skill_path: Path) -> CheckResult:
     """L1: Check SKILL.md exists."""
     skill_md = skill_path / "SKILL.md"
     if skill_md.exists():
-        return TestResult(
+        return CheckResult(
             name="SKILL.md exists", passed=True, level=1, message=f"Found: {skill_md}"
         )
-    return TestResult(name="SKILL.md exists", passed=False, level=1, message=f"Missing: {skill_md}")
+    return CheckResult(
+        name="SKILL.md exists", passed=False, level=1, message=f"Missing: {skill_md}"
+    )
 
 
-def test_frontmatter_valid(skill_path: Path) -> TestResult:
+def _check_frontmatter_valid(skill_path: Path) -> CheckResult:
     """L1: Check SKILL.md has valid frontmatter."""
     skill_md = skill_path / "SKILL.md"
     if not skill_md.exists():
-        return TestResult(
+        return CheckResult(
             name="Frontmatter valid", passed=False, level=1, message="SKILL.md not found"
         )
 
@@ -123,38 +125,47 @@ def test_frontmatter_valid(skill_path: Path) -> TestResult:
     frontmatter = parse_yaml_frontmatter(content)
 
     if not frontmatter:
-        return TestResult(
+        return CheckResult(
             name="Frontmatter valid",
             passed=False,
             level=1,
             message="No valid YAML frontmatter found",
         )
 
-    # Check required fields
-    required = ["name", "description", "allowed-tools", "version"]
+    # Check required fields (per Anthropic official spec - Dec 2025)
+    # Official: name (required), description (required), allowed-tools (optional), version (optional)
+    # Source: https://code.claude.com/docs/en/skills
+    required = ["name", "description"]  # Only name and description are required per spec
+    recommended = ["allowed-tools", "version"]  # Optional but recommended
     missing = [f for f in required if f not in frontmatter]
+    missing_recommended = [f for f in recommended if f not in frontmatter]
 
     if missing:
-        return TestResult(
+        return CheckResult(
             name="Frontmatter valid",
             passed=False,
             level=1,
             message=f"Missing required fields: {missing}",
         )
 
-    return TestResult(
+    # Note: missing recommended fields don't cause failure
+    recommended_msg = f" (missing optional: {missing_recommended})" if missing_recommended else ""
+
+    return CheckResult(
         name="Frontmatter valid",
         passed=True,
         level=1,
-        message=f"All required fields present: {list(frontmatter.keys())}",
+        message=f"All required fields present: {list(frontmatter.keys())}{recommended_msg}",
     )
 
 
-def test_scripts_exist(skill_path: Path) -> TestResult:
+def _check_scripts_exist(skill_path: Path) -> CheckResult:
     """L1: Check all referenced scripts exist."""
     skill_md = skill_path / "SKILL.md"
     if not skill_md.exists():
-        return TestResult(name="Scripts exist", passed=False, level=1, message="SKILL.md not found")
+        return CheckResult(
+            name="Scripts exist", passed=False, level=1, message="SKILL.md not found"
+        )
 
     content = skill_md.read_text()
 
@@ -164,7 +175,7 @@ def test_scripts_exist(skill_path: Path) -> TestResult:
 
     if not referenced:
         # No scripts referenced is OK (skill might not need scripts)
-        return TestResult(
+        return CheckResult(
             name="Scripts exist", passed=True, level=1, message="No scripts referenced in SKILL.md"
         )
 
@@ -176,30 +187,30 @@ def test_scripts_exist(skill_path: Path) -> TestResult:
     missing = referenced - actual
 
     if missing:
-        return TestResult(
+        return CheckResult(
             name="Scripts exist",
             passed=False,
             level=1,
             message=f"Missing scripts: {sorted(missing)}",
         )
 
-    return TestResult(
+    return CheckResult(
         name="Scripts exist", passed=True, level=1, message=f"All {len(referenced)} scripts found"
     )
 
 
-def test_scripts_syntax(skill_path: Path) -> TestResult:
+def _check_scripts_syntax(skill_path: Path) -> CheckResult:
     """L1: Check scripts are syntactically valid Python."""
     scripts_dir = skill_path / "scripts"
 
     if not scripts_dir.exists():
-        return TestResult(
+        return CheckResult(
             name="Scripts syntax valid", passed=True, level=1, message="No scripts directory"
         )
 
     scripts = list(scripts_dir.glob("*.py"))
     if not scripts:
-        return TestResult(
+        return CheckResult(
             name="Scripts syntax valid", passed=True, level=1, message="No Python scripts found"
         )
 
@@ -212,11 +223,11 @@ def test_scripts_syntax(skill_path: Path) -> TestResult:
             errors.append(f"{script.name}: {e.msg} (line {e.lineno})")
 
     if errors:
-        return TestResult(
+        return CheckResult(
             name="Scripts syntax valid", passed=False, level=1, message=f"Syntax errors: {errors}"
         )
 
-    return TestResult(
+    return CheckResult(
         name="Scripts syntax valid",
         passed=True,
         level=1,
@@ -224,18 +235,18 @@ def test_scripts_syntax(skill_path: Path) -> TestResult:
     )
 
 
-def test_scripts_importable(skill_path: Path) -> TestResult:
+def _check_scripts_importable(skill_path: Path) -> CheckResult:
     """L2: Check scripts can be imported."""
     scripts_dir = skill_path / "scripts"
 
     if not scripts_dir.exists():
-        return TestResult(
+        return CheckResult(
             name="Scripts importable", passed=True, level=2, message="No scripts directory"
         )
 
     scripts = list(scripts_dir.glob("*.py"))
     if not scripts:
-        return TestResult(
+        return CheckResult(
             name="Scripts importable", passed=True, level=2, message="No Python scripts found"
         )
 
@@ -251,11 +262,11 @@ def test_scripts_importable(skill_path: Path) -> TestResult:
             errors.append(f"{script.name}: {str(e)[:50]}")
 
     if errors:
-        return TestResult(
+        return CheckResult(
             name="Scripts importable", passed=False, level=2, message=f"Import issues: {errors}"
         )
 
-    return TestResult(
+    return CheckResult(
         name="Scripts importable",
         passed=True,
         level=2,
@@ -263,18 +274,18 @@ def test_scripts_importable(skill_path: Path) -> TestResult:
     )
 
 
-def test_scripts_help(skill_path: Path) -> TestResult:
+def _check_scripts_help(skill_path: Path) -> CheckResult:
     """L2: Check scripts respond to --help."""
     scripts_dir = skill_path / "scripts"
 
     if not scripts_dir.exists():
-        return TestResult(
+        return CheckResult(
             name="Scripts --help works", passed=True, level=2, message="No scripts directory"
         )
 
     scripts = list(scripts_dir.glob("*.py"))
     if not scripts:
-        return TestResult(
+        return CheckResult(
             name="Scripts --help works", passed=True, level=2, message="No Python scripts found"
         )
 
@@ -299,14 +310,14 @@ def test_scripts_help(skill_path: Path) -> TestResult:
             errors.append(f"{script.name}: {str(e)[:30]}")
 
     if errors and len(errors) == len(scripts):
-        return TestResult(
+        return CheckResult(
             name="Scripts --help works",
             passed=False,
             level=2,
             message=f"All scripts failed: {errors[:3]}",
         )
 
-    return TestResult(
+    return CheckResult(
         name="Scripts --help works",
         passed=True,
         level=2,
@@ -314,11 +325,11 @@ def test_scripts_help(skill_path: Path) -> TestResult:
     )
 
 
-def test_description_quality(skill_path: Path) -> TestResult:
+def _check_description_quality(skill_path: Path) -> CheckResult:
     """L4: Check description quality score."""
     skill_md = skill_path / "SKILL.md"
     if not skill_md.exists():
-        return TestResult(
+        return CheckResult(
             name="Description quality", passed=False, level=4, message="SKILL.md not found"
         )
 
@@ -326,7 +337,7 @@ def test_description_quality(skill_path: Path) -> TestResult:
     frontmatter = parse_yaml_frontmatter(content)
 
     if not frontmatter or "description" not in frontmatter:
-        return TestResult(
+        return CheckResult(
             name="Description quality", passed=False, level=4, message="No description found"
         )
 
@@ -377,7 +388,7 @@ def test_description_quality(skill_path: Path) -> TestResult:
 
     passed = score >= 100
 
-    return TestResult(
+    return CheckResult(
         name="Description quality",
         passed=passed,
         level=4,
@@ -385,30 +396,30 @@ def test_description_quality(skill_path: Path) -> TestResult:
     )
 
 
-def test_skill(skill_path: Path, levels: List[int] = [1, 2, 3, 4]) -> SkillTestReport:
-    """Run all tests for a skill."""
-    report = SkillTestReport(skill_name=skill_path.name, timestamp=datetime.now().isoformat())
+def run_skill_checks(skill_path: Path, levels: List[int] = [1, 2, 3, 4]) -> SkillCheckReport:
+    """Run all checks for a skill."""
+    report = SkillCheckReport(skill_name=skill_path.name, timestamp=datetime.now().isoformat())
 
-    # Level 1 tests
+    # Level 1 checks
     if 1 in levels:
-        report.results.append(test_skill_md_exists(skill_path))
-        report.results.append(test_frontmatter_valid(skill_path))
-        report.results.append(test_scripts_exist(skill_path))
-        report.results.append(test_scripts_syntax(skill_path))
+        report.results.append(_check_skill_md_exists(skill_path))
+        report.results.append(_check_frontmatter_valid(skill_path))
+        report.results.append(_check_scripts_exist(skill_path))
+        report.results.append(_check_scripts_syntax(skill_path))
 
-    # Level 2 tests
+    # Level 2 checks
     if 2 in levels:
-        report.results.append(test_scripts_importable(skill_path))
-        report.results.append(test_scripts_help(skill_path))
+        report.results.append(_check_scripts_importable(skill_path))
+        report.results.append(_check_scripts_help(skill_path))
 
-    # Level 4 tests
+    # Level 4 checks
     if 4 in levels:
-        report.results.append(test_description_quality(skill_path))
+        report.results.append(_check_description_quality(skill_path))
 
     return report
 
 
-def print_report(report: SkillTestReport) -> None:
+def print_report(report: SkillCheckReport) -> None:
     """Print test report to console."""
     status = "PASS" if report.passed else "FAIL"
     print(f"\n{'='*60}")
@@ -422,7 +433,7 @@ def print_report(report: SkillTestReport) -> None:
         print(f"  {icon} [{level}] {result.name}: {result.message}")
 
 
-def save_report(report: SkillTestReport, output_dir: Path) -> None:
+def save_report(report: SkillCheckReport, output_dir: Path) -> None:
     """Save test report to JSON file."""
     output_dir.mkdir(parents=True, exist_ok=True)
     output_file = output_dir / f"test_{report.skill_name}.json"
@@ -472,7 +483,7 @@ def main():
     failed_count = 0
 
     for skill_path in skill_paths:
-        report = test_skill(skill_path, levels)
+        report = run_skill_checks(skill_path, levels)
         all_reports.append(report)
 
         if not args.json:

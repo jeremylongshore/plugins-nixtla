@@ -95,9 +95,8 @@ def run_batch_forecast(
     Returns:
         Dict with results summary
     """
-    from prepare_data import analyze_series, load_multi_series_data, split_into_batches
-
     from nixtla import NixtlaClient
+    from prepare_data import analyze_series, load_multi_series_data, split_into_batches
 
     check_api_key()
     client = NixtlaClient()

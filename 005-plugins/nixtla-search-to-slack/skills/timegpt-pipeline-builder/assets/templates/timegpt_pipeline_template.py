@@ -15,7 +15,6 @@ from typing import Any, Dict, List, Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from nixtla import NixtlaClient
 
 # Setup logging
