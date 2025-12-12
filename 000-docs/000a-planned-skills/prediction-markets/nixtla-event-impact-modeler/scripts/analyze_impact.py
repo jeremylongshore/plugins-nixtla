@@ -14,7 +14,6 @@ from typing import List, Tuple
 
 import pandas as pd
 from causalimpact import CausalImpact
-
 from nixtla import NixtlaClient
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

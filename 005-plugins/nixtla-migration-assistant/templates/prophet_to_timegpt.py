@@ -35,7 +35,6 @@ print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']])
 # =============================================================================
 
 import pandas as pd
-
 from nixtla import NixtlaClient
 
 # Load data (same format as Prophet: ds, y columns)

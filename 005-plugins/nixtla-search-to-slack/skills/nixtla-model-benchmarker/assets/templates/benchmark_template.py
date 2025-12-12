@@ -21,15 +21,15 @@ from mlforecast import MLForecast
 from mlforecast.lag_transforms import ExponentiallyWeightedMean, RollingMean
 from neuralforecast import NeuralForecast
 from neuralforecast.models import NBEATS, NHITS
+
+# Nixtla imports
+from nixtla import NixtlaClient
 from sklearn.ensemble import RandomForestRegressor
 from statsforecast import StatsForecast
 from statsforecast.models import AutoARIMA, AutoETS, AutoTheta
 
 # Metrics
 from utilsforecast.losses import mae, mape, mse, rmse, smape
-
-# Nixtla imports
-from nixtla import NixtlaClient
 
 
 class NixtlaBenchmark:

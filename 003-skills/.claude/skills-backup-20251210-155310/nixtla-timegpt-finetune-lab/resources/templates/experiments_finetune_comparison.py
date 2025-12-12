@@ -13,12 +13,11 @@ from pathlib import Path
 
 import pandas as pd
 import yaml
+from nixtla import NixtlaClient
 from statsforecast import StatsForecast
 from statsforecast.models import AutoARIMA, AutoETS, AutoTheta
 from utilsforecast.evaluation import evaluate
 from utilsforecast.losses import mae, mase, smape
-
-from nixtla import NixtlaClient
 
 
 def load_finetuned_model_id():

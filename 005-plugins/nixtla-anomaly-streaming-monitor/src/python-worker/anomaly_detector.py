@@ -5,7 +5,6 @@ import os
 from typing import Optional
 
 import pandas as pd
-
 from nixtla import NixtlaClient
 
 
