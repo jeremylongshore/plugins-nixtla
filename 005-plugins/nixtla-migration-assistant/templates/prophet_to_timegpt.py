@@ -35,14 +35,15 @@ print(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']])
 # =============================================================================
 
 import pandas as pd
+
 from nixtla import NixtlaClient
 
 # Load data (same format as Prophet: ds, y columns)
-df = pd.read_csv('data.csv')
+df = pd.read_csv("data.csv")
 
 # Add unique_id if not present (required for Nixtla)
-if 'unique_id' not in df.columns:
-    df['unique_id'] = 'series_1'
+if "unique_id" not in df.columns:
+    df["unique_id"] = "series_1"
 
 # Initialize client
 client = NixtlaClient()  # Uses NIXTLA_TIMEGPT_API_KEY env var
@@ -51,8 +52,8 @@ client = NixtlaClient()  # Uses NIXTLA_TIMEGPT_API_KEY env var
 forecast = client.forecast(
     df=df,
     h=30,  # horizon (same as periods in Prophet)
-    freq='D',  # frequency
-    level=[80, 95]  # confidence intervals (similar to Prophet's interval_width)
+    freq="D",  # frequency
+    level=[80, 95],  # confidence intervals (similar to Prophet's interval_width)
 )
 
 # Results columns: unique_id, ds, TimeGPT, TimeGPT-lo-80, TimeGPT-hi-80, etc.

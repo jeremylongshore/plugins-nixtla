@@ -177,9 +177,7 @@ def validate_skills_structure(temp_dir: Path) -> List[str]:
 
     # Find all nixtla-* skill directories
     installed_skills = [
-        d.name
-        for d in skills_dir.iterdir()
-        if d.is_dir() and d.name.startswith("nixtla-")
+        d.name for d in skills_dir.iterdir() if d.is_dir() and d.name.startswith("nixtla-")
     ]
 
     # Check count
@@ -287,11 +285,7 @@ def run_e2e_test() -> bool:
         # Find installed skills
         skills_dir = temp_dir / ".claude" / "skills"
         installed_skills = sorted(
-            [
-                d.name
-                for d in skills_dir.iterdir()
-                if d.is_dir() and d.name.startswith("nixtla-")
-            ]
+            [d.name for d in skills_dir.iterdir() if d.is_dir() and d.name.startswith("nixtla-")]
         )
 
         expected_count = get_source_skills_count()
@@ -300,9 +294,7 @@ def run_e2e_test() -> bool:
             for skill in installed_skills:
                 print(f"   - {skill}")
         else:
-            print(
-                f"✗ Expected {expected_count} skills, found {len(installed_skills)}"
-            )
+            print(f"✗ Expected {expected_count} skills, found {len(installed_skills)}")
             raise TestFailure("Wrong number of skills installed")
 
         # Validate detailed structure

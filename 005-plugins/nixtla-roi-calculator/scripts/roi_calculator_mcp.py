@@ -14,7 +14,7 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 app = Server("nixtla-roi-calculator")
 
@@ -22,6 +22,7 @@ app = Server("nixtla-roi-calculator")
 @dataclass
 class ROIInputs:
     """ROI calculation inputs."""
+
     current_tool_cost: float = 0.0
     fte_hours_per_week: float = 0.0
     fte_hourly_rate: float = 75.0
@@ -46,8 +47,10 @@ def calculate_roi_internal(inputs: ROIInputs) -> dict[str, Any]:
 
     # ROI calculation
     annual_savings = current_total_annual - timegpt_total_annual
-    roi_percentage = (annual_savings / current_total_annual) * 100 if current_total_annual > 0 else 0
-    payback_months = 1 if annual_savings > 0 else float('inf')
+    roi_percentage = (
+        (annual_savings / current_total_annual) * 100 if current_total_annual > 0 else 0
+    )
+    payback_months = 1 if annual_savings > 0 else float("inf")
 
     return {
         "current_costs": {
@@ -55,20 +58,20 @@ def calculate_roi_internal(inputs: ROIInputs) -> dict[str, Any]:
             "fte_annual": current_fte_annual,
             "infrastructure_annual": current_infra_annual,
             "total_annual": current_total_annual,
-            "total_3year": current_total_annual * 3
+            "total_3year": current_total_annual * 3,
         },
         "timegpt_costs": {
             "api_annual": timegpt_annual,
             "fte_annual": timegpt_fte_annual,
             "total_annual": timegpt_total_annual,
-            "total_3year": timegpt_total_annual * 3
+            "total_3year": timegpt_total_annual * 3,
         },
         "savings": {
             "annual": annual_savings,
             "3year": annual_savings * 3,
             "roi_percentage": roi_percentage,
-            "payback_months": payback_months
-        }
+            "payback_months": payback_months,
+        },
     }
 
 
@@ -82,14 +85,29 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "current_tool_cost": {"type": "number", "description": "Monthly tool/license cost"},
-                    "fte_hours_per_week": {"type": "number", "description": "Data scientist hours/week on forecasting"},
-                    "fte_hourly_rate": {"type": "number", "description": "Hourly rate (default: $75)"},
-                    "infrastructure_cost": {"type": "number", "description": "Monthly infrastructure cost"},
-                    "forecast_volume_monthly": {"type": "integer", "description": "Monthly forecast API calls"}
+                    "current_tool_cost": {
+                        "type": "number",
+                        "description": "Monthly tool/license cost",
+                    },
+                    "fte_hours_per_week": {
+                        "type": "number",
+                        "description": "Data scientist hours/week on forecasting",
+                    },
+                    "fte_hourly_rate": {
+                        "type": "number",
+                        "description": "Hourly rate (default: $75)",
+                    },
+                    "infrastructure_cost": {
+                        "type": "number",
+                        "description": "Monthly infrastructure cost",
+                    },
+                    "forecast_volume_monthly": {
+                        "type": "integer",
+                        "description": "Monthly forecast API calls",
+                    },
                 },
-                "required": ["current_tool_cost", "forecast_volume_monthly"]
-            }
+                "required": ["current_tool_cost", "forecast_volume_monthly"],
+            },
         ),
         Tool(
             name="generate_report",
@@ -98,11 +116,15 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "roi_data": {"type": "object", "description": "ROI calculation results"},
-                    "format": {"type": "string", "enum": ["pdf", "pptx"], "description": "Output format"},
-                    "output_path": {"type": "string", "description": "Output file path"}
+                    "format": {
+                        "type": "string",
+                        "enum": ["pdf", "pptx"],
+                        "description": "Output format",
+                    },
+                    "output_path": {"type": "string", "description": "Output file path"},
                 },
-                "required": ["roi_data", "format"]
-            }
+                "required": ["roi_data", "format"],
+            },
         ),
         Tool(
             name="compare_scenarios",
@@ -110,10 +132,14 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "scenarios": {"type": "array", "items": {"type": "string"}, "description": "Scenarios to compare"}
+                    "scenarios": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "Scenarios to compare",
+                    }
                 },
-                "required": ["scenarios"]
-            }
+                "required": ["scenarios"],
+            },
         ),
         Tool(
             name="export_salesforce",
@@ -122,11 +148,14 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "roi_data": {"type": "object", "description": "ROI calculation results"},
-                    "opportunity_name": {"type": "string", "description": "Salesforce opportunity name"}
+                    "opportunity_name": {
+                        "type": "string",
+                        "description": "Salesforce opportunity name",
+                    },
                 },
-                "required": ["roi_data", "opportunity_name"]
-            }
-        )
+                "required": ["roi_data", "opportunity_name"],
+            },
+        ),
     ]
 
 
@@ -139,7 +168,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             fte_hours_per_week=arguments.get("fte_hours_per_week", 0),
             fte_hourly_rate=arguments.get("fte_hourly_rate", 75),
             infrastructure_cost=arguments.get("infrastructure_cost", 0),
-            forecast_volume_monthly=arguments.get("forecast_volume_monthly", 1000)
+            forecast_volume_monthly=arguments.get("forecast_volume_monthly", 1000),
         )
         result = calculate_roi_internal(inputs)
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
@@ -166,4 +195,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

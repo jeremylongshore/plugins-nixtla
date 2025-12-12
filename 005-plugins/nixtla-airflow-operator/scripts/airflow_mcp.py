@@ -13,7 +13,7 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 app = Server("nixtla-airflow-operator")
 
@@ -110,48 +110,44 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "dag_name": {"type": "string"},
                     "schedule": {"type": "string", "default": "@daily"},
-                    "source": {"type": "string", "enum": ["bigquery", "snowflake", "postgres", "s3"]},
+                    "source": {
+                        "type": "string",
+                        "enum": ["bigquery", "snowflake", "postgres", "s3"],
+                    },
                     "horizon": {"type": "integer", "default": 14},
                     "freq": {"type": "string", "default": "D"},
-                    "alert_email": {"type": "string"}
+                    "alert_email": {"type": "string"},
                 },
-                "required": ["dag_name", "source"]
-            }
+                "required": ["dag_name", "source"],
+            },
         ),
         Tool(
             name="validate_dag",
             description="Validate DAG syntax and connections",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "dag_path": {"type": "string"}
-                },
-                "required": ["dag_path"]
-            }
+                "properties": {"dag_path": {"type": "string"}},
+                "required": ["dag_path"],
+            },
         ),
         Tool(
             name="configure_connection",
             description="Generate Airflow connection configuration",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "source": {"type": "string"},
-                    "connection_id": {"type": "string"}
-                },
-                "required": ["source", "connection_id"]
-            }
+                "properties": {"source": {"type": "string"}, "connection_id": {"type": "string"}},
+                "required": ["source", "connection_id"],
+            },
         ),
         Tool(
             name="generate_tests",
             description="Generate DAG test file",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "dag_name": {"type": "string"}
-                },
-                "required": ["dag_name"]
-            }
-        )
+                "properties": {"dag_name": {"type": "string"}},
+                "required": ["dag_name"],
+            },
+        ),
     ]
 
 
@@ -164,7 +160,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             source=arguments.get("source", "bigquery"),
             horizon=arguments.get("horizon", 14),
             freq=arguments.get("freq", "D"),
-            alert_email=arguments.get("alert_email", "data-team@company.com")
+            alert_email=arguments.get("alert_email", "data-team@company.com"),
         )
         return [TextContent(type="text", text=dag_code)]
 
@@ -187,4 +183,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

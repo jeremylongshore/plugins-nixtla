@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Report generator for ROI analysis."""
 
+import json
 from pathlib import Path
 from typing import Any, Optional
-import json
 
 
 def generate_markdown_report(roi_data: dict[str, Any], output_path: Optional[Path] = None) -> str:
@@ -84,6 +84,6 @@ def generate_salesforce_export(roi_data: dict[str, Any], opportunity_name: str) 
             "ROI_Percentage__c": savings.get("roi_percentage", 0),
             "Payback_Months__c": savings.get("payback_months", 0),
             "Current_Annual_Cost__c": roi_data.get("current_costs", {}).get("total_annual", 0),
-            "Proposed_Annual_Cost__c": roi_data.get("timegpt_costs", {}).get("total_annual", 0)
-        }
+            "Proposed_Annual_Cost__c": roi_data.get("timegpt_costs", {}).get("total_annual", 0),
+        },
     }

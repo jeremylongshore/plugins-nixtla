@@ -9,7 +9,7 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 app = Server("nixtla-cost-optimizer")
 
@@ -25,26 +25,30 @@ def analyze_usage(api_calls: list[dict]) -> dict:
     # Check for batching opportunities
     single_series_calls = sum(1 for call in api_calls if call.get("series_count", 1) == 1)
     if single_series_calls > total_calls * 0.5:
-        opportunities.append({
-            "type": "batching",
-            "description": f"{single_series_calls} single-series calls could be batched",
-            "potential_savings": "40-60%"
-        })
+        opportunities.append(
+            {
+                "type": "batching",
+                "description": f"{single_series_calls} single-series calls could be batched",
+                "potential_savings": "40-60%",
+            }
+        )
 
     # Check for caching opportunities
     unique_inputs = len(set(json.dumps(call.get("input_hash", "")) for call in api_calls))
     if unique_inputs < total_calls * 0.8:
-        opportunities.append({
-            "type": "caching",
-            "description": f"{total_calls - unique_inputs} duplicate calls could be cached",
-            "potential_savings": "20-30%"
-        })
+        opportunities.append(
+            {
+                "type": "caching",
+                "description": f"{total_calls - unique_inputs} duplicate calls could be cached",
+                "potential_savings": "20-30%",
+            }
+        )
 
     return {
         "total_calls": total_calls,
         "total_series": total_series,
         "avg_series_per_call": total_series / total_calls if total_calls > 0 else 0,
-        "opportunities": opportunities
+        "opportunities": opportunities,
     }
 
 
@@ -58,9 +62,9 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "start_date": {"type": "string", "description": "Analysis start date"},
-                    "end_date": {"type": "string", "description": "Analysis end date"}
-                }
-            }
+                    "end_date": {"type": "string", "description": "Analysis end date"},
+                },
+            },
         ),
         Tool(
             name="recommend_optimizations",
@@ -69,8 +73,8 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "target_reduction": {"type": "number", "description": "Target cost reduction %"}
-                }
-            }
+                },
+            },
         ),
         Tool(
             name="simulate_batching",
@@ -79,9 +83,9 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "batch_size": {"type": "integer", "default": 100},
-                    "batch_window_seconds": {"type": "integer", "default": 60}
-                }
-            }
+                    "batch_window_seconds": {"type": "integer", "default": 60},
+                },
+            },
         ),
         Tool(
             name="generate_hybrid_strategy",
@@ -89,20 +93,21 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "timegpt_threshold": {"type": "number", "description": "Value threshold for TimeGPT"}
-                }
-            }
+                    "timegpt_threshold": {
+                        "type": "number",
+                        "description": "Value threshold for TimeGPT",
+                    }
+                },
+            },
         ),
         Tool(
             name="export_report",
             description="Export optimization report",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "format": {"type": "string", "enum": ["markdown", "pdf", "json"]}
-                }
-            }
-        )
+                "properties": {"format": {"type": "string", "enum": ["markdown", "pdf", "json"]}},
+            },
+        ),
     ]
 
 
@@ -117,10 +122,22 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "avg_series_per_call": 5.8,
             "estimated_cost": "$154.20",
             "optimization_opportunities": [
-                {"type": "batching", "potential_savings": "45%", "description": "67% of calls have <10 series"},
-                {"type": "caching", "potential_savings": "15%", "description": "12% of calls are duplicates"},
-                {"type": "hybrid", "potential_savings": "25%", "description": "Low-value series could use StatsForecast"}
-            ]
+                {
+                    "type": "batching",
+                    "potential_savings": "45%",
+                    "description": "67% of calls have <10 series",
+                },
+                {
+                    "type": "caching",
+                    "potential_savings": "15%",
+                    "description": "12% of calls are duplicates",
+                },
+                {
+                    "type": "hybrid",
+                    "potential_savings": "25%",
+                    "description": "Low-value series could use StatsForecast",
+                },
+            ],
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -134,24 +151,24 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                     "action": "Implement batch aggregation",
                     "impact": "40-50% cost reduction",
                     "effort": "Low",
-                    "details": "Aggregate API calls in 60-second windows, batch up to 100 series per call"
+                    "details": "Aggregate API calls in 60-second windows, batch up to 100 series per call",
                 },
                 {
                     "priority": 2,
                     "action": "Add request caching",
                     "impact": "15-20% cost reduction",
                     "effort": "Medium",
-                    "details": "Cache identical requests for 1 hour using Redis"
+                    "details": "Cache identical requests for 1 hour using Redis",
                 },
                 {
                     "priority": 3,
                     "action": "Hybrid StatsForecast strategy",
                     "impact": "20-30% cost reduction",
                     "effort": "High",
-                    "details": "Use StatsForecast for series with value < $1000/month"
-                }
+                    "details": "Use StatsForecast for series with value < $1000/month",
+                },
             ],
-            "projected_savings": "$61.68/month (40%)"
+            "projected_savings": "$61.68/month (40%)",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -162,7 +179,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "strategy": f"Batch {batch_size} series every {window} seconds",
             "before": {"calls_per_day": 514, "cost_per_day": "$5.14"},
             "after": {"calls_per_day": 125, "cost_per_day": "$2.83"},
-            "savings": "45% reduction"
+            "savings": "45% reduction",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -174,7 +191,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "timegpt_series": "15% of total (high-value)",
             "statsforecast_series": "85% of total (standard)",
             "projected_savings": "35% overall cost reduction",
-            "accuracy_impact": "< 2% accuracy reduction on low-value series"
+            "accuracy_impact": "< 2% accuracy reduction on low-value series",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -191,4 +208,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

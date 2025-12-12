@@ -5,6 +5,7 @@ import os
 from typing import Optional
 
 import pandas as pd
+
 from nixtla import NixtlaClient
 
 
@@ -15,11 +16,7 @@ class AnomalyDetector:
         self.client = NixtlaClient(api_key=api_key or os.environ.get("NIXTLA_TIMEGPT_API_KEY"))
         self.batch_size = 100
 
-    def detect_anomalies(
-        self,
-        df: pd.DataFrame,
-        threshold: float = 0.95
-    ) -> pd.DataFrame:
+    def detect_anomalies(self, df: pd.DataFrame, threshold: float = 0.95) -> pd.DataFrame:
         """Detect anomalies in time series data.
 
         Args:
@@ -29,11 +26,7 @@ class AnomalyDetector:
         Returns:
             DataFrame with anomaly flags and scores
         """
-        result = self.client.detect_anomalies(
-            df=df,
-            freq="auto",
-            level=int(threshold * 100)
-        )
+        result = self.client.detect_anomalies(df=df, freq="auto", level=int(threshold * 100))
         return result
 
     def process_batch(self, events: list[dict]) -> list[dict]:

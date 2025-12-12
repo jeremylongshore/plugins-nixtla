@@ -9,15 +9,12 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 app = Server("nixtla-forecast-explainer")
 
 
-def generate_narrative(
-    forecast_data: dict,
-    audience: str = "executive"
-) -> str:
+def generate_narrative(forecast_data: dict, audience: str = "executive") -> str:
     """Generate plain-English narrative from forecast data."""
     if audience == "executive":
         return f"""Executive Summary:
@@ -50,10 +47,10 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "data_path": {"type": "string", "description": "Path to forecast CSV"},
-                    "period": {"type": "integer", "description": "Seasonal period"}
+                    "period": {"type": "integer", "description": "Seasonal period"},
                 },
-                "required": ["data_path"]
-            }
+                "required": ["data_path"],
+            },
         ),
         Tool(
             name="identify_drivers",
@@ -62,8 +59,8 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "decomposition": {"type": "object", "description": "STL decomposition results"}
-                }
-            }
+                },
+            },
         ),
         Tool(
             name="generate_narrative",
@@ -72,9 +69,12 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "forecast_data": {"type": "object"},
-                    "audience": {"type": "string", "enum": ["executive", "technical", "compliance"]}
-                }
-            }
+                    "audience": {
+                        "type": "string",
+                        "enum": ["executive", "technical", "compliance"],
+                    },
+                },
+            },
         ),
         Tool(
             name="generate_report",
@@ -83,20 +83,15 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "content": {"type": "object"},
-                    "format": {"type": "string", "enum": ["pdf", "html", "pptx", "markdown"]}
-                }
-            }
+                    "format": {"type": "string", "enum": ["pdf", "html", "pptx", "markdown"]},
+                },
+            },
         ),
         Tool(
             name="assess_risk_factors",
             description="Identify and flag high uncertainty periods",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "forecast_data": {"type": "object"}
-                }
-            }
-        )
+            inputSchema={"type": "object", "properties": {"forecast_data": {"type": "object"}}},
+        ),
     ]
 
 
@@ -106,7 +101,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         result = {
             "trend": {"contribution_pct": 45.2, "direction": "increasing", "slope": 0.023},
             "seasonal": {"contribution_pct": 38.5, "period": 7, "amplitude": 0.15},
-            "residual": {"contribution_pct": 16.3, "std_dev": 0.08}
+            "residual": {"contribution_pct": 16.3, "std_dev": 0.08},
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -115,9 +110,9 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "drivers": [
                 {"name": "Seasonal Q4 Pattern", "contribution": 8.7, "confidence": "high"},
                 {"name": "Recent Momentum", "contribution": 4.2, "confidence": "medium"},
-                {"name": "Trend Growth", "contribution": 2.3, "confidence": "high"}
+                {"name": "Trend Growth", "contribution": 2.3, "confidence": "high"},
             ],
-            "total_explained": 85.2
+            "total_explained": 85.2,
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -135,9 +130,9 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "risk_factors": [
                 {"factor": "Forecast extends beyond historical range", "severity": "medium"},
                 {"factor": "Increasing prediction interval width", "severity": "low"},
-                {"factor": "Recent volatility spike", "severity": "low"}
+                {"factor": "Recent volatility spike", "severity": "low"},
             ],
-            "overall_confidence": "HIGH"
+            "overall_confidence": "HIGH",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -151,4 +146,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

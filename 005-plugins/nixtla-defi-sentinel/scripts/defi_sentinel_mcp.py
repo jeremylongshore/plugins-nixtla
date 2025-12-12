@@ -9,15 +9,23 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 app = Server("nixtla-defi-sentinel")
 
 
 # DeFi protocols supported
 SUPPORTED_PROTOCOLS = [
-    "aave", "compound", "uniswap", "curve", "maker",
-    "lido", "convex", "yearn", "balancer", "sushiswap"
+    "aave",
+    "compound",
+    "uniswap",
+    "curve",
+    "maker",
+    "lido",
+    "convex",
+    "yearn",
+    "balancer",
+    "sushiswap",
 ]
 
 METRICS = ["tvl", "apy", "volume", "liquidity", "price"]
@@ -32,23 +40,28 @@ async def list_tools() -> list[Tool]:
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "protocol": {"type": "string", "description": f"Protocol name ({', '.join(SUPPORTED_PROTOCOLS[:5])}...)"},
-                    "metrics": {"type": "array", "items": {"type": "string"}, "description": f"Metrics to monitor ({', '.join(METRICS)})"},
-                    "threshold": {"type": "number", "default": 0.95}
+                    "protocol": {
+                        "type": "string",
+                        "description": f"Protocol name ({', '.join(SUPPORTED_PROTOCOLS[:5])}...)",
+                    },
+                    "metrics": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": f"Metrics to monitor ({', '.join(METRICS)})",
+                    },
+                    "threshold": {"type": "number", "default": 0.95},
                 },
-                "required": ["protocol"]
-            }
+                "required": ["protocol"],
+            },
         ),
         Tool(
             name="get_protocol_status",
             description="Get current status of monitored protocol",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "protocol": {"type": "string"}
-                },
-                "required": ["protocol"]
-            }
+                "properties": {"protocol": {"type": "string"}},
+                "required": ["protocol"],
+            },
         ),
         Tool(
             name="configure_alerts",
@@ -58,10 +71,10 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "protocol": {"type": "string"},
                     "channel": {"type": "string", "enum": ["telegram", "discord", "email"]},
-                    "webhook": {"type": "string"}
+                    "webhook": {"type": "string"},
                 },
-                "required": ["protocol", "channel"]
-            }
+                "required": ["protocol", "channel"],
+            },
         ),
         Tool(
             name="run_anomaly_scan",
@@ -70,10 +83,10 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "protocol": {"type": "string"},
-                    "lookback_days": {"type": "integer", "default": 30}
+                    "lookback_days": {"type": "integer", "default": 30},
                 },
-                "required": ["protocol"]
-            }
+                "required": ["protocol"],
+            },
         ),
         Tool(
             name="generate_risk_report",
@@ -82,22 +95,20 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "protocol": {"type": "string"},
-                    "include_forecast": {"type": "boolean", "default": True}
+                    "include_forecast": {"type": "boolean", "default": True},
                 },
-                "required": ["protocol"]
-            }
+                "required": ["protocol"],
+            },
         ),
         Tool(
             name="compare_protocols",
             description="Compare multiple protocols on risk metrics",
             inputSchema={
                 "type": "object",
-                "properties": {
-                    "protocols": {"type": "array", "items": {"type": "string"}}
-                },
-                "required": ["protocols"]
-            }
-        )
+                "properties": {"protocols": {"type": "array", "items": {"type": "string"}}},
+                "required": ["protocols"],
+            },
+        ),
     ]
 
 
@@ -112,7 +123,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "metrics": metrics,
             "threshold": arguments.get("threshold", 0.95),
             "data_source": "DeFiLlama API",
-            "update_frequency": "5 minutes"
+            "update_frequency": "5 minutes",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -125,7 +136,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "tvl_change_24h": "+2.3%",
             "avg_apy": "4.2%",
             "anomalies_detected_24h": 0,
-            "last_updated": "2024-01-15T10:30:00Z"
+            "last_updated": "2024-01-15T10:30:00Z",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -134,7 +145,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "status": "configured",
             "protocol": arguments.get("protocol"),
             "channel": arguments.get("channel"),
-            "alert_types": ["anomaly", "tvl_drop", "apy_spike"]
+            "alert_types": ["anomaly", "tvl_drop", "apy_spike"],
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -149,11 +160,11 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                     "metric": "tvl",
                     "severity": "medium",
                     "description": "TVL dropped 8% in 2 hours",
-                    "confidence": 0.92
+                    "confidence": 0.92,
                 }
             ],
             "risk_score": 2.3,
-            "risk_level": "LOW"
+            "risk_level": "LOW",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -166,14 +177,10 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             "risk_factors": [
                 {"factor": "Smart contract risk", "score": 2, "max": 10},
                 {"factor": "Liquidity risk", "score": 3, "max": 10},
-                {"factor": "Market risk", "score": 4, "max": 10}
+                {"factor": "Market risk", "score": 4, "max": 10},
             ],
-            "tvl_forecast_7d": {
-                "point": "$12.8B",
-                "lower": "$11.9B",
-                "upper": "$13.7B"
-            },
-            "recommendation": "STABLE - Continue monitoring"
+            "tvl_forecast_7d": {"point": "$12.8B", "lower": "$11.9B", "upper": "$13.7B"},
+            "recommendation": "STABLE - Continue monitoring",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -182,10 +189,10 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         result = {
             "comparison": [
                 {"protocol": "aave", "tvl": "$12.5B", "risk_score": 2.3, "apy": "4.2%"},
-                {"protocol": "compound", "tvl": "$8.2B", "risk_score": 2.8, "apy": "3.8%"}
+                {"protocol": "compound", "tvl": "$8.2B", "risk_score": 2.8, "apy": "3.8%"},
             ],
             "lowest_risk": "aave",
-            "highest_tvl": "aave"
+            "highest_tvl": "aave",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -199,4 +206,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())

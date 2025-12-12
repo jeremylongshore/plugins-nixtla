@@ -10,7 +10,7 @@ from typing import Any
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import Tool, TextContent
+from mcp.types import TextContent, Tool
 
 app = Server("nixtla-migration-assistant")
 
@@ -67,39 +67,37 @@ def analyze_code(code: str) -> dict:
 
     # Detect Prophet
     if any("prophet" in imp.lower() for imp in imports):
-        patterns.append({
-            "library": "Prophet",
-            "confidence": "high",
-            "migration_target": "TimeGPT"
-        })
+        patterns.append({"library": "Prophet", "confidence": "high", "migration_target": "TimeGPT"})
 
     # Detect statsmodels
     if any("statsmodels" in imp for imp in imports):
         if any("arima" in imp.lower() for imp in imports):
-            patterns.append({
-                "library": "statsmodels.ARIMA",
-                "confidence": "high",
-                "migration_target": "StatsForecast"
-            })
+            patterns.append(
+                {
+                    "library": "statsmodels.ARIMA",
+                    "confidence": "high",
+                    "migration_target": "StatsForecast",
+                }
+            )
         elif any("exponential" in imp.lower() for imp in imports):
-            patterns.append({
-                "library": "statsmodels.ExponentialSmoothing",
-                "confidence": "high",
-                "migration_target": "StatsForecast"
-            })
+            patterns.append(
+                {
+                    "library": "statsmodels.ExponentialSmoothing",
+                    "confidence": "high",
+                    "migration_target": "StatsForecast",
+                }
+            )
 
     # Detect sklearn time series
     if any("sklearn" in imp for imp in imports):
-        patterns.append({
-            "library": "sklearn",
-            "confidence": "medium",
-            "migration_target": "StatsForecast"
-        })
+        patterns.append(
+            {"library": "sklearn", "confidence": "medium", "migration_target": "StatsForecast"}
+        )
 
     return {
         "imports": imports,
         "patterns": patterns,
-        "complexity": "medium" if len(patterns) > 1 else "low"
+        "complexity": "medium" if len(patterns) > 1 else "low",
     }
 
 
@@ -113,9 +111,9 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "source_path": {"type": "string", "description": "Path to source file"},
-                    "code": {"type": "string", "description": "Code string to analyze"}
-                }
-            }
+                    "code": {"type": "string", "description": "Code string to analyze"},
+                },
+            },
         ),
         Tool(
             name="generate_plan",
@@ -124,9 +122,9 @@ async def list_tools() -> list[Tool]:
                 "type": "object",
                 "properties": {
                     "analysis": {"type": "object", "description": "Code analysis results"},
-                    "target": {"type": "string", "enum": ["timegpt", "statsforecast"]}
-                }
-            }
+                    "target": {"type": "string", "enum": ["timegpt", "statsforecast"]},
+                },
+            },
         ),
         Tool(
             name="transform_data",
@@ -137,10 +135,10 @@ async def list_tools() -> list[Tool]:
                     "data_path": {"type": "string"},
                     "timestamp_col": {"type": "string"},
                     "value_col": {"type": "string"},
-                    "group_col": {"type": "string"}
+                    "group_col": {"type": "string"},
                 },
-                "required": ["data_path"]
-            }
+                "required": ["data_path"],
+            },
         ),
         Tool(
             name="generate_code",
@@ -151,9 +149,9 @@ async def list_tools() -> list[Tool]:
                     "source_library": {"type": "string"},
                     "target_library": {"type": "string"},
                     "horizon": {"type": "integer"},
-                    "freq": {"type": "string"}
-                }
-            }
+                    "freq": {"type": "string"},
+                },
+            },
         ),
         Tool(
             name="compare_accuracy",
@@ -163,10 +161,10 @@ async def list_tools() -> list[Tool]:
                 "properties": {
                     "original_path": {"type": "string"},
                     "migrated_path": {"type": "string"},
-                    "test_data_path": {"type": "string"}
-                }
-            }
-        )
+                    "test_data_path": {"type": "string"},
+                },
+            },
+        ),
     ]
 
 
@@ -193,19 +191,22 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                 {"phase": 1, "name": "Code Analysis", "status": "complete"},
                 {"phase": 2, "name": "Data Transformation", "status": "pending"},
                 {"phase": 3, "name": "Code Generation", "status": "pending"},
-                {"phase": 4, "name": "Accuracy Comparison", "status": "pending"}
+                {"phase": 4, "name": "Accuracy Comparison", "status": "pending"},
             ],
             "estimated_effort": "2-4 hours" if len(patterns) <= 1 else "4-8 hours",
-            "risk_level": "low" if analysis.get("complexity") == "low" else "medium"
+            "risk_level": "low" if analysis.get("complexity") == "low" else "medium",
         }
         return [TextContent(type="text", text=json.dumps(plan, indent=2))]
 
     elif name == "transform_data":
         result = {
             "status": "transformed",
-            "input_columns": [arguments.get("timestamp_col", "ds"), arguments.get("value_col", "y")],
+            "input_columns": [
+                arguments.get("timestamp_col", "ds"),
+                arguments.get("value_col", "y"),
+            ],
             "output_columns": ["unique_id", "ds", "y"],
-            "rows_processed": 1000
+            "rows_processed": 1000,
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -216,7 +217,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             data_path="data.csv",
             group_by_line="df['unique_id'] = 'series_1'  # Add if not present",
             horizon=arguments.get("horizon", 14),
-            freq=arguments.get("freq", "D")
+            freq=arguments.get("freq", "D"),
         )
         return [TextContent(type="text", text=code)]
 
@@ -224,14 +225,10 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         result = {
             "metrics": {
                 "original": {"smape": 8.2, "mase": 0.92, "rmse": 145.3},
-                "migrated": {"smape": 6.1, "mase": 0.71, "rmse": 112.8}
+                "migrated": {"smape": 6.1, "mase": 0.71, "rmse": 112.8},
             },
-            "improvement": {
-                "smape": "-25.6%",
-                "mase": "-22.8%",
-                "rmse": "-22.4%"
-            },
-            "recommendation": "MIGRATE - significant accuracy improvement"
+            "improvement": {"smape": "-25.6%", "mase": "-22.8%", "rmse": "-22.4%"},
+            "recommendation": "MIGRATE - significant accuracy improvement",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
@@ -245,4 +242,5 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())
