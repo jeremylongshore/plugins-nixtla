@@ -68,7 +68,7 @@ jobs:
         run: black --check --diff .
 
       - name: Run isort import checker
-        run: isort --check-only --diff .
+        run: isort --check-only --diff --settings-path pyproject.toml .
 
       - name: Run Flake8 linter
         run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
