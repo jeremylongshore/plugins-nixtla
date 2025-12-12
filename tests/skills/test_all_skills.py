@@ -130,9 +130,13 @@ def test_frontmatter_valid(skill_path: Path) -> TestResult:
             message="No valid YAML frontmatter found",
         )
 
-    # Check required fields
-    required = ["name", "description", "allowed-tools", "version"]
+    # Check required fields (per Anthropic official spec - Dec 2025)
+    # Official: name (required), description (required), allowed-tools (optional), version (optional)
+    # Source: https://code.claude.com/docs/en/skills
+    required = ["name", "description"]  # Only name and description are required per spec
+    recommended = ["allowed-tools", "version"]  # Optional but recommended
     missing = [f for f in required if f not in frontmatter]
+    missing_recommended = [f for f in recommended if f not in frontmatter]
 
     if missing:
         return TestResult(
@@ -142,11 +146,14 @@ def test_frontmatter_valid(skill_path: Path) -> TestResult:
             message=f"Missing required fields: {missing}",
         )
 
+    # Note: missing recommended fields don't cause failure
+    recommended_msg = f" (missing optional: {missing_recommended})" if missing_recommended else ""
+
     return TestResult(
         name="Frontmatter valid",
         passed=True,
         level=1,
-        message=f"All required fields present: {list(frontmatter.keys())}",
+        message=f"All required fields present: {list(frontmatter.keys())}{recommended_msg}",
     )
 
 
