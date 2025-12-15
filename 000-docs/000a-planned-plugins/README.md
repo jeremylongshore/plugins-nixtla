@@ -6,222 +6,185 @@ This directory contains documentation for both **implemented** and **planned** C
 
 ```
 000a-planned-plugins/
-├── implemented/              # Documentation for working plugins
+├── implemented/              # Documentation for 13 working plugins
 │   ├── nixtla-baseline-lab/
 │   ├── nixtla-bigquery-forecaster/
-│   └── nixtla-search-to-slack/
-├── internal-efficiency/      # Planned: Tools for Nixtla's team (33% of roadmap)
-├── business-growth/          # Planned: Market expansion tools (58% of roadmap)
-└── nixtla-defi-sentinel/     # Planned: DeFi/Crypto vertical (experimental)
+│   ├── nixtla-search-to-slack/
+│   ├── nixtla-airflow-operator/
+│   ├── nixtla-anomaly-streaming-monitor/
+│   ├── nixtla-dbt-package/
+│   ├── nixtla-roi-calculator/
+│   ├── nixtla-snowflake-adapter/
+│   ├── nixtla-vs-statsforecast-benchmark/
+│   ├── nixtla-cost-optimizer/
+│   ├── nixtla-forecast-explainer/
+│   ├── nixtla-migration-assistant/
+│   └── nixtla-defi-sentinel/
+└── external-revenue/         # Planned: 6 revenue-generating plugins
+    ├── nixtla-support-deflector/
+    ├── nixtla-docs-qa-generator/
+    ├── nixtla-sales-demo-builder/
+    ├── nixtla-forecast-workflow-templates/
+    ├── nixtla-embedded-forecast-widget/
+    └── nixtla-forecast-audit-report/
 ```
 
 ---
 
-## Implemented Plugins
+## Summary
 
-Working plugins with full documentation in `implemented/`:
-
-| Plugin | Status | Documentation |
-|--------|--------|---------------|
-| **nixtla-baseline-lab** | v0.8.0 | `implemented/nixtla-baseline-lab/` |
-| **nixtla-bigquery-forecaster** | Demo | `implemented/nixtla-bigquery-forecaster/` |
-| **nixtla-search-to-slack** | v0.1.0 MVP | `implemented/nixtla-search-to-slack/` |
-
-Each has 6 standardized docs: Business Case, PRD, Architecture, User Journey, Technical Spec, Status.
+| Category | Count | Status |
+|----------|-------|--------|
+| **Implemented Plugins** | 13 | Live in `005-plugins/` |
+| **Planned Plugins** | 6 | PRDs complete, awaiting build |
+| **Total** | 19 | - |
 
 ---
 
-## Planned Plugins
+## Implemented Plugins (13)
 
-**Planned Plugins**: 10 (specifications in category directories)
+All implemented plugins have working code in `/005-plugins/` with full documentation.
 
----
+### Original Core (3)
+| Plugin | Status | Description |
+|--------|--------|-------------|
+| **nixtla-baseline-lab** | v0.8.0 | M4 benchmark harness for statsforecast |
+| **nixtla-bigquery-forecaster** | Demo | TimeGPT forecasting on BigQuery data |
+| **nixtla-search-to-slack** | v0.1.0 | Search results → Slack notifications |
 
-## Internal Efficiency Plugins (33%)
+### Business Growth (6)
+| Plugin | Status | Description |
+|--------|--------|-------------|
+| **nixtla-airflow-operator** | v0.1.0 | Custom Airflow operator for TimeGPT |
+| **nixtla-anomaly-streaming-monitor** | v0.1.0 | Real-time anomaly detection (Kafka/Kinesis) |
+| **nixtla-dbt-package** | v0.1.0 | dbt macros for SQL-first forecasting |
+| **nixtla-roi-calculator** | v0.1.0 | Cost/benefit calculator for TimeGPT |
+| **nixtla-snowflake-adapter** | v0.1.0 | Native Snowflake integration |
+| **nixtla-vs-statsforecast-benchmark** | v0.1.0 | TimeGPT vs open source comparison |
 
-**Goal**: Make Nixtla's team 2-3x more productive
+### Internal Efficiency (3)
+| Plugin | Status | Description |
+|--------|--------|-------------|
+| **nixtla-cost-optimizer** | v0.1.0 | API cost analysis and optimization |
+| **nixtla-forecast-explainer** | v0.1.0 | Plain-language forecast explanations |
+| **nixtla-migration-assistant** | v0.1.0 | Migration from pandas/scikit-learn |
 
-### 1. nixtla-cost-optimizer
-**Impact**: 30-50% API cost reduction
-- Analyzes API usage patterns
-- Suggests StatsForecast vs TimeGPT for each use case
-- Identifies opportunities to batch requests
-
-### 2. nixtla-migration-assistant
-**Impact**: Onboarding: weeks → hours
-- Generates migration code from pandas/scikit-learn
-- Creates data transformation pipelines
-- Provides testing harness
-
-### 3. nixtla-forecast-explainer
-**Impact**: 40% fewer support tickets
-- Explains forecasts in plain language
-- Visualizes confidence intervals and uncertainty
-- Generates customer-facing reports
-
-**Total Internal ROI**: 2-3x team productivity improvement
-
----
-
-## Business Growth Plugins (58%)
-
-**Goal**: Expand market reach to new customer segments
-
-### 4. nixtla-vs-statsforecast-benchmark
-**Impact**: Increase TimeGPT adoption
-- Runs side-by-side comparisons
-- Generates accuracy reports (MAPE, RMSE, SMAPE)
-- Helps users choose right model for their data
-
-### 5. nixtla-roi-calculator
-**Impact**: Shorten sales cycles 2-3 months
-- Calculates cost/benefit vs building in-house
-- Estimates time savings
-- Generates executive summary for buyers
-
-### 6. nixtla-airflow-operator
-**Impact**: Enterprise data platform teams
-- Custom Airflow operator for TimeGPT/StatsForecast
-- Integrates with existing data pipelines
-- Production-grade logging and monitoring
-
-### 7. nixtla-dbt-package
-**Impact**: Analytics engineering market
-- dbt package for time series forecasting
-- SQL-first interface to Nixtla APIs
-- Integrates with dbt Cloud workflows
-
-### 8. nixtla-snowflake-adapter
-**Impact**: Fortune 500 contracts
-- Native Snowflake integration
-- Forecasting as SQL functions
-- Enterprise security and governance
-
-### 9. nixtla-anomaly-streaming-monitor
-**Impact**: Real-time monitoring market
-- Kafka/Kinesis integration
-- Real-time anomaly detection
-- Alert generation and escalation
-
-**Total Business Impact**: Access to Airflow, dbt, Snowflake, streaming markets
+### Vertical (1)
+| Plugin | Status | Description |
+|--------|--------|-------------|
+| **nixtla-defi-sentinel** | v0.1.0 | DeFi protocol monitoring |
 
 ---
 
-## Vertical: DeFi/Crypto (Experimental)
+## Planned Plugins (6) - External Revenue
 
-**Goal**: Explore new vertical market opportunities
+Six strategic plugins designed to generate direct revenue and unlock enterprise deals.
 
-### 10. nixtla-defi-sentinel
-**Impact**: DeFi protocol monitoring
-- Monitors TVL, liquidity, token prices
-- Anomaly detection for DeFi metrics
-- Integration with The Graph, Dune Analytics
+### Internal Efficiency (to be built)
+| Plugin | Effort | Revenue Impact |
+|--------|--------|----------------|
+| **nixtla-support-deflector** | 4-6 weeks | $15-25K/mo in recovered productivity |
+| **nixtla-docs-qa-generator** | 3-4 weeks | Reduced churn, faster releases |
+| **nixtla-sales-demo-builder** | 3 weeks | Direct sales acceleration |
 
-**Status**: Experimental (market validation needed)
+### External Revenue (to be built)
+| Plugin | Effort | Revenue Impact |
+|--------|--------|----------------|
+| **nixtla-forecast-workflow-templates** | 6 weeks | $50-100K ARR (template sales + API) |
+| **nixtla-embedded-forecast-widget** | 10-12 weeks | $200-500K ARR by Y2 |
+| **nixtla-forecast-audit-report** | 8 weeks | $100-200K ARR (enterprise deals) |
+
+---
+
+## Planned Plugin Details
+
+### 1. nixtla-support-deflector
+**Category:** Internal Efficiency | **Effort:** 4-6 weeks
+
+AI-powered support ticket triage using RAG over Nixtla documentation. Auto-drafts responses, detects patterns, and surfaces product insights.
+
+- **Impact:** 50% faster response time, 30% auto-resolution rate
+- **Revenue:** Indirect (engineering productivity recovery)
+
+### 2. nixtla-docs-qa-generator
+**Category:** Internal Efficiency | **Effort:** 3-4 weeks
+
+Monitors SDK changes, generates documentation updates, and validates code examples. Prevents docs/code drift.
+
+- **Impact:** 80% reduction in "docs wrong" tickets
+- **Revenue:** Indirect (reduced churn, trust)
+
+### 3. nixtla-sales-demo-builder
+**Category:** Internal Efficiency | **Effort:** 3 weeks
+
+Generates industry-specific demo notebooks in minutes. Retail, energy, finance, healthcare verticals with public datasets and talking points.
+
+- **Impact:** Demo prep: 4 hours → 15 minutes
+- **Revenue:** Direct (accelerates enterprise deals)
+
+### 4. nixtla-forecast-workflow-templates
+**Category:** External Revenue | **Effort:** 6 weeks
+
+Marketplace of pre-built forecasting workflow templates ($99-499 each). Includes data connectors, scheduling, and output integrations.
+
+- **Impact:** 3x API consumption for template users
+- **Revenue:** $50-100K ARR (Y1)
+
+### 5. nixtla-embedded-forecast-widget
+**Category:** External Revenue | **Effort:** 10-12 weeks
+
+White-label React component for SaaS companies to embed forecasting. Drop-in integration, usage-based pricing.
+
+- **Impact:** Partner distribution multiplies reach
+- **Revenue:** $200-500K ARR (Y2)
+
+### 6. nixtla-forecast-audit-report
+**Category:** External Revenue | **Effort:** 8 weeks
+
+Automated compliance documentation (SOX, FDA, Basel III, IFRS 9). Essential for regulated industries.
+
+- **Impact:** Unlocks blocked enterprise deals
+- **Revenue:** $100-200K ARR + premium pricing justification
+
+---
+
+## Prioritization Matrix
+
+| Plugin | Category | Effort | Revenue (Y1) | Priority |
+|--------|----------|--------|--------------|----------|
+| Sales Demo Builder | Internal | 3 weeks | Indirect | **High** |
+| Workflow Templates | Revenue | 6 weeks | $50-100K | **High** |
+| Audit Report | Revenue | 8 weeks | $100-200K | **High** |
+| Support Deflector | Internal | 4-6 weeks | Indirect | Medium |
+| Docs QA Generator | Internal | 3-4 weeks | Indirect | Medium |
+| Embedded Widget | Revenue | 10-12 weeks | $200-500K | Medium |
 
 ---
 
 ## Plugin Specification Structure
 
-Each plugin directory contains:
+Each plugin directory contains 6 standardized documents:
 
 ```
 plugin-name/
-├── 01-OVERVIEW.md           # Business case and value proposition
-├── 02-REQUIREMENTS.md       # Functional and technical requirements
-├── 03-ARCHITECTURE.md       # System design and integration points
-├── 04-TESTING.md            # Test strategy and acceptance criteria
-└── README.md                # Quick reference and status
+├── 01-BUSINESS-CASE.md      # Value proposition, ROI
+├── 02-PRD.md                # Product requirements
+├── 03-ARCHITECTURE.md       # System design
+├── 04-USER-JOURNEY.md       # User workflows
+├── 05-TECHNICAL-SPEC.md     # API specifications
+└── 06-STATUS.md             # Current status
 ```
-
-### Specification Template
-
-**01-OVERVIEW.md**:
-- Value proposition (1-2 sentences)
-- Target users and use cases
-- Success metrics (ROI, adoption, etc.)
-- Competitive landscape
-
-**02-REQUIREMENTS.md**:
-- Functional requirements (what it must do)
-- Non-functional requirements (performance, security)
-- Integration requirements (APIs, tools, platforms)
-- Out of scope (what it won't do)
-
-**03-ARCHITECTURE.md**:
-- System architecture diagram
-- Component breakdown
-- Data flow
-- API integration patterns
-- Deployment model
-
-**04-TESTING.md**:
-- Unit test strategy
-- Integration test scenarios
-- Acceptance criteria
-- Performance benchmarks
-
----
-
-## Prioritization Framework
-
-Plugins are prioritized using:
-
-**Impact Score** = (Market Size × Differentiation × Ease of Use) / Development Cost
-
-**Market Size**:
-- Small: <1,000 potential users
-- Medium: 1,000-10,000 users
-- Large: >10,000 users
-
-**Differentiation**:
-- Low: Many alternatives exist
-- Medium: Few alternatives, but not unique
-- High: Unique capability, no direct competitors
-
-**Ease of Use**:
-- Low: Requires significant setup/learning
-- Medium: Moderate learning curve
-- High: Intuitive, immediate value
-
-**Development Cost**:
-- Low: <2 weeks engineering
-- Medium: 2-6 weeks engineering
-- High: >6 weeks engineering
-
----
-
-## Next Steps
-
-1. **Validate Priorities**: Review with Nixtla CEO (Max Mergenthaler)
-2. **Select Top 3**: Choose highest-impact plugins for Q1 2026
-3. **Build MVPs**: Implement working prototypes
-4. **Measure Success**: Track adoption, ROI, user feedback
-5. **Iterate**: Refine based on data
-
----
-
-## Contributing
-
-To add a new planned plugin:
-
-1. Create directory: `mkdir <category>/plugin-name`
-2. Copy specification template
-3. Fill out all 4 specification files
-4. Update this README with plugin summary
-5. Add to prioritization framework
 
 ---
 
 ## Related Documentation
 
-- **Business Case**: `000-docs/035-PP-PROD-nixtla-plugin-business-case.md`
-- **Implemented Plugins**: `/005-plugins/`
+- **Live Plugin Code**: `/005-plugins/`
 - **Skills Pack**: `003-skills/.claude/skills/`
-- **CLAUDE.md**: `/CLAUDE.md` (repository guide)
+- **Repository Guide**: `/CLAUDE.md`
 
 ---
 
-**Last Updated**: 2025-12-12
-**Version**: 1.3.0 (Added Implemented Plugins Documentation)
+**Last Updated**: 2025-12-15
+**Version**: 2.0.0 (Reorganized: 13 implemented + 6 planned)
 **Maintained By**: Intent Solutions × Nixtla
