@@ -3,6 +3,7 @@ name: nixtla-anomaly-detector
 description: Detects anomalies in time series data using TimeGPT. Identifies outliers, level shifts, and trend breaks without model training. Use when identifying anomalies, outliers, or unusual patterns in time series. Trigger with "detect anomalies", "find outliers", "anomaly detection".
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 

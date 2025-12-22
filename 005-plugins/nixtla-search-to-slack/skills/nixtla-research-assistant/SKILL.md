@@ -1,7 +1,7 @@
 ---
 name: nixtla-research-assistant
 description: Specialized research assistant for Nixtla ecosystem updates, TimeGPT news, StatsForecast, MLForecast, NeuralForecast developments, and time-series forecasting content. Searches web and GitHub, generates summaries, and provides actionable insights.
-allowed-tools: "WebFetch,WebSearch,Bash,Read,Write,Grep,Glob"
+allowed-tools: "WebFetch,WebSearch,Bash(python:*),Read,Write,Grep,Glob"
 version: "1.0.0"
 ---
 

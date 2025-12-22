@@ -2,6 +2,7 @@
 name: nixtla-arbitrage-detector
 description: "Detect arbitrage opportunities between Polymarket and Kalshi using forecast analysis. Use when finding price discrepancies across platforms. Trigger with 'find arbitrage' or 'compare market prices'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebFetch"
 ---

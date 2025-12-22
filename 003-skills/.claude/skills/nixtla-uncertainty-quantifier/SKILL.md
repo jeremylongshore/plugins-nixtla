@@ -3,6 +3,7 @@ name: nixtla-uncertainty-quantifier
 description: "Analyze forecast uncertainty using conformal prediction. Use when risk assessment or scenario planning is required. Trigger with 'quantify uncertainty' or 'prediction intervals'."
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 

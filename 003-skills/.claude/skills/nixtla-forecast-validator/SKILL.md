@@ -2,6 +2,7 @@
 name: nixtla-forecast-validator
 description: "Validate forecast quality by comparing MASE and sMAPE against benchmarks. Use when detecting model degradation. Trigger with 'validate forecast' or 'check forecast quality'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

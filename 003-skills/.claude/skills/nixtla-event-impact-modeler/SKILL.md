@@ -2,6 +2,7 @@
 name: nixtla-event-impact-modeler
 description: "Analyze causal impact of events on time series forecasts using TimeGPT. Use when quantifying promotion or disaster effects. Trigger with 'event impact analysis' or 'causal analysis'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebSearch"
 ---

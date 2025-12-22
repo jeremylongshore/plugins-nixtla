@@ -2,6 +2,7 @@
 name: nixtla-polymarket-analyst
 description: "Analyze and forecast Polymarket contracts using TimeGPT with confidence intervals. Use when predicting contract prices. Trigger with 'Polymarket analysis' or 'forecast prediction market'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebFetch"
 ---

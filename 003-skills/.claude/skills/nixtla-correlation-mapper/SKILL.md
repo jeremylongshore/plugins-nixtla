@@ -2,6 +2,7 @@
 name: nixtla-correlation-mapper
 description: "Analyze multi-contract correlations for forecast-based hedge recommendations. Use when managing correlated assets. Trigger with 'analyze correlations' or 'suggest hedge'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

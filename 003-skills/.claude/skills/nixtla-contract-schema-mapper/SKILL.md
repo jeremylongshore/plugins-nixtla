@@ -2,6 +2,7 @@
 name: nixtla-contract-schema-mapper
 description: "Transform prediction market data to Nixtla format (unique_id, ds, y). Use when preparing datasets for forecasting. Trigger with 'convert to Nixtla format' or 'schema mapping'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

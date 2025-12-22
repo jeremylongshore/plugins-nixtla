@@ -2,6 +2,7 @@
 name: nixtla-model-selector
 description: "Automatically selects the best forecasting model between StatsForecast and TimeGPT based on time series data characteristics. Use when unsure which model performs best. Trigger with 'auto-select model', 'choose best model', 'model selection'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

@@ -2,6 +2,7 @@
 name: nixtla-batch-forecaster
 description: "Forecast multiple time series in parallel using TimeGPT. Use when processing 10-100+ contracts efficiently. Trigger with 'batch forecast' or 'parallel forecasting'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

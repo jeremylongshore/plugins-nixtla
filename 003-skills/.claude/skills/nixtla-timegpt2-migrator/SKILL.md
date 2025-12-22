@@ -3,6 +3,7 @@ name: nixtla-timegpt2-migrator
 description: "Analyze and transform code for TimeGPT-1 to TimeGPT-2 migration. Use when upgrading TimeGPT version. Trigger with 'migrate to TimeGPT-2' or 'upgrade TimeGPT'."
 allowed-tools: "Read,Write,Edit,Glob,Grep"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 

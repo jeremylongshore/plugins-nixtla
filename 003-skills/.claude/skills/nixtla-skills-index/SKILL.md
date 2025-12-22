@@ -3,6 +3,7 @@ name: nixtla-skills-index
 description: "Analyze and categorize installed Nixtla Skills for forecasting guidance. Use when seeing available skills or selecting the right one. Trigger with 'list nixtla skills' or 'what skills'."
 allowed-tools: "Read,Glob"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 

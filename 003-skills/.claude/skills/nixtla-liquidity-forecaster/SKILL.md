@@ -3,6 +3,7 @@ name: nixtla-liquidity-forecaster
 description: "Forecasts orderbook depth and spreads to optimize trade execution timing. Use when needing to estimate market liquidity for large orders. Trigger with 'forecast liquidity', 'predict orderbook', 'estimate depth'."
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebFetch"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 

@@ -2,6 +2,7 @@
 name: nixtla-cross-validator
 description: "Performs rigorous time series cross-validation using expanding and sliding windows. Use when needing to evaluate the performance of time series models on unseen data. Trigger with cross validate time series, evaluate forecasting model, time series backtesting."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

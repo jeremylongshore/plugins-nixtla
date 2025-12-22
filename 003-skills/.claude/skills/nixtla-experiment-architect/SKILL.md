@@ -3,6 +3,7 @@ name: nixtla-experiment-architect
 description: "Generate production-ready forecasting experiments with StatsForecast and TimeGPT. Use when setting up model benchmarking or cross-validation. Trigger with 'scaffold experiment' or 'compare models'."
 allowed-tools: "Read,Write,Glob,Grep,Edit"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 

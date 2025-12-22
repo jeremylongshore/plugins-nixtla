@@ -2,6 +2,7 @@
 name: nixtla-market-risk-analyzer
 description: "Analyze market risk with VaR, volatility, and position sizing using forecast data. Use when assessing investment risk. Trigger with 'analyze market risk' or 'calculate VaR'."
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 ---

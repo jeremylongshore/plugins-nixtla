@@ -3,6 +3,7 @@ name: nixtla-prod-pipeline-generator
 description: "Transform forecasting experiments into Airflow/Prefect pipelines with monitoring. Use when deploying forecasts to production. Trigger with 'generate pipeline' or 'create Airflow DAG'."
 allowed-tools: "Read,Write,Glob,Grep,Edit"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
 ---
 
