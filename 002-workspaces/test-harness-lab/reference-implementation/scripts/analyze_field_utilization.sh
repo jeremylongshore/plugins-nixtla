@@ -173,22 +173,23 @@ log "Analysis complete. Runtime: ${RUNTIME}s"
 # ============================================
 log "Generating output JSON..."
 
-# Convert arrays to JSON
-unused_json=$(printf '%s\n' "${UNUSED_FIELDS[@]}" | awk -F'|' '{print "{\"table\":\"" $1 "\",\"field\":\"" $2 "\",\"null_pct\":" $3 "}"}' | jq -s .)
-low_util_json=$(printf '%s\n' "${LOW_UTIL_FIELDS[@]}" | awk -F'|' '{print "{\"table\":\"" $1 "\",\"field\":\"" $2 "\",\"null_pct\":" $3 "}"}' | jq -s .)
-high_util_json=$(printf '%s\n' "${HIGH_UTIL_FIELDS[@]}" | awk -F'|' '{print "{\"table\":\"" $1 "\",\"field\":\"" $2 "\",\"null_pct\":" $3 "}"}' | jq -s .)
-
-# Handle empty arrays
+# Convert arrays to JSON (check length first to avoid 'set -u' errors)
 if [ ${#UNUSED_FIELDS[@]} -eq 0 ]; then
   unused_json="[]"
+else
+  unused_json=$(printf '%s\n' "${UNUSED_FIELDS[@]}" | awk -F'|' '{print "{\"table\":\"" $1 "\",\"field\":\"" $2 "\",\"null_pct\":" $3 "}"}' | jq -s .)
 fi
 
 if [ ${#LOW_UTIL_FIELDS[@]} -eq 0 ]; then
   low_util_json="[]"
+else
+  low_util_json=$(printf '%s\n' "${LOW_UTIL_FIELDS[@]}" | awk -F'|' '{print "{\"table\":\"" $1 "\",\"field\":\"" $2 "\",\"null_pct\":" $3 "}"}' | jq -s .)
 fi
 
 if [ ${#HIGH_UTIL_FIELDS[@]} -eq 0 ]; then
   high_util_json="[]"
+else
+  high_util_json=$(printf '%s\n' "${HIGH_UTIL_FIELDS[@]}" | awk -F'|' '{print "{\"table\":\"" $1 "\",\"field\":\"" $2 "\",\"null_pct\":" $3 "}"}' | jq -s .)
 fi
 
 # Build complete JSON
