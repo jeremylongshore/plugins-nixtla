@@ -127,5 +127,8 @@ claude-code-plugins-plus/
 # TimeGPT Lab environment file
 002-workspaces/timegpt-lab/.env
 .venv-skill-tests/
-# Local emailer utility (contains API keys)
-emailer/
+# Temporary/generated data
+009-temp-data/
+
+# Local emailer utility (contains API keys) - moved to 004-scripts/
+004-scripts/emailer/.env

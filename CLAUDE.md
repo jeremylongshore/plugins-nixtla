@@ -1,44 +1,103 @@
-## Task Tracking (Beads / bd)
-- Use `bd` for ALL tasks/issues (no markdown TODO lists).
-- Start of session: `bd ready`
-- Create work: `bd create "Title" -p 1 --description "Context + acceptance criteria"`
-- Update status: `bd update <id> --status in_progress`
-- Finish: `bd close <id> --reason "Done"`
-- End of session: `bd sync` (flush/import/export + git sync)
-- Manual testing safety:
-  - Prefer `BEADS_DIR` to isolate a workspace if needed. (`BEADS_DB` exists but is deprecated.)
-
-
 # CLAUDE.md
 
-
-### Beads upgrades
-- After upgrading `bd`, run: `bd info --whats-new`
-- If `bd info` warns about hooks, run: `bd hooks install`
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Task Tracking (Beads / bd)
+
+**All task tracking uses Beads (`bd` CLI)** - no markdown TODO lists.
+
+```bash
+# Session start
+bd ready
+
+# Create task
+bd create "Title" -p 1 --description "Context + acceptance criteria"
+
+# Update status
+bd update <id> --status in_progress
+
+# Complete task
+bd close <id> --reason "Done"
+
+# Session end (flush/import/export + git sync)
+bd sync
+```
+
+**After upgrading `bd`:**
+```bash
+bd info --whats-new
+bd hooks install  # If warned about hooks
+```
+
+**Workspace isolation**: Prefer `BEADS_DIR` environment variable (`BEADS_DB` deprecated).
 
 ## Repository Overview
 
 **Business showcase for Nixtla CEO** demonstrating Claude Code plugins and AI skills for time-series forecasting workflows.
 
-**Version**: 1.7.0 | **Status**: 3 working plugins + 23 production skills (all at 100% L4 quality)
+**Version**: 1.8.1 | **Status**: 3 working plugins + 23 production skills (all at 100% L4 quality)
+
+**Tech Stack**: Python 3.9+, statsforecast, TimeGPT API, Nixtla SDK, pytest, black, isort, flake8
 
 ## Directory Structure
 
-The repository uses numbered prefixes for top-level organization:
+The repository uses numbered prefixes for top-level organization. **Root directory is clean** - only numbered directories + essential config files.
 
 ```
-000-docs/           # Documentation (AAR system, planned plugins, specs)
-001-htmlcov/        # Test coverage reports
+000-docs/           # ALL documentation (AAR system, specs, community standards)
+001-htmlcov/        # ALL test coverage reports (.coverage, coverage.xml, HTML)
 002-workspaces/     # Demo projects and workspace templates
 003-skills/         # Claude Skills (.claude/skills/nixtla-*/)
-004-scripts/        # Automation scripts (validators, generators)
+004-scripts/        # ALL automation (validators, generators, configs/, emailer/)
 005-plugins/        # Plugin implementations (baseline-lab, bigquery-forecaster, search-to-slack)
 006-packages/       # Installable packages (skills-installer)
 007-tests/          # Additional test utilities
+009-temp-data/      # Generated/temporary data (inventories, reports)
 010-archive/        # Archived/deprecated content
 tests/              # pytest test suite (skills tests)
 ```
+
+### Root Directory (Clean)
+
+**23 items total**: 10 numbered directories + 13 essential files (includes 3 symlinks for GitHub compliance)
+
+**Essential files only:**
+- `README.md`, `CLAUDE.md`, `CHANGELOG.md`, `LICENSE`, `VERSION`
+- `pyproject.toml`, `pytest.ini`
+- `requirements.txt`, `requirements-dev.txt`
+- `CODE_OF_CONDUCT.md` → symlink to `000-docs/` (GitHub Community Standards)
+- `CONTRIBUTING.md` → symlink to `000-docs/` (GitHub Community Standards)
+- `SECURITY.md` → symlink to `000-docs/` (GitHub Community Standards)
+
+## Learning Resources
+
+### Test Harness Lab
+
+**Location**: `002-workspaces/test-harness-lab/`
+
+A comprehensive learning lab teaching the **multi-phase validated workflow pattern** for building production-ready agent systems with empirical verification.
+
+**Quick Start**:
+```bash
+cd 002-workspaces/test-harness-lab/
+cat docs/QUICK-START.md          # 5-minute introduction
+cat guides/GUIDE-00-START-HERE.md  # Deep dive (1 hour)
+cat docs/NIXTLA-APPLICATIONS.md  # 3 concrete use cases
+```
+
+**What you'll learn**:
+- How to decompose workflows into validated phases
+- Phase 4 pattern: Run deterministic scripts to verify LLM conclusions
+- Build release validation, benchmark regression, docs sync workflows
+- Deploy skills from lab → 003-skills/ (production)
+
+**Contents**:
+- 4 comprehensive guides (~60 pages)
+- Complete reference implementation (5-phase schema-optimization)
+- Hands-on exercises
+- Nixtla-specific applications with working scripts
+
+**See**: `002-workspaces/test-harness-lab/README.md` for full details.
 
 ## Claude Skills – SKILL.md Structure Reference
 
