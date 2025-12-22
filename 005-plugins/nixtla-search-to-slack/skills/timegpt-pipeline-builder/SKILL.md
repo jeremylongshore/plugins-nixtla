@@ -1,8 +1,6 @@
 ---
 name: timegpt-pipeline-builder
-description: Generates production-ready TimeGPT forecasting pipelines with data validation,
-  error handling, visualization, and deployment configurations. Creates complete Python
-  code from user requirements.
+description: "Generate production-ready TimeGPT forecasting pipeline code from requirements. Use when scaffolding a pipeline with validation, logging, visualization, and repeatable runs. Trigger with \"create TimeGPT pipeline\", \"build TimeGPT integration\", or \"generate forecast code\"."
 allowed-tools: Write,Read,Bash(python:*),Glob,Grep
 version: 1.0.1
 author: Jeremy Longshore <jeremy@intentsolutions.io>
@@ -10,6 +8,39 @@ license: MIT
 ---
 
 # TimeGPT Pipeline Builder
+
+## Overview
+
+Generate a runnable, production-oriented pipeline skeleton (config, validation, forecasting call, output persistence, and optional plots) based on a short set of user requirements.
+
+## Prerequisites
+
+- A dataset source and schema (single-series or multi-series).
+- A TimeGPT API key if the pipeline must run end-to-end against the API.
+
+## Instructions
+
+1. Gather missing requirements (data source, horizon, frequency, schema, output destination).
+2. Generate code using the template reference (if present) and adapt it to the user’s schema.
+3. Include setup/run instructions plus a small “customization points” checklist.
+
+## Output
+
+- A complete Python module plus supporting files (`requirements.txt`, `.env.example`, minimal README instructions).
+
+## Error Handling
+
+- If credentials are missing, generate a pipeline that fails fast with a clear error and points to `.env.example`.
+- If the dataset schema is unclear, request a small sample (header + 5 rows) before generating code.
+
+## Examples
+
+- “Create a TimeGPT pipeline for daily sales with 30-day horizon.”
+- “Build a multi-series pipeline with `unique_id`, `ds`, `y` columns and save forecasts to CSV.”
+
+## Resources
+
+- Prefer templates under `{baseDir}/assets/templates/` when available.
 
 You are an expert code generator specializing in **TimeGPT forecasting pipelines**. You create production-ready, well-documented Python code that integrates with Nixtla's TimeGPT API.
 

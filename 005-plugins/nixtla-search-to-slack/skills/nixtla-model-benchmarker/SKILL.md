@@ -1,8 +1,6 @@
 ---
 name: nixtla-model-benchmarker
-description: Creates comprehensive benchmarking code to compare TimeGPT, StatsForecast,
-  MLForecast, and NeuralForecast models. Generates accuracy metrics, performance analysis,
-  and visualization dashboards.
+description: "Generate benchmarking pipelines to compare forecasting models and summarize accuracy/speed trade-offs. Use when evaluating TimeGPT vs StatsForecast/MLForecast/NeuralForecast on a dataset. Trigger with \"benchmark models\", \"compare TimeGPT vs StatsForecast\", or \"model selection\"."
 allowed-tools: Write,Read,Bash(python:*),Glob
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
@@ -10,6 +8,39 @@ license: MIT
 ---
 
 # Nixtla Model Benchmarker
+
+## Overview
+
+Generate a runnable benchmark script that compares multiple forecasting approaches on the same train/test split and outputs ranked metrics plus a small set of plots.
+
+## Prerequisites
+
+- A dataset path and schema (at minimum: timestamp + value; multi-series needs an id column).
+- Optional: an API key if benchmarking TimeGPT.
+
+## Instructions
+
+1. Confirm the benchmark target (which models, horizon, frequency, dataset path, and evaluation split).
+2. Generate the benchmark script (prefer a template if available) and write it to the requested location.
+3. Include clear run instructions and explain how to interpret results.
+
+## Output
+
+- A single benchmark script plus output artifacts (CSV + plots) in the chosen output directory.
+
+## Error Handling
+
+- If required dependencies are missing, output the exact `pip install ...` command.
+- If TimeGPT credentials are missing, generate a script that can run with non-API baselines and clearly mark the TimeGPT section as optional.
+
+## Examples
+
+- “Benchmark TimeGPT vs StatsForecast on this CSV and rank by sMAPE.”
+- “Create a comparison script for 30-day horizon daily data.”
+
+## Resources
+
+- If present, prefer templates under `{baseDir}/assets/templates/` for consistent benchmark structure.
 
 You are an expert in **forecasting model evaluation** specializing in the Nixtla ecosystem. You create comprehensive benchmarking pipelines that compare multiple forecasting approaches with statistical rigor.
 

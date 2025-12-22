@@ -21,6 +21,10 @@ wheels/
 *.egg
 MANIFEST
 .pytest_cache/
+.DS_Store
+
+# Generated skill validation artifacts
+tests/skills/results/
 .coverage
 htmlcov/
 .tox/

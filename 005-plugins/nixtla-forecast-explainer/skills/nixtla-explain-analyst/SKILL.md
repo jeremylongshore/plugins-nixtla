@@ -17,32 +17,45 @@ license: MIT
 
 # Nixtla Explain Analyst
 
-## Purpose
+## Overview
 
-Generate plain-English explanations of TimeGPT forecasts for non-technical stakeholders.
+Generate plain-English explanations of TimeGPT forecasts for non-technical stakeholders, with a short executive narrative plus driver-oriented analysis.
 
-## Capabilities
+## Prerequisites
 
-1. **STL Decomposition**: Break forecasts into trend, seasonal, residual
-2. **Driver Analysis**: Identify and quantify forecast drivers
-3. **Narrative Generation**: Create executive summaries
-4. **Report Export**: PDF, HTML, PowerPoint formats
+- A forecast output artifact to explain (CSV/JSON/markdown), or a path under the plugin workspace containing results.
+- If using TimeGPT outputs: access to the TimeGPT run metadata used to generate the forecast.
 
 ## Instructions
 
-1. Load the forecast data from the specified path
-2. Run STL decomposition to identify components
-3. Calculate driver contributions
-4. Generate appropriate narrative for audience
-5. Export report in requested format
+1. Locate the forecast results file(s) and any run metadata (model, horizon, frequency, training window).
+2. Summarize forecast context: what is being forecast, horizon, and any known events/holidays/regressors.
+3. Explain forecast shape using: baseline level, trend direction, seasonal pattern (if present), and uncertainty.
+4. Provide driver analysis at the level supported by available data (do not fabricate causal drivers).
+5. Produce a stakeholder-ready narrative plus a short technical appendix (assumptions + limitations).
 
-## Output Formats
+## Output
 
 - **Executive**: 1-page summary for C-level
 - **Technical**: Detailed analysis for data science
 - **Compliance**: SOX/Basel III documentation
 
-## Example
+## Error Handling
 
-```
-User: Explain the Q4 forecast for the board presentation
+- If only point forecasts are available, state that uncertainty intervals are unavailable and recommend generating prediction intervals.
+- If inputs are missing (no horizon/freq), request the minimum details required to interpret results.
+- If drivers/regressors are not provided, restrict “drivers” to observable components (trend/seasonality/outliers).
+
+## Examples
+
+**User**: “Explain the Q4 forecast for the board presentation.”
+
+**Response structure**:
+- Executive summary (3–6 bullets)
+- What changed vs last quarter (trend/seasonality)
+- Key risks and uncertainty
+- Assumptions and limitations (what was/wasn’t modeled)
+
+## Resources
+
+- Plugin docs and outputs under `005-plugins/nixtla-forecast-explainer/`

@@ -1,0 +1,16 @@
+{
+  "project": "plugin-name",
+  "version": "0.1.0",
+  "tasks": [
+    {
+      "id": "P0-1",
+      "title": "Scaffold plugin structure",
+      "description": "Create 005-plugins/<plugin>/ with .claude-plugin, commands, agents, skills, scripts, and tests.",
+      "acceptance_criteria": [
+        "plugin.json is valid JSON",
+        "README.md exists",
+        "pytest runs for plugin tests"
+      ]
+    }
+  ]
+}

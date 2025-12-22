@@ -2,7 +2,8 @@
 name: nixtla-baseline-review
 description: Analyze Nixtla baseline forecasting results (sMAPE/MASE on M4 or other
   benchmark datasets). Use when the user asks about baseline performance, model comparisons,
-  or metric interpretation for Nixtla time-series experiments.
+  or metric interpretation for Nixtla time-series experiments. Trigger with "baseline review",
+  "interpret sMAPE/MASE", or "compare AutoETS vs AutoTheta".
 allowed-tools: Read,Grep,Bash(ls:*)
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
@@ -11,9 +12,9 @@ license: MIT
 
 # Nixtla Baseline Review Skill
 
-## Purpose
+## Overview
 
-This skill helps Claude interpret baseline forecasting results from the `/nixtla-baseline-m4` command. It provides expert analysis of model performance metrics, identifies patterns, and recommends next steps.
+Analyze baseline forecasting results from the `nixtla-baseline-m4` workflow. Interpret metrics, compare models, surface patterns, and recommend next steps.
 
 ## When to Use This Skill
 
@@ -49,7 +50,7 @@ This baseline lab is built on **Nixtla's statsforecast library**. What this plug
 - At minimum, `results_*.csv` file must be present
 - CSV format: columns `series_id`, `model`, `sMAPE`, `MASE`
 
-## Core Instructions
+## Instructions
 
 ### Step 1: Locate Results Files
 
@@ -131,7 +132,7 @@ Based on {N} series from M4-Daily with horizon={H}:
 - {Actionable recommendation 2}
 ```
 
-## Example Interactions
+## Examples
 
 ### Example 1: Simple Query
 
@@ -214,6 +215,11 @@ Help users create GitHub issue drafts to share results with Nixtla maintainers. 
 - User suspects a bug or unexpected behavior
 - User wants to share benchmark results with the community
 
+## Output
+
+- A structured markdown analysis with an overall winner, key insights, and recommended next steps.
+- Optional: a short “power user” section highlighting series-level anomalies and failure cases.
+
 ## Error Handling
 
 **If results files are missing**:
@@ -221,7 +227,7 @@ Help users create GitHub issue drafts to share results with Nixtla maintainers. 
 I don't see baseline results in nixtla_baseline_m4/.
 
 Please run the baseline command first:
-/nixtla-baseline-m4 horizon=14 series_limit=50
+Run: `/nixtla-baseline-m4 horizon=14 series_limit=50`
 
 This will generate the metrics files I need to analyze.
 ```
@@ -234,14 +240,12 @@ The results file exists but appears malformed. Expected columns:
 Please re-run /nixtla-baseline-m4 to regenerate clean results.
 ```
 
-## Resource Files
+## Resources
 
 For detailed information on specific topics:
 - **Metric interpretation**: `resources/METRIC_INTERPRETATION.md`
 - **TimeGPT comparisons**: `resources/TIMEGPT_COMPARISON.md`
 - **GitHub issue drafts**: `resources/GITHUB_ISSUES.md`
-
-## Documentation
 
 For complete technical details, see:
 - Architecture: `000-docs/6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md`

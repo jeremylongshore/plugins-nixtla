@@ -32,7 +32,7 @@ pip install pandas numpy scipy matplotlib seaborn
 
 ### Step 1: Prepare Data
 
-Load multi-series contract data and calculate returns. Uses {baseDir}/scripts/prepare_data.py.
+Load multi-series contract data and calculate returns. Uses `{baseDir}/scripts/prepare_data.py`.
 
 ```bash
 python scripts/prepare_data.py contracts.csv --method log --output-dir results/
@@ -42,7 +42,7 @@ python scripts/prepare_data.py contracts.csv --method log --output-dir results/
 
 ### Step 2: Calculate Correlations
 
-Calculate correlation matrix and identify significant pairs. Uses {baseDir}/scripts/correlation_analysis.py.
+Calculate correlation matrix and identify significant pairs. Uses `{baseDir}/scripts/correlation_analysis.py`.
 
 ```bash
 python scripts/correlation_analysis.py \
@@ -57,7 +57,7 @@ python scripts/correlation_analysis.py \
 
 ### Step 3: Generate Hedge Recommendations
 
-Calculate optimal hedge ratios using regression or minimum variance methods. Uses {baseDir}/scripts/hedge_recommendations.py.
+Calculate optimal hedge ratios using regression or minimum variance methods. Uses `{baseDir}/scripts/hedge_recommendations.py`.
 
 ```bash
 python scripts/hedge_recommendations.py \
@@ -73,7 +73,7 @@ python scripts/hedge_recommendations.py \
 
 ### Step 4: Create Visualizations
 
-Generate correlation heatmap, rolling correlation plot, and hedge effectiveness chart. Uses {baseDir}/scripts/visualize.py.
+Generate correlation heatmap, rolling correlation plot, and hedge effectiveness chart. Uses `{baseDir}/scripts/visualize.py`.
 
 ```bash
 python scripts/visualize.py \
@@ -88,7 +88,7 @@ python scripts/visualize.py \
 
 ### Step 5: Generate Report
 
-Create comprehensive markdown report with all analysis results. Uses {baseDir}/scripts/generate_report.py.
+Create comprehensive markdown report with all analysis results. Uses `{baseDir}/scripts/generate_report.py`.
 
 ```bash
 python scripts/generate_report.py \

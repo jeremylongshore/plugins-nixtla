@@ -2,7 +2,8 @@
 name: nixtla-baseline-review
 description: Analyze Nixtla baseline forecasting results (sMAPE/MASE on M4 or other
   benchmark datasets). Use when the user asks about baseline performance, model comparisons,
-  or metric interpretation for Nixtla time-series experiments.
+  or metric interpretation for Nixtla time-series experiments. Trigger with "baseline review",
+  "interpret sMAPE/MASE", or "compare AutoETS vs AutoTheta".
 allowed-tools: Read,Grep,Bash(ls:*)
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
@@ -11,9 +12,9 @@ license: MIT
 
 # Nixtla Baseline Review Skill
 
-## Purpose
+## Overview
 
-This skill helps Claude interpret baseline forecasting results from the `/nixtla-baseline-m4` command. It provides expert analysis of model performance metrics, identifies patterns, and recommends next steps.
+Analyze baseline forecasting results from the `nixtla-baseline-m4` workflow. Interpret metrics, compare models, surface patterns, and recommend next steps.
 
 ## When to Use This Skill
 
@@ -134,7 +135,11 @@ Based on {N} series from M4-Daily with horizon={H}:
 - {Actionable recommendation 2}
 ```
 
-## Example Interactions
+## Output
+
+- A structured markdown analysis with a clear winner, key insights, and recommended next steps.
+
+## Examples
 
 ### Example 1: Simple Query
 
@@ -197,7 +202,7 @@ MASE provides additional context - if MASE < 1.0, this forecast beats a simple "
 I don't see baseline results in nixtla_baseline_m4/.
 
 Please run the baseline command first:
-/nixtla-baseline-m4 horizon=14 series_limit=50
+Run: `/nixtla-baseline-m4 horizon=14 series_limit=50`
 
 This will generate the metrics files I need to analyze.
 ```

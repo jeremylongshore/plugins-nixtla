@@ -19,6 +19,7 @@ Author: Jeremy Longshore <jeremy@intentsolutions.io>
 Version: 2.0.0
 """
 
+import argparse
 import re
 import sys
 from pathlib import Path
@@ -71,28 +72,66 @@ REQUIRED_SECTIONS = [
 RE_FRONTMATTER = re.compile(r"^---\s*\n(.*?)\n---\s*\n(.*)$", re.DOTALL)
 RE_DESCRIPTION_USE_WHEN = re.compile(r"\bUse when\b", re.IGNORECASE)
 RE_DESCRIPTION_TRIGGER_WITH = re.compile(r"\bTrigger with\b", re.IGNORECASE)
-RE_ABSOLUTE_PATH = re.compile(r"(^/|[A-Za-z]:\\)")
 RE_BASEDIR_SCRIPTS = re.compile(r"{baseDir}/scripts/([\w\-./]+)")
+RE_BASEDIR_REFERENCES = re.compile(r"{baseDir}/references/([\w\-./]+)")
+RE_BASEDIR_ASSETS = re.compile(r"{baseDir}/assets/([\w\-./]+)")
 RE_FIRST_PERSON = re.compile(r"\b(I can|I will|I'm going to|I help)\b", re.IGNORECASE)
 RE_SECOND_PERSON = re.compile(r"\b(You can|You should|You will)\b", re.IGNORECASE)
 FORBIDDEN_WORDS = ("anthropic", "claude")
+CODE_FENCE_PATTERN = re.compile(r"^\s*(```|~~~)")
+HEADING_PATTERN = re.compile(r"^\s*#{1,6}\s+")
+ABSOLUTE_PATH_PATTERNS = [
+    (re.compile(r"/home/\w+/"), "/home/..."),
+    (re.compile(r"/Users/\w+/"), "/Users/..."),
+    (re.compile(r"[A-Za-z]:\\\\Users\\\\", re.IGNORECASE), "C:\\\\Users\\\\..."),
+]
 
 # Defaults
 DEFAULT_AUTHOR = "Jeremy Longshore <jeremy@intentsolutions.io>"
 DEFAULT_LICENSE = "MIT"
+
+# Skill list token budget (Lee Han Chung deep dive): total descriptions are aggregated.
+# Enforce a hard cap and warn when approaching.
+TOTAL_DESCRIPTION_BUDGET_WARN = 12_000
+TOTAL_DESCRIPTION_BUDGET_ERROR = 15_000
 
 
 # === UTILITY FUNCTIONS ===
 
 def find_skill_files(root: Path) -> List[Path]:
     """Find all SKILL.md files, excluding archive and backup directories."""
-    excluded_dirs = {"archive", "backups", "backup", ".git", "node_modules", "__pycache__", ".venv", "010-archive"}
+    # Scope: validate real, runnable skills shipped with the repo.
+    # Exclude documentation/workspace artifacts that may contain SKILL.md examples/specs.
+    excluded_dirs = {
+        "archive",
+        "backups",
+        "backup",
+        ".git",
+        "node_modules",
+        "__pycache__",
+        ".venv",
+        "010-archive",
+        "000-docs",
+        "002-workspaces",
+    }
     results = []
     for p in root.rglob("SKILL.md"):
         if p.is_file():
             parts = p.relative_to(root).parts
-            if not any(part in excluded_dirs for part in parts):
-                results.append(p)
+            if any(part in excluded_dirs for part in parts):
+                continue
+            if any(part.startswith("skills-backup-") for part in parts):
+                continue
+            if not any(part in {"skills", ".claude"} for part in parts):
+                # Defensive: ignore stray SKILL.md outside skill packages.
+                continue
+            if not any(part == "skills" for part in parts):
+                # Require a skills/ directory in the path (plugins and root skills follow this).
+                continue
+            if not any(part in {"003-skills", "005-plugins", ".claude"} for part in parts):
+                # Only validate shipped skill locations.
+                continue
+            results.append(p)
     return results
 
 
@@ -343,12 +382,173 @@ def validate_body(path: Path, body: str) -> Tuple[List[str], List[str]]:
         if sec not in body:
             errors.append(f"[body] Required section missing: '{sec}' (nixtla quality standard)")
 
+    # === LEE HAN CHUNG: SECTION CONTENT MUST BE NON-EMPTY ===
+
+    def _section_body(section_heading: str) -> str:
+        # Grab content between this heading and the next heading of same or higher level.
+        # (i.e., include nested subheadings like ### Step 1 under ## Instructions.)
+        m_heading = re.match(r"^(#+)\s+", section_heading.strip())
+        if not m_heading:
+            return ""
+        level = len(m_heading.group(1))
+
+        lower = body.lower()
+        idx = lower.find(section_heading.lower())
+        if idx == -1:
+            return ""
+
+        after = body[idx + len(section_heading):]
+        stop = None
+        for m in re.finditer(r"^\s*(#{1,6})\s+", after, flags=re.M):
+            next_level = len(m.group(1))
+            if next_level <= level:
+                stop = m.start()
+                break
+
+        if stop is not None:
+            after = after[:stop]
+
+        return after.strip()
+
+    for section, min_chars, level in [
+        ("## Instructions", 40, "ERROR"),
+        ("## Output", 20, "WARN"),
+        ("## Error Handling", 20, "WARN"),
+        ("## Examples", 20, "WARN"),
+        ("## Resources", 20, "WARN"),
+    ]:
+        content = _section_body(section)
+        # Ignore empty sections that only contain code fences/whitespace
+        content_no_code = re.sub(r"```.*?```", "", content, flags=re.DOTALL).strip()
+        if len(content_no_code) < min_chars:
+            msg = f"[body] Section '{section}' looks empty/too short (Lee Han Chung standard)"
+            if level == "ERROR":
+                errors.append(msg)
+            else:
+                warnings.append(msg)
+
+    # === LEE HAN CHUNG: INSTRUCTIONS MUST BE STEP-BY-STEP ===
+
+    instructions = _section_body("## Instructions")
+    if instructions:
+        has_numbered = bool(re.search(r"(?m)^\s*1\.\s+\S+", instructions))
+        has_step_heading = bool(re.search(r"(?mi)^\s*#{2,6}\s*step\s*\d+", instructions))
+        has_step_label = bool(re.search(r"(?mi)^\s*step\s*\d+[:\-]", instructions))
+        if not (has_numbered or has_step_heading or has_step_label):
+            errors.append("[body] '## Instructions' must include step-by-step steps (numbered list or Step headings) (Lee Han Chung)")
+
+    # === LEE HAN CHUNG: PURPOSE STATEMENT (1-2 sentences near top) ===
+
+    def _sentence_count(text: str) -> int:
+        # Heuristic: count sentence terminators in plain text.
+        cleaned = re.sub(r"\s+", " ", text.strip())
+        if not cleaned:
+            return 0
+        parts = re.split(r"(?<=[.!?])\s+", cleaned)
+        return len([p for p in parts if p.strip()])
+
+    def _extract_first_paragraph(after_line_idx: int) -> str:
+        paragraph: List[str] = []
+        in_code = False
+        for raw in lines[after_line_idx:]:
+            if CODE_FENCE_PATTERN.match(raw):
+                in_code = not in_code
+                continue
+            if in_code:
+                continue
+            if HEADING_PATTERN.match(raw):
+                break
+            if not raw.strip():
+                if paragraph:
+                    break
+                continue
+            # Skip list items to avoid counting bullets as purpose text.
+            if raw.lstrip().startswith(("-", "*", "+")):
+                if paragraph:
+                    break
+                continue
+            paragraph.append(raw.strip())
+        return " ".join(paragraph).strip()
+
+    # Find first H1 title line
+    title_idx: Optional[int] = None
+    for i, line in enumerate(lines):
+        if line.startswith("# "):
+            title_idx = i
+            break
+
+    purpose_text = ""
+    purpose_location: Optional[int] = None
+
+    # Prefer explicit "## Purpose" section if present
+    for i, line in enumerate(lines):
+        if line.strip().lower() == "## purpose":
+            purpose_text = _extract_first_paragraph(i + 1)
+            purpose_location = i + 1
+            break
+
+    # Fallback: first paragraph after title
+    if not purpose_text and title_idx is not None:
+        purpose_text = _extract_first_paragraph(title_idx + 1)
+        purpose_location = title_idx + 1
+        if not purpose_text:
+            # Common layout: title followed immediately by a section heading (e.g., ## Overview).
+            for i, line in enumerate(lines):
+                if line.strip().lower() == "## overview":
+                    purpose_text = _extract_first_paragraph(i + 1)
+                    purpose_location = i + 1
+                    break
+
+    if not purpose_text:
+        errors.append("[body] Missing purpose statement near the top (Lee Han Chung standard)")
+    else:
+        sc = _sentence_count(purpose_text)
+        if sc == 0:
+            errors.append("[body] Purpose statement is empty (Lee Han Chung standard)")
+        elif sc > 2:
+            warnings.append(f"[body] Purpose statement is {sc} sentences (recommended 1-2 per Lee Han Chung)")
+        if len(purpose_text) > 400:
+            warnings.append("[body] Purpose statement is long (>400 chars) - keep it crisp (Lee Han Chung)")
+        if purpose_location is not None and purpose_location > 120:
+            warnings.append("[body] Purpose statement appears late in the document - keep it near the top (Lee Han Chung)")
+
+    # === LEE HAN CHUNG: AVOID HUGE EMBEDDED BLOCKS ===
+
+    in_code_block = False
+    code_block_lines = 0
+    for raw in lines:
+        if CODE_FENCE_PATTERN.match(raw):
+            if in_code_block:
+                if code_block_lines >= 200:
+                    warnings.append(
+                        f"[body] Large embedded code block ({code_block_lines} lines) - prefer scripts/ or references/ (Lee Han Chung)"
+                    )
+                code_block_lines = 0
+            in_code_block = not in_code_block
+            continue
+        if in_code_block:
+            code_block_lines += 1
+
     # === PATH CHECKS ===
 
-    for i, line in enumerate(lines, start=1):
-        # Absolute paths forbidden
-        if RE_ABSOLUTE_PATH.search(line):
-            errors.append(f"[body] Line {i}: contains absolute/OS-specific path - use '{{baseDir}}/...'")
+    in_code_block = False
+    for i, raw_line in enumerate(lines, start=1):
+        if CODE_FENCE_PATTERN.match(raw_line):
+            in_code_block = not in_code_block
+            continue
+        if in_code_block:
+            continue
+
+        # Drop inline code before scanning to reduce false positives
+        line = re.sub(r"`[^`]+`", "", raw_line)
+
+        # Absolute paths forbidden (ignore code blocks)
+        for pattern, desc in ABSOLUTE_PATH_PATTERNS:
+            if pattern.search(line):
+                errors.append(
+                    f"[body] Line {i}: contains absolute/OS-specific path ({desc}) - use '{{baseDir}}/...'"
+                )
+                break
 
         # Backslashes forbidden
         if "\\scripts\\" in line:
@@ -368,7 +568,8 @@ def validate_scripts_exist(path: Path, body: str) -> List[str]:
     Nixtla strict mode: HARD FAIL if script doesn't exist.
     """
     errors: List[str] = []
-    skill_dir = path.parent
+    # Resolve to avoid false "escape" errors when validating via relative paths.
+    skill_dir = path.parent.resolve()
 
     referenced = set(m.group(1) for m in RE_BASEDIR_SCRIPTS.finditer(body))
 
@@ -386,6 +587,44 @@ def validate_scripts_exist(path: Path, body: str) -> List[str]:
             errors.append(
                 f"[scripts] Referenced script not found: '{{baseDir}}/scripts/{rel}' "
                 f"(expected at {skill_dir.name}/scripts/{rel})"
+            )
+
+    return errors
+
+
+def validate_resource_files_exist(path: Path, body: str) -> List[str]:
+    """
+    Validate that all {baseDir}/references/... and {baseDir}/assets/... references point to real files.
+    Strict: missing referenced files are errors.
+    """
+    errors: List[str] = []
+    # Resolve to avoid false "escape" errors when validating via relative paths.
+    skill_dir = path.parent.resolve()
+
+    for rel in sorted(set(m.group(1) for m in RE_BASEDIR_REFERENCES.finditer(body))):
+        target = (skill_dir / "references" / rel).resolve()
+        try:
+            target.relative_to(skill_dir)
+        except ValueError:
+            errors.append(f"[resources] Reference escapes skill directory: references/{rel}")
+            continue
+        if not target.exists():
+            errors.append(
+                f"[resources] Referenced file not found: '{{baseDir}}/references/{rel}' "
+                f"(expected at {skill_dir.name}/references/{rel})"
+            )
+
+    for rel in sorted(set(m.group(1) for m in RE_BASEDIR_ASSETS.finditer(body))):
+        target = (skill_dir / "assets" / rel).resolve()
+        try:
+            target.relative_to(skill_dir)
+        except ValueError:
+            errors.append(f"[resources] Reference escapes skill directory: assets/{rel}")
+            continue
+        if not target.exists():
+            errors.append(
+                f"[resources] Referenced file not found: '{{baseDir}}/assets/{rel}' "
+                f"(expected at {skill_dir.name}/assets/{rel})"
             )
 
     return errors
@@ -409,6 +648,16 @@ def validate_skill(path: Path) -> Dict[str, Any]:
     errors: List[str] = []
     warnings: List[str] = []
 
+    # Lee Han Chung: frontmatter size budget (local, per-file)
+    m = RE_FRONTMATTER.match(content)
+    if m:
+        front_str, _body = m.groups()
+        front_len = len(front_str)
+        if front_len > 15_000:
+            errors.append(f"[frontmatter] Frontmatter is {front_len} chars (max 15000 per Lee Han Chung token budget)")
+        elif front_len >= 12_000:
+            warnings.append(f"[frontmatter] Frontmatter is {front_len} chars (warn at 12000 per Lee Han Chung token budget)")
+
     # Validate frontmatter
     fm_errors, fm_warnings = validate_frontmatter(path, fm)
     errors.extend(fm_errors)
@@ -423,11 +672,17 @@ def validate_skill(path: Path) -> Dict[str, Any]:
     script_errors = validate_scripts_exist(path, body)
     errors.extend(script_errors)
 
+    # Validate referenced resources/templates
+    resource_errors = validate_resource_files_exist(path, body)
+    errors.extend(resource_errors)
+
+    description = str(fm.get("description") or "")
     return {
         'errors': errors,
         'warnings': warnings,
         'word_count': estimate_word_count(content),
-        'line_count': len(body.splitlines())
+        'line_count': len(body.splitlines()),
+        'description_length': len(description),
     }
 
 
@@ -441,7 +696,15 @@ def main() -> int:
         print("No SKILL.md files found - nothing to validate.")
         return 0
 
-    verbose = '--verbose' in sys.argv or '-v' in sys.argv
+    parser = argparse.ArgumentParser(add_help=True)
+    parser.add_argument("--verbose", "-v", action="store_true", help="Print per-file OK lines")
+    parser.add_argument(
+        "--fail-on-warn",
+        action="store_true",
+        help="Treat warnings as errors (enterprise strict mode).",
+    )
+    args, _unknown = parser.parse_known_args()
+    verbose = args.verbose
 
     print(f"🔍 CLAUDE CODE SKILLS VALIDATOR v2.0")
     print(f"   Enterprise + Nixtla Strict Quality Mode")
@@ -451,6 +714,7 @@ def main() -> int:
 
     total_errors = 0
     total_warnings = 0
+    total_description_chars = 0
     files_with_errors = []
     files_with_warnings = []
     files_compliant = []
@@ -491,6 +755,8 @@ def main() -> int:
         if not result['errors'] and not result['warnings']:
             files_compliant.append(str(rel))
 
+        total_description_chars += int(result.get("description_length") or 0)
+
     # Summary
     print(f"\n{'=' * 70}")
     print(f"📊 VALIDATION SUMMARY")
@@ -505,11 +771,26 @@ def main() -> int:
     compliant_pct = (len(files_compliant) / len(skills) * 100) if skills else 0
     print(f"\n📈 Compliance rate: {compliant_pct:.1f}%")
 
+    if total_description_chars >= TOTAL_DESCRIPTION_BUDGET_WARN:
+        msg = (
+            f"\n⚠️  Skill description budget: {total_description_chars} chars "
+            f"(warn at {TOTAL_DESCRIPTION_BUDGET_WARN}, cap {TOTAL_DESCRIPTION_BUDGET_ERROR})"
+        )
+        if total_description_chars > TOTAL_DESCRIPTION_BUDGET_ERROR:
+            print(msg.replace("⚠️", "❌"))
+            total_errors += 1
+        else:
+            print(msg)
+            total_warnings += 1
+
     if total_errors > 0:
         print(f"\n❌ Validation FAILED with {total_errors} errors")
         print("\nTo fix: Add missing enterprise fields to all skills:")
         print("  author: \"Jeremy Longshore <jeremy@intentsolutions.io>\"")
         print("  license: \"MIT\"")
+        return 1
+    elif total_warnings > 0 and args.fail_on_warn:
+        print(f"\n❌ Validation FAILED due to {total_warnings} warning(s) (--fail-on-warn)")
         return 1
     elif total_warnings > 0:
         print(f"\n⚠️  Validation PASSED with {total_warnings} warnings")

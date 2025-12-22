@@ -35,7 +35,7 @@ bd hooks install  # If warned about hooks
 
 **Business showcase for Nixtla CEO** demonstrating Claude Code plugins and AI skills for time-series forecasting workflows.
 
-**Version**: 1.9.0 | **Status**: 3 working plugins + 26 production skills (all at 100% L4 quality)
+**Version**: 1.8.1 | **Status**: Experimental showcase (plugins + skills)
 
 **Tech Stack**: Python 3.9+, statsforecast, TimeGPT API, Nixtla SDK, pytest, black, isort, flake8
 
@@ -149,6 +149,8 @@ description: |
   Trigger with "phrase 1", "phrase 2", "phrase 3".
 allowed-tools: "Read,Write,Glob,Grep,Edit,Bash(python:*)"
 version: "1.0.0"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+license: "MIT"
 ---
 
 # [Skill Name]
@@ -184,7 +186,7 @@ Links to external docs, related skills, references.
 - **Paths**: All paths must use `{baseDir}` for portability (e.g., `{baseDir}/skills-pack/.claude/skills/`).
 - **Body Length**: ≤ 500 lines. Extract long code to `scripts/` or `assets/templates/`.
 - **Voice**: Use imperative for instructions ("Run the script", "Copy the file").
-- **Forbidden Frontmatter**: No `author`, `priority`, `audience`, `when_to_use`, `license` fields.
+- **Forbidden Frontmatter**: No `priority`, `audience`, `when_to_use` fields.
 
 ### Skill File Structure
 
@@ -272,7 +274,7 @@ python 007-tests/test_skills_installer_e2e.py
 python 005-plugins/nixtla-baseline-lab/tests/run_baseline_m4_smoke.py
 
 # Skills compliance validator (strict mode)
-python 004-scripts/validate_skills.py
+python 004-scripts/validate_skills_v2.py
 
 # Skills test suite (L1/L2/L4 quality checks)
 python tests/skills/test_all_skills.py                        # All 23 skills
@@ -454,9 +456,11 @@ description: >
   Action-oriented description with when-to-use context
 version: X.Y.Z
 allowed-tools: "Read,Write,Glob,Grep,Edit"
+author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+license: "MIT"
 ```
 
-**Forbidden fields**: author, priority, audience, when_to_use, license
+**Forbidden fields**: priority, audience, when_to_use
 
 ## Nixtla Integration Patterns
 
@@ -541,7 +545,7 @@ All in `.github/workflows/`:
 
 ## Version & Release
 
-**Current**: 1.7.0 (23 Skills at 100% L4 Quality)
+**Current**: 1.8.1 (source of truth: `VERSION`)
 
 See `CHANGELOG.md` for full history. Release process:
 1. Update `VERSION` file
@@ -557,7 +561,7 @@ See `CHANGELOG.md` for full history. Release process:
 - **Scripts location**: `003-skills/.claude/skills/{skill-name}/scripts/`
 - **Templates location**: `003-skills/.claude/skills/{skill-name}/assets/templates/`
 - **Why**: Prevents SKILL.md from becoming unwieldy, enables code reuse
-- **Validator**: `python 004-scripts/validate_skills.py` checks compliance
+- **Validator**: `python 004-scripts/validate_skills_v2.py` checks compliance
 
 Recent extractions (Dec 2025):
 - nixtla-experiment-architect, nixtla-prod-pipeline-generator, nixtla-schema-mapper

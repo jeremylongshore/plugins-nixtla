@@ -28,4 +28,4 @@ jobs:
 
       - name: Validate Claude Skills (v2 - Enterprise + Strict)
         run: |
-          python 004-scripts/validate_skills_v2.py
+          python 004-scripts/validate_skills_v2.py --fail-on-warn
