@@ -133,9 +133,13 @@ claude-code-plugins-plus/
 .venv-skill-tests/
 # Temporary/generated data
 009-temp-data/
+reports/
 
 # Local emailer utility (contains API keys) - moved to 004-scripts/
 004-scripts/emailer/.env
 
 # bv (beads viewer) local config and caches
 .bv/
+
+# beads runtime locks (should never be committed)
+.beads/*.startlock

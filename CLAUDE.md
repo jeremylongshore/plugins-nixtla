@@ -122,6 +122,34 @@ python 004-scripts/validate_skills_v2.py --verbose
 # See: .github/workflows/skills-validation.yml
 ```
 
+### Universal Validation (Evidence Bundles)
+
+For deterministic, profile-driven validation that writes an evidence bundle (JSON + report + logs):
+
+```bash
+python 003-skills/.claude/skills/nixtla-universal-validator/scripts/run_validator_suite.py \
+  --target . \
+  --project pr-1234 \
+  --out reports/pr-1234 \
+  --profile default
+```
+
+List built-in profiles:
+
+```bash
+python 003-skills/.claude/skills/nixtla-universal-validator/scripts/run_validator_suite.py \
+  --list-profiles \
+  --target . \
+  --project pr-1234 \
+  --out reports/pr-1234
+```
+
+Evidence bundle output:
+
+- `reports/<project>/<timestamp>/summary.json`
+- `reports/<project>/<timestamp>/report.md`
+- `reports/<project>/<timestamp>/checks/*.log`
+
 **Validator v2 enforces**:
 - **Anthropic Spec**: Description ≤1024 chars, third-person voice, proper structure
 - **Enterprise Fields**: author, license, version (required for marketplace)
@@ -198,6 +226,11 @@ Links to external docs, related skills, references.
 ├── resources/            # Supporting docs (EXAMPLES.md, TROUBLESHOOTING.md)
 └── references/           # External links, citations
 ```
+
+### Planned Templates (Reusable)
+
+- Universal validator (skill template): `000-docs/000a-planned-skills/templates/universal-validator/`
+- Universal validator (plugin template): `000-docs/000a-planned-plugins/templates/universal-validator/`
 
 ### L4 Quality Scoring (Enforced at 100%)
 

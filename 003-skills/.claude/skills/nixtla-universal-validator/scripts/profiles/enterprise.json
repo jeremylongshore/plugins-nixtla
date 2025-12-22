@@ -1,0 +1,65 @@
+{
+  "name": "enterprise",
+  "description": "Runs repo structural validators plus formatting/linting and tests when requested.",
+  "phases": [
+    {
+      "name": "structural",
+      "checks": [
+        {
+          "name": "skills.validate_strict",
+          "command": ["python", "004-scripts/validate_skills_v2.py", "--fail-on-warn"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        },
+        {
+          "name": "skills.scaffold",
+          "command": ["python", "003-skills/.claude/skills/nixtla-universal-validator/scripts/validate_skill_scaffold.py", "--target", "{skill_root}"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        },
+        {
+          "name": "plugins.validate",
+          "command": ["bash", "004-scripts/validate-all-plugins.sh", "{target}"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        }
+      ]
+    },
+    {
+      "name": "quality",
+      "checks": [
+        {
+          "name": "format.black_check",
+          "command": ["black", "--check", "."],
+          "cwd": "{repo_root}",
+          "severity": "warn"
+        },
+        {
+          "name": "format.isort_check",
+          "command": ["isort", "--check-only", "."],
+          "cwd": "{repo_root}",
+          "severity": "warn"
+        },
+        {
+          "name": "lint.flake8",
+          "command": ["flake8", "."],
+          "cwd": "{repo_root}",
+          "severity": "warn"
+        }
+      ]
+    },
+    {
+      "name": "behavioral",
+      "checks": [
+        {
+          "name": "tests.pytest",
+          "command": ["pytest", "-q"],
+          "cwd": "{repo_root}",
+          "severity": "error",
+          "when": { "flag": "run_tests", "equals": true }
+        }
+      ]
+    }
+  ]
+}
+

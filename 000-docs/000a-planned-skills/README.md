@@ -83,6 +83,16 @@ These skills are implemented and ready to use. Located in `003-skills/.claude/sk
 These skills have comprehensive PRD + ARD documentation but no implementation yet.
 **Domain**: Prediction Markets + Time Series Forecasting
 
+---
+
+## Universal Workflow Template (Use for Any Company)
+
+If you want a repeatable way to manufacture skills/plugins at scale with deterministic verification, use:
+
+- `000-docs/000a-planned-skills/templates/verification-pipeline/README.md`
+
+This provides a 5-phase subagent pipeline with “ground truth” scripts (Phase 2 + Phase 4) and a copy-paste `skill-package/` layout.
+
 ### Skill Specifications
 
 | Skill | PRD | ARD | Description | Priority |

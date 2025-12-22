@@ -16,6 +16,7 @@
 - Run plugin tests: `pytest 005-plugins/<plugin>/tests -v`
 - Validate skills (strict): `python 004-scripts/validate_skills_v2.py --fail-on-warn`
 - Validate plugins (canonical): `bash 004-scripts/validate-all-plugins.sh .`
+- Generate a deterministic evidence bundle: `python 003-skills/.claude/skills/nixtla-universal-validator/scripts/run_validator_suite.py --target . --project pr-1234 --out reports/pr-1234 --profile default`
 - Coverage artifacts: `.coverage` plus HTML output in `001-htmlcov/` (see `pytest.ini`).
 
 ## Coding Style & Naming Conventions

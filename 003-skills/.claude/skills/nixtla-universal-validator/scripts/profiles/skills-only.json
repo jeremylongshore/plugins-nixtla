@@ -1,0 +1,30 @@
+{
+  "name": "skills-only",
+  "description": "Validates skills strictly; optionally runs skills-focused tests.",
+  "phases": [
+    {
+      "name": "structural",
+      "checks": [
+        {
+          "name": "skills.validate_strict",
+          "command": ["python", "004-scripts/validate_skills_v2.py", "--fail-on-warn"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        }
+      ]
+    },
+    {
+      "name": "behavioral",
+      "checks": [
+        {
+          "name": "tests.skills_pytest",
+          "command": ["pytest", "-q", "tests/skills/test_all_skills.py"],
+          "cwd": "{repo_root}",
+          "severity": "error",
+          "when": { "flag": "run_tests", "equals": true }
+        }
+      ]
+    }
+  ]
+}
+

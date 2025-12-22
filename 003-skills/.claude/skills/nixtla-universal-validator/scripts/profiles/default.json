@@ -1,0 +1,52 @@
+{
+  "name": "default",
+  "description": "Runs structural validators for skills + plugins; optionally includes tests.",
+  "phases": [
+    {
+      "name": "discover",
+      "checks": [
+        {
+          "name": "repo.discover",
+          "command": ["python", "003-skills/.claude/skills/nixtla-universal-validator/scripts/discover_scope.py", "{target}"],
+          "cwd": "{repo_root}",
+          "severity": "info"
+        }
+      ]
+    },
+    {
+      "name": "structural",
+      "checks": [
+        {
+          "name": "skills.validate_strict",
+          "command": ["python", "004-scripts/validate_skills_v2.py", "--fail-on-warn"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        },
+        {
+          "name": "skills.scaffold",
+          "command": ["python", "003-skills/.claude/skills/nixtla-universal-validator/scripts/validate_skill_scaffold.py", "--target", "{skill_root}"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        },
+        {
+          "name": "plugins.validate",
+          "command": ["bash", "004-scripts/validate-all-plugins.sh", "{target}"],
+          "cwd": "{repo_root}",
+          "severity": "error"
+        }
+      ]
+    },
+    {
+      "name": "behavioral",
+      "checks": [
+        {
+          "name": "tests.pytest",
+          "command": ["pytest", "-q"],
+          "cwd": "{repo_root}",
+          "severity": "error",
+          "when": { "flag": "run_tests", "equals": true }
+        }
+      ]
+    }
+  ]
+}

@@ -27,6 +27,8 @@ This directory contains documentation for both **implemented** and **planned** C
     ├── nixtla-forecast-workflow-templates/
     ├── nixtla-embedded-forecast-widget/
     └── nixtla-forecast-audit-report/
+└── templates/                # Reusable plugin blueprints
+    └── universal-validator/
 ```
 
 ---
@@ -37,7 +39,8 @@ This directory contains documentation for both **implemented** and **planned** C
 |----------|-------|--------|
 | **Implemented Plugins** | 13 | Live in `005-plugins/` |
 | **Planned Plugins** | 6 | PRDs complete, awaiting build |
-| **Total** | 19 | - |
+| **Templates** | 1 | Reusable blueprints |
+| **Total** | 20 | - |
 
 ---
 
