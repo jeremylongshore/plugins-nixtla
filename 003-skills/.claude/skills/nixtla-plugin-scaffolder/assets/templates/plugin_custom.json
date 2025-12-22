@@ -32,5 +32,8 @@
     "forecasting",
     "time-series",
     "nixtla"
-  ]
+  ],
+  "customization": {
+    "notes": "Optional overrides for your org (extra tags, default env vars, etc.)."
+  }
 }

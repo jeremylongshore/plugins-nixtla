@@ -108,10 +108,13 @@ class PluginScaffolder:
         """Create plugin directory structure."""
         dirs = [
             self.output_dir,
-            self.output_dir / '.claude' / 'skills' / self.plugin_name,
-            self.output_dir / '.claude' / 'commands',
-            self.output_dir / '.claude' / 'agents',
-            self.output_dir / 'scripts',
+            self.output_dir / '.claude-plugin',
+            self.output_dir / 'commands',
+            self.output_dir / 'agents',
+            self.output_dir / 'skills' / self.plugin_name,
+            self.output_dir / 'skills' / self.plugin_name / 'scripts',
+            self.output_dir / 'skills' / self.plugin_name / 'references',
+            self.output_dir / 'skills' / self.plugin_name / 'assets' / 'templates',
             self.output_dir / 'tests',
         ]
 
@@ -120,26 +123,43 @@ class PluginScaffolder:
 
         print(f"✓ Created directory structure at {self.output_dir}")
 
+    def _parse_author_object(self) -> Dict[str, str]:
+        """
+        Convert author string into plugin.json author object.
+        Accepts:
+          - \"Name <email>\"
+          - \"Name\"
+        """
+        raw = self.author.strip()
+        m = re.match(r"^(.*?)\\s*<([^>]+)>\\s*$", raw)
+        if m:
+            name = m.group(1).strip()
+            email = m.group(2).strip()
+            out = {"name": name}
+            if email:
+                out["email"] = email
+            return out
+        return {"name": raw}
+
     def generate_plugin_json(self, mcp_tools: List[Dict[str, str]]):
-        """Generate plugin.json with MCP server configuration."""
-        # Convert plugin name to snake_case for script name
+        """Generate .claude-plugin/plugin.json with MCP server configuration."""
         script_name = self.plugin_name.replace('-', '_') + '_mcp_server.py'
 
         plugin_json = {
             "name": self.plugin_name,
             "version": self.version,
             "description": self.description,
-            "author": self.author,
+            "author": self._parse_author_object(),
             "license": self.license_type,
             "mcpServers": {
                 self.plugin_name: {
                     "command": "python",
-                    "args": [f"{{baseDir}}/scripts/{script_name}"]
+                    "args": [f"skills/{self.plugin_name}/scripts/{script_name}"]
                 }
             }
         }
 
-        output_path = self.output_dir / 'plugin.json'
+        output_path = self.output_dir / '.claude-plugin' / 'plugin.json'
         output_path.write_text(json.dumps(plugin_json, indent=2) + '\n')
         print(f"✓ Generated {output_path}")
 
@@ -152,6 +172,8 @@ class PluginScaffolder:
             f"Trigger with '{self.plugin_name}' or 'run {self.plugin_name}'."
         )
 
+        purpose = f"Scaffold and operate the {self._title_case(self.plugin_name)} plugin workflows with validated structure and predictable outputs."
+
         skill_content = f"""---
 name: {self.plugin_name}
 description: "{skill_description}"
@@ -163,7 +185,7 @@ license: {self.license_type}
 
 # {self._title_case(self.plugin_name)}
 
-{self.description}
+{purpose}
 
 ## Overview
 
@@ -191,7 +213,7 @@ Describe preparation steps here.
 ### Step 2: Execution
 
 ```bash
-python {{{{baseDir}}}}/scripts/{self.plugin_name.replace('-', '_')}_mcp_server.py
+python {{baseDir}}/scripts/{self.plugin_name.replace('-', '_')}_mcp_server.py
 ```
 
 ### Step 3: Validation
@@ -229,10 +251,10 @@ Verify results here.
 
 - **Official Docs**: [Link]
 - **Related Skills**: List related skills
-- **Scripts**: `{{{{baseDir}}}}/scripts/`
+- **Scripts**: `{{baseDir}}/scripts/`
 """
 
-        output_path = self.output_dir / '.claude' / 'skills' / self.plugin_name / 'SKILL.md'
+        output_path = self.output_dir / 'skills' / self.plugin_name / 'SKILL.md'
         output_path.write_text(skill_content)
         print(f"✓ Generated {output_path}")
 
@@ -263,14 +285,14 @@ claude-code install {self.plugin_name}
 
 ## Configuration
 
-Configure in `plugin.json`:
+Configure in `.claude-plugin/plugin.json`:
 
 ```json
 {{
   "mcpServers": {{
     "{self.plugin_name}": {{
       "command": "python",
-      "args": ["{{{{baseDir}}}}/scripts/{self.plugin_name.replace('-', '_')}_mcp_server.py"]
+      "args": ["skills/{self.plugin_name}/scripts/{self.plugin_name.replace('-', '_')}_mcp_server.py"]
     }}
   }}
 }}
@@ -283,7 +305,7 @@ Configure in `plugin.json`:
 pytest tests/
 
 # Run MCP server locally
-python scripts/{self.plugin_name.replace('-', '_')}_mcp_server.py
+python skills/{self.plugin_name}/scripts/{self.plugin_name.replace('-', '_')}_mcp_server.py
 ```
 
 ## License
@@ -362,7 +384,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 '''
 
-        output_path = self.output_dir / 'scripts' / script_name
+        output_path = self.output_dir / 'skills' / self.plugin_name / 'scripts' / script_name
         output_path.write_text(mcp_content)
         output_path.chmod(0o755)  # Make executable
         print(f"✓ Generated {output_path}")
@@ -387,16 +409,17 @@ def test_plugin_structure():
     plugin_dir = Path(__file__).parent.parent
 
     # Check required files exist
-    assert (plugin_dir / 'plugin.json').exists()
+    assert (plugin_dir / '.claude-plugin' / 'plugin.json').exists()
     assert (plugin_dir / 'README.md').exists()
-    assert (plugin_dir / '.claude' / 'skills' / '{self.plugin_name}' / 'SKILL.md').exists()
+    assert (plugin_dir / 'skills' / '{self.plugin_name}' / 'SKILL.md').exists()
+    assert (plugin_dir / 'skills' / '{self.plugin_name}' / 'scripts' / '{self.plugin_name.replace('-', '_')}_mcp_server.py').exists()
 
 
 def test_plugin_json_valid():
     """Test that plugin.json is valid JSON."""
     import json
     plugin_dir = Path(__file__).parent.parent
-    plugin_json = plugin_dir / 'plugin.json'
+    plugin_json = plugin_dir / '.claude-plugin' / 'plugin.json'
 
     with open(plugin_json) as f:
         data = json.load(f)
@@ -432,7 +455,7 @@ def test_plugin_json_valid():
         print(f"\n✓ Plugin scaffold complete!")
         print(f"\nNext steps:")
         print(f"1. Review generated files in {self.output_dir}")
-        print(f"2. Implement MCP server logic in scripts/")
+        print(f"2. Implement MCP server logic in skills/{self.plugin_name}/scripts/")
         print(f"3. Expand SKILL.md instructions and examples")
         print(f"4. Add functional tests to tests/")
         print(f"5. Run validator: python 004-scripts/validate_skills_v2.py")

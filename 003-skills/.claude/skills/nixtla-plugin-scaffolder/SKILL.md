@@ -126,7 +126,7 @@ python {baseDir}/scripts/scaffold_plugin.py \
   "name": "nixtla-roi-calculator",
   "version": "0.1.0",
   "description": "Enterprise ROI calculator for TimeGPT vs. build-in-house analysis",
-  "author": "Jeremy Longshore <jeremy@intentsolutions.io>",
+  "author": { "name": "Jeremy Longshore", "email": "jeremy@intentsolutions.io" },
   "license": "MIT",
   "mcpServers": {
     "nixtla-roi-calculator": {
