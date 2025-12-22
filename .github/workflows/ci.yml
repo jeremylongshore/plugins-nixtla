@@ -79,6 +79,7 @@ jobs:
     needs:
       - validate-skills
       - validate-plugins
+      - validate-command-agent-frontmatter
     steps:
       - uses: actions/checkout@v4
 
@@ -139,6 +140,26 @@ jobs:
       - name: Validate plugins (canonical)
         run: |
           bash 004-scripts/validate-all-plugins.sh .
+
+  validate-command-agent-frontmatter:
+    name: Validate Command/Agent Frontmatter
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install validator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Run command/agent frontmatter validator
+        run: |
+          python 004-scripts/validate_command_agent_frontmatter.py
 
   # ===========================================================================
   # TIER 2: Full Matrix (PRs only) - All OS + Python versions

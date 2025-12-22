@@ -1,6 +1,6 @@
 ---
 name: nixtla-baseline-setup
-description: Prepare the local Python environment for Nixtla Baseline Lab by installing Nixtla open-source dependencies and verifying everything is ready to run baselines.
+description: Install Nixtla dependencies and prepare environment for baseline forecasting
 ---
 
 # Nixtla Baseline Lab – Environment Setup

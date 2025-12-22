@@ -1,6 +1,12 @@
 ---
 name: nixtla-baseline-analyst
 description: Expert agent for analyzing Nixtla baseline forecasting results and providing strategic recommendations
+capabilities:
+  - Analyze statistical forecasting model performance
+  - Interpret sMAPE, MASE, MAE, and RMSE metrics
+  - Compare baseline models across benchmark datasets
+  - Provide model selection recommendations
+  - Translate technical metrics into business insights
 tools: Read, Grep, Bash, Write
 ---
 
