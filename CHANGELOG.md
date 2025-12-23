@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Features
+- **Test Harness Lab Documentation** (2,507 lines):
+  - Created comprehensive 5-phase reference documentation for multi-phase validated workflow pattern
+  - `02-phase-2.md` (436 lines): Field utilization analysis procedure
+  - `03-phase-3.md` (560 lines): Impact assessment and risk analysis procedure
+  - `05-phase-5.md` (708 lines): Final synthesis and go/no-go recommendation procedure
+  - Completes reference docs for all 5 phases (1, 2, 3, 4, 5)
+
+- **Release Validation Skill**:
+  - Created `nixtla-release-validation` skill for automated pre-release validation
+  - 5-phase workflow: Change Analysis → Test Impact Prediction → Risk Assessment → Verification → Go/No-Go
+  - Phase 4 verification script (`analyze_test_results.sh`) runs pytest suite and generates structured JSON report
+  - Enables empirical validation of release readiness (e.g., v1.7.0 → v1.8.0)
+
+### Fixes
+- **Test Harness Reference Script**: Fixed bash array expansion bug in `analyze_field_utilization.sh`
+  - Arrays now checked for emptiness BEFORE expansion to prevent 'set -u' errors
+  - Applied to all three array variables (UNUSED_FIELDS, LOW_UTIL_FIELDS, HIGH_UTIL_FIELDS)
+
+### Technical Details
+- Commits: 3 (docs/test-harness, fix/test-harness, docs/test-harness)
+- Files added: 4 (3 reference docs + 1 skill directory with scripts)
+- Lines of documentation: 1,705 insertions
+- Test Harness Lab: Now production-ready with complete reference implementation
+
 ## [1.8.1] - 2025-12-12
 
 ### Release Highlights
