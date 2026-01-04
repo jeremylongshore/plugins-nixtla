@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Changelog Automation Configuration",
+  "description": "Configuration schema for changelog-automation plugin",
+  "type": "object",
+  "required": ["sources", "template", "output_path"],
+  "properties": {
+    "sources": {
+      "type": "array",
+      "description": "List of data sources to fetch changelog items from",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["type", "config"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["github", "slack", "git"],
+            "description": "Data source type"
+          },
+          "config": {
+            "type": "object",
+            "description": "Source-specific configuration"
+          }
+        }
+      }
+    },
+    "template": {
+      "type": "string",
+      "description": "Path to markdown template file (relative to project root)",
+      "pattern": "^[^/].*\\.md$"
+    },
+    "output_path": {
+      "type": "string",
+      "description": "Path to output changelog file (relative to project root)",
+      "pattern": "^[^/].*\\.md$"
+    },
+    "quality_threshold": {
+      "type": "integer",
+      "description": "Minimum quality score (0-100) required to pass quality gate",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 80
+    },
+    "pr_config": {
+      "type": "object",
+      "description": "Pull request configuration",
+      "properties": {
+        "base_branch": {
+          "type": "string",
+          "description": "Target branch for PR",
+          "default": "main"
+        },
+        "labels": {
+          "type": "array",
+          "description": "Labels to apply to PR",
+          "items": {
+            "type": "string"
+          },
+          "default": ["documentation", "changelog"]
+        },
+        "auto_merge": {
+          "type": "boolean",
+          "description": "Automatically merge PR if quality gate passes",
+          "default": false
+        }
+      }
+    }
+  }
+}

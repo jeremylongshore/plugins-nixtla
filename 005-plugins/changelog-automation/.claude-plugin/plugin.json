@@ -1,0 +1,26 @@
+{
+  "name": "changelog-automation",
+  "version": "0.1.0",
+  "description": "Automate changelog generation with AI-powered synthesis, multi-source data fetching, and quality validation",
+  "author": "Jeremy Longshore <jeremy@intentsolutions.io>",
+  "license": "MIT",
+  "category": "automation",
+  "tags": ["changelog", "release-notes", "automation", "documentation", "github", "slack"],
+  "commands": [
+    "changelog-weekly",
+    "changelog-custom",
+    "changelog-validate"
+  ],
+  "skills": [
+    "changelog-orchestrator"
+  ],
+  "mcp_servers": [
+    "changelog-mcp"
+  ],
+  "requires": {
+    "python": ">=3.10",
+    "claude_code": ">=0.9.0"
+  },
+  "repository": "https://github.com/nixtla/nixtla",
+  "documentation": "000-docs/000a-planned-plugins/changelog-automation/"
+}

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "changelog-mcp": {
+      "command": "python",
+      "args": [
+        "{pluginDir}/scripts/changelog_mcp.py"
+      ],
+      "env": {},
+      "disabled": false
+    }
+  }
+}
