@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_c8b579376b032a0c018a66bfb649a080 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@3.0.0/Control.FullScreen.css"/>
+</head>
+<body>
+    
+    
+    <div style="
+        position: fixed;
+        bottom: 50px;
+        left: 50px;
+        z-index: 1000;
+        background-color: white;
+        padding: 15px;
+        border-radius: 5px;
+        border: 2px solid gray;
+        font-family: Arial;
+        font-size: 12px;
+    ">
+        <h4 style="margin: 0 0 10px 0;">ERCOT Grid Forecast</h4>
+        <p style="margin: 5px 0;">
+            <span style="color: #FFD700; font-weight: bold;">━━━</span> Transmission Corridor
+        </p>
+        <p style="margin: 5px 0;">
+            <span style="display: inline-block; width: 15px; height: 15px;
+                         background-color: #1f77b4; border-radius: 50%;
+                         vertical-align: middle;"></span> Weather Zone
+        </p>
+        <hr style="margin: 10px 0;">
+        <p style="margin: 5px 0; font-size: 10px; color: gray;">
+            Circle size = Load magnitude<br>
+            Click zones for forecast details
+        </p>
+    </div>
+    
+    
+    <div style="
+        position: fixed;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background-color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        border: 2px solid #333;
+        font-family: Arial;
+        font-size: 18px;
+        font-weight: bold;
+    ">
+        ERCOT Grid 48-Hour Load Forecast
+        <span style="font-size: 12px; font-weight: normal; color: gray;">
+            | 2026-01-03 23:01
+        </span>
+    </div>
+    
+    
+            <div class="folium-map" id="map_c8b579376b032a0c018a66bfb649a080" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_c8b579376b032a0c018a66bfb649a080 = L.map(
+                "map_c8b579376b032a0c018a66bfb649a080",
+                {
+                    center: [31.0, -99.5],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 6,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_1e3abb2ee71e5b8da80e27cb4ab01c59 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_1e3abb2ee71e5b8da80e27cb4ab01c59.addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            L.control.fullscreen(
+                {
+  "position": "topleft",
+  "title": "Full Screen",
+  "titleCancel": "Exit Full Screen",
+  "forceSeparateButton": false,
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var poly_line_efd0babaece411f14db4b8df2bdcb596 = L.polyline(
+                [[33.0198, -96.6989], [29.4241, -98.4936]],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FFD700", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            poly_line_efd0babaece411f14db4b8df2bdcb596.bindTooltip(
+                `<div>
+                     Dallas-SA Corridor (345kV)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e43915bdfceafeabd2874efd8ac7d881 = L.polyline(
+                [[29.4241, -98.4936], [29.3013, -94.7977]],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FFD700", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            poly_line_e43915bdfceafeabd2874efd8ac7d881.bindTooltip(
+                `<div>
+                     SA-Houston Corridor (345kV)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_22b07d8b15328db5549d54bdafb5d7fa = L.polyline(
+                [[33.0198, -96.6989], [29.3013, -94.7977]],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FFD700", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            poly_line_22b07d8b15328db5549d54bdafb5d7fa.bindTooltip(
+                `<div>
+                     Dallas-Houston Corridor (345kV)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_46e81c1ce670246634391d9e61b15c89 = L.polyline(
+                [[31.4638, -100.437], [33.0198, -96.6989]],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FFD700", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            poly_line_46e81c1ce670246634391d9e61b15c89.bindTooltip(
+                `<div>
+                     West-North Corridor (345kV)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1307e61b1c70c213fe818453bb768944 = L.polyline(
+                [[31.4638, -100.437], [29.4241, -98.4936]],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FFD700", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            poly_line_1307e61b1c70c213fe818453bb768944.bindTooltip(
+                `<div>
+                     West-SC Corridor (345kV)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_595b5a08e734ee77216a834cd307c3c5 = L.polyline(
+                [[31.106, -104.0214], [31.4638, -100.437]],
+                {"bubblingMouseEvents": true, "color": "#FFD700", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FFD700", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.7, "smoothFactor": 1.0, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            poly_line_595b5a08e734ee77216a834cd307c3c5.bindTooltip(
+                `<div>
+                     Far West Tie (345kV)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_aa44e59b54ad73ff0a89340e4daa3acf = L.circle(
+                [29.3013, -94.7977],
+                {"bubblingMouseEvents": true, "color": "#1f77b4", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#1f77b4", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_5251c006180fef66a00f4b71c1b6fd5a = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_68062cacba3554a058c833db8b195d51 = $(`<div id="html_68062cacba3554a058c833db8b195d51" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #1f77b4;">                 Coast Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> Houston, Galveston, Beaumont</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 16,474 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 18,452 MW</p>             <p style="margin: 5px 0; color: red;">                 <b>Change:</b> +12.0%             </p>         </div>         </div>`)[0];
+                popup_5251c006180fef66a00f4b71c1b6fd5a.setContent(html_68062cacba3554a058c833db8b195d51);
+            
+        
+
+        circle_aa44e59b54ad73ff0a89340e4daa3acf.bindPopup(popup_5251c006180fef66a00f4b71c1b6fd5a)
+        ;
+
+        
+    
+    
+            circle_aa44e59b54ad73ff0a89340e4daa3acf.bindTooltip(
+                `<div>
+                     Coast Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_6500b36ec45994699f7b186a5b73adfa = L.marker(
+                [29.3013, -94.7977],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_c7bd8070eed80499d6b777a3efb2402b = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #1f77b4;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    Coast\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_6500b36ec45994699f7b186a5b73adfa.setIcon(div_icon_c7bd8070eed80499d6b777a3efb2402b);
+            
+    
+            var circle_b53304a3e2733c66d545271e6697c5c1 = L.circle(
+                [31.7619, -95.6308],
+                {"bubblingMouseEvents": true, "color": "#ff7f0e", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ff7f0e", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_2b897b9e8731032e40248750a5266913 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_31bc95f639b7172e99064f5da08b86c3 = $(`<div id="html_31bc95f639b7172e99064f5da08b86c3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #ff7f0e;">                 East Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> Tyler, Longview, Nacogdoches</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 5,351 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 5,861 MW</p>             <p style="margin: 5px 0; color: red;">                 <b>Change:</b> +9.5%             </p>         </div>         </div>`)[0];
+                popup_2b897b9e8731032e40248750a5266913.setContent(html_31bc95f639b7172e99064f5da08b86c3);
+            
+        
+
+        circle_b53304a3e2733c66d545271e6697c5c1.bindPopup(popup_2b897b9e8731032e40248750a5266913)
+        ;
+
+        
+    
+    
+            circle_b53304a3e2733c66d545271e6697c5c1.bindTooltip(
+                `<div>
+                     East Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_2a576ce2dd794c2cd06fc092dc1ff0fb = L.marker(
+                [31.7619, -95.6308],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_4d83724aa32971a56351f71716d11bb4 = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #ff7f0e;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    East\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_2a576ce2dd794c2cd06fc092dc1ff0fb.setIcon(div_icon_4d83724aa32971a56351f71716d11bb4);
+            
+    
+            var circle_e6f9cd587053432e6c2b7349de535e0a = L.circle(
+                [31.106, -104.0214],
+                {"bubblingMouseEvents": true, "color": "#2ca02c", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#2ca02c", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_00c3c300e2619341325d3d55a1f1554e = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_202e807ecd4cd1ecdff5a819770e5e71 = $(`<div id="html_202e807ecd4cd1ecdff5a819770e5e71" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #2ca02c;">                 Far West Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> El Paso, Midland, Odessa</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 1,980 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 2,145 MW</p>             <p style="margin: 5px 0; color: red;">                 <b>Change:</b> +8.3%             </p>         </div>         </div>`)[0];
+                popup_00c3c300e2619341325d3d55a1f1554e.setContent(html_202e807ecd4cd1ecdff5a819770e5e71);
+            
+        
+
+        circle_e6f9cd587053432e6c2b7349de535e0a.bindPopup(popup_00c3c300e2619341325d3d55a1f1554e)
+        ;
+
+        
+    
+    
+            circle_e6f9cd587053432e6c2b7349de535e0a.bindTooltip(
+                `<div>
+                     Far West Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_77578b068322de45d5617554d3b81a4f = L.marker(
+                [31.106, -104.0214],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_6150de6eaef90938eb455bc6e87d506e = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #2ca02c;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    Far West\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_77578b068322de45d5617554d3b81a4f.setIcon(div_icon_6150de6eaef90938eb455bc6e87d506e);
+            
+    
+            var circle_fa497bd382f74db404a2afab364fd9f5 = L.circle(
+                [33.0198, -96.6989],
+                {"bubblingMouseEvents": true, "color": "#d62728", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#d62728", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_30af8f9d434a623489b4090195799953 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_feb3bfab44961c91676cf7dd9fa1b4c9 = $(`<div id="html_feb3bfab44961c91676cf7dd9fa1b4c9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #d62728;">                 North Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> Dallas, Fort Worth, Denton</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 14,372 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 14,331 MW</p>             <p style="margin: 5px 0; color: green;">                 <b>Change:</b> -0.3%             </p>         </div>         </div>`)[0];
+                popup_30af8f9d434a623489b4090195799953.setContent(html_feb3bfab44961c91676cf7dd9fa1b4c9);
+            
+        
+
+        circle_fa497bd382f74db404a2afab364fd9f5.bindPopup(popup_30af8f9d434a623489b4090195799953)
+        ;
+
+        
+    
+    
+            circle_fa497bd382f74db404a2afab364fd9f5.bindTooltip(
+                `<div>
+                     North Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_a242b3163606ddcc7de818d7c089e091 = L.marker(
+                [33.0198, -96.6989],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_3dd821b82666cbd75758df0e3d219b24 = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #d62728;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    North\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_a242b3163606ddcc7de818d7c089e091.setIcon(div_icon_3dd821b82666cbd75758df0e3d219b24);
+            
+    
+            var circle_7a99651d59a52c490eb8c428e0f8a8df = L.circle(
+                [32.0853, -97.5672],
+                {"bubblingMouseEvents": true, "color": "#9467bd", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#9467bd", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_6b53b63eecb71f77aad0b6d33a257906 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_77fe9db57e6ba3194e29ac4ea56e3d2e = $(`<div id="html_77fe9db57e6ba3194e29ac4ea56e3d2e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #9467bd;">                 North Central Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> Waco, Killeen, Temple</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 6,395 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 6,844 MW</p>             <p style="margin: 5px 0; color: red;">                 <b>Change:</b> +7.0%             </p>         </div>         </div>`)[0];
+                popup_6b53b63eecb71f77aad0b6d33a257906.setContent(html_77fe9db57e6ba3194e29ac4ea56e3d2e);
+            
+        
+
+        circle_7a99651d59a52c490eb8c428e0f8a8df.bindPopup(popup_6b53b63eecb71f77aad0b6d33a257906)
+        ;
+
+        
+    
+    
+            circle_7a99651d59a52c490eb8c428e0f8a8df.bindTooltip(
+                `<div>
+                     North Central Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_33359ec054d68d01926c38fdc437e167 = L.marker(
+                [32.0853, -97.5672],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_89de2b34c7ea85a33f398af5c6c8e027 = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #9467bd;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    North Central\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_33359ec054d68d01926c38fdc437e167.setIcon(div_icon_89de2b34c7ea85a33f398af5c6c8e027);
+            
+    
+            var circle_f2f376ef7565ba2b53e4c087e5909b51 = L.circle(
+                [29.4241, -98.4936],
+                {"bubblingMouseEvents": true, "color": "#8c564b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#8c564b", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_f014b5af8ae37f4038e15aef4fa3a387 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_dfee355818db050a2a57fbb7ac4b3f7b = $(`<div id="html_dfee355818db050a2a57fbb7ac4b3f7b" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #8c564b;">                 South Central Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> San Antonio, Austin, New Braunfels</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 13,189 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 12,937 MW</p>             <p style="margin: 5px 0; color: green;">                 <b>Change:</b> -1.9%             </p>         </div>         </div>`)[0];
+                popup_f014b5af8ae37f4038e15aef4fa3a387.setContent(html_dfee355818db050a2a57fbb7ac4b3f7b);
+            
+        
+
+        circle_f2f376ef7565ba2b53e4c087e5909b51.bindPopup(popup_f014b5af8ae37f4038e15aef4fa3a387)
+        ;
+
+        
+    
+    
+            circle_f2f376ef7565ba2b53e4c087e5909b51.bindTooltip(
+                `<div>
+                     South Central Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_a419aa1af1c648ea072ec6ae9fd0812b = L.marker(
+                [29.4241, -98.4936],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_493b8ea1354894f4e4ff20ce65756211 = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #8c564b;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    South Central\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_a419aa1af1c648ea072ec6ae9fd0812b.setIcon(div_icon_493b8ea1354894f4e4ff20ce65756211);
+            
+    
+            var circle_2388b6b575b06110c1030959fd4c8ed5 = L.circle(
+                [26.2034, -98.23],
+                {"bubblingMouseEvents": true, "color": "#e377c2", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#e377c2", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_820ea03ad7a791bc464faba2823a2ac6 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_5301f4e8f10c8b4a8358a6ed6053bdaa = $(`<div id="html_5301f4e8f10c8b4a8358a6ed6053bdaa" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #e377c2;">                 Southern Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> Corpus Christi, McAllen, Brownsville</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 4,038 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 4,197 MW</p>             <p style="margin: 5px 0; color: red;">                 <b>Change:</b> +3.9%             </p>         </div>         </div>`)[0];
+                popup_820ea03ad7a791bc464faba2823a2ac6.setContent(html_5301f4e8f10c8b4a8358a6ed6053bdaa);
+            
+        
+
+        circle_2388b6b575b06110c1030959fd4c8ed5.bindPopup(popup_820ea03ad7a791bc464faba2823a2ac6)
+        ;
+
+        
+    
+    
+            circle_2388b6b575b06110c1030959fd4c8ed5.bindTooltip(
+                `<div>
+                     Southern Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_c78b6bb34716c33ebbf8fbb7db180466 = L.marker(
+                [26.2034, -98.23],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_5b31394fb8b97e01577e00a412632fd6 = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #e377c2;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    Southern\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_c78b6bb34716c33ebbf8fbb7db180466.setIcon(div_icon_5b31394fb8b97e01577e00a412632fd6);
+            
+    
+            var circle_461f4d4ba366fd90cb10e22dcf801b85 = L.circle(
+                [31.4638, -100.437],
+                {"bubblingMouseEvents": true, "color": "#7f7f7f", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#7f7f7f", "fillOpacity": 0.4, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 15000, "stroke": true, "weight": 3}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+        var popup_3dec4733aec9b4135cdf869d86ff927a = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_0de66e01b4224a5fcf85eb05ee1e58cd = $(`<div id="html_0de66e01b4224a5fcf85eb05ee1e58cd" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial; width: 200px;">             <h4 style="margin: 0 0 10px 0; color: #7f7f7f;">                 West Zone             </h4>             <p style="margin: 5px 0;"><b>Cities:</b> Abilene, San Angelo, Lubbock</p>             <hr style="margin: 10px 0;">             <p style="margin: 5px 0;"><b>Current Load:</b> 2,719 MW</p>             <p style="margin: 5px 0;"><b>48h Forecast:</b> 3,058 MW</p>             <p style="margin: 5px 0; color: red;">                 <b>Change:</b> +12.4%             </p>         </div>         </div>`)[0];
+                popup_3dec4733aec9b4135cdf869d86ff927a.setContent(html_0de66e01b4224a5fcf85eb05ee1e58cd);
+            
+        
+
+        circle_461f4d4ba366fd90cb10e22dcf801b85.bindPopup(popup_3dec4733aec9b4135cdf869d86ff927a)
+        ;
+
+        
+    
+    
+            circle_461f4d4ba366fd90cb10e22dcf801b85.bindTooltip(
+                `<div>
+                     West Zone
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_ff7edfe566a30cf0b7a7670ffc92fd87 = L.marker(
+                [31.4638, -100.437],
+                {
+}
+            ).addTo(map_c8b579376b032a0c018a66bfb649a080);
+        
+    
+            var div_icon_63a6ef0c43c1ffa7af5c45e4dabc8da7 = L.divIcon({
+  "html": "\n                \u003cdiv style=\"\n                    font-size: 12px;\n                    font-weight: bold;\n                    color: #7f7f7f;\n                    text-shadow: 1px 1px 2px white, -1px -1px 2px white;\n                    white-space: nowrap;\n                \"\u003e\n                    West\n                \u003c/div\u003e\n                ",
+  "iconSize": [100, 20],
+  "iconAnchor": [50, 10],
+  "className": "empty",
+});
+        
+    
+                marker_ff7edfe566a30cf0b7a7670ffc92fd87.setIcon(div_icon_63a6ef0c43c1ffa7af5c45e4dabc8da7);
+            
+</script>
+</html>
