@@ -2,13 +2,23 @@
   "extraKnownMarketplaces": {
     "nixtla-dev-marketplace": {
       "source": {
-        "type": "github",
-        "url": "https://github.com/intent-solutions-io/plugins-nixtla.git"
+        "source": "github",
+        "repo": "intent-solutions-io/plugins-nixtla"
       }
     }
   },
   "hooks": {
-    "post-compact": ".claude/hooks/post-compact.sh"
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/post-compact.sh"
+          }
+        ]
+      }
+    ]
   },
   "readAfterCompact": [
     "scripts/validate_skills.py",
