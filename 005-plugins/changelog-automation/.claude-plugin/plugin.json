@@ -2,7 +2,11 @@
   "name": "changelog-automation",
   "version": "0.1.0",
   "description": "Automate changelog generation with AI-powered synthesis, multi-source data fetching, and quality validation",
-  "author": "Jeremy Longshore <jeremy@intentsolutions.io>",
+  "author": {
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/intent-solutions-io"
+  },
   "license": "MIT",
   "category": "automation",
   "tags": ["changelog", "release-notes", "automation", "documentation", "github", "slack"],
