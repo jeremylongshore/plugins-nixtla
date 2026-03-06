@@ -1,9 +1,10 @@
 name: TimeGPT Real-API Smoke Test (Weekly)
 
 on:
-  # Weekly scheduled run (Sundays at 02:00 UTC)
-  schedule:
-    - cron: '0 2 * * 0'
+  # schedule disabled — burns Actions minutes
+  # # Weekly scheduled run (Sundays at 02:00 UTC)
+  # schedule:
+  #   - cron: '0 2 * * 0'
 
   # Allow manual triggering
   workflow_dispatch:
