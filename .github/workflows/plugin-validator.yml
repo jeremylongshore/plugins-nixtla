@@ -39,7 +39,7 @@ jobs:
             exit 0
           fi
 
-          json_array=$(echo "$plugins" | jq -R -c 'split(\" \")')
+          json_array=$(echo "$plugins" | jq -R -c 'split(" ")')
           echo "matrix={\"plugin\":$json_array}" >> $GITHUB_OUTPUT
 
   validate:
