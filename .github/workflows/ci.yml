@@ -124,9 +124,9 @@ jobs:
             pip install pyyaml
           fi
 
-      - name: Run canonical skills validator
+      - name: Run canonical skills validator (v7.0 marketplace, min-grade B)
         run: |
-          python 004-scripts/validate_skills_v2.py --fail-on-warn
+          python 004-scripts/validate_skills_v2.py --marketplace --min-grade B --show-low-grades
 
   validate-plugins:
     name: Validate Plugin Structure

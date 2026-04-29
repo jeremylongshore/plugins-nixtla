@@ -50,7 +50,7 @@ import os
 import re
 import sys
 from pathlib import Path
-from typing import List, Tuple, Dict, Any, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 try:
     import yaml
@@ -82,19 +82,29 @@ except ImportError:
 #                       doesn't affect /-menu visibility); added ${CLAUDE_EFFORT} to
 #                       YAML_VALUE_ALLOWED_VARS.
 # See 000-docs/SCHEMA_CHANGELOG.md.
-SCHEMA_VERSION = '3.3.1'
+SCHEMA_VERSION = "3.3.1"
 
 # Validation tiers
-TIER_STANDARD = 'standard'
-TIER_MARKETPLACE = 'marketplace'
+TIER_STANDARD = "standard"
+TIER_MARKETPLACE = "marketplace"
 # Backward-compat alias; --enterprise still resolves to TIER_MARKETPLACE
 TIER_ENTERPRISE = TIER_MARKETPLACE
 
 # Valid tools per Claude Code spec (2026)
 VALID_TOOLS = {
-    'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep',
-    'WebFetch', 'WebSearch', 'Task', 'TodoWrite',
-    'NotebookEdit', 'AskUserQuestion', 'Skill'
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Glob",
+    "Grep",
+    "WebFetch",
+    "WebSearch",
+    "Task",
+    "TodoWrite",
+    "NotebookEdit",
+    "AskUserQuestion",
+    "Skill",
 }
 
 # === Two-tier field definitions (Anthropic spec alignment, 2026-04-28) ===
@@ -109,10 +119,10 @@ VALID_TOOLS = {
 #
 # Marketplace tier: same hard requirements + WARNINGS for missing polish fields.
 # Higher rubric scores reward inclusion. No additional ERRORS beyond Standard.
-STANDARD_REQUIRED = {'name', 'description'}
+STANDARD_REQUIRED = {"name", "description"}
 STANDARD_RECOMMENDED = set()  # description is now in REQUIRED at standard tier
 
-MARKETPLACE_REQUIRED = {'name', 'description'}
+MARKETPLACE_REQUIRED = {"name", "description"}
 # Tracking + governance fields that marketplace listings benefit from.
 # These are not "polish" — they are how a serious marketplace operates:
 #   - author    : who maintains it, who to contact
@@ -122,7 +132,14 @@ MARKETPLACE_REQUIRED = {'name', 'description'}
 #   - tags      : discovery filtering
 #   - compatibility : runtime / environment requirements (free-text, AgentSkills.io)
 # Validator warns at marketplace tier when any are missing; never errors.
-MARKETPLACE_TRACKING_FIELDS = {'allowed-tools', 'version', 'author', 'license', 'compatibility', 'tags'}
+MARKETPLACE_TRACKING_FIELDS = {
+    "allowed-tools",
+    "version",
+    "author",
+    "license",
+    "compatibility",
+    "tags",
+}
 # Back-compat alias — old name, same set.
 MARKETPLACE_RECOMMENDED = MARKETPLACE_TRACKING_FIELDS
 
@@ -149,12 +166,12 @@ REQUIRED_FIELDS = STANDARD_REQUIRED
 #
 # `mode` was an old IS-only field; replaced by `disable-model-invocation`.
 DEPRECATED_FIELDS = {
-    'mode': 'Use `disable-model-invocation: true` instead. Not in any published spec.',
-    'compatible-with': (
-        'Use `compatibility` (free-text per agentskills.io/specification) instead. '
-        'Example: `compatibility: Designed for Claude Code` or '
-        '`compatibility: Requires Python 3.10+ and uv`. The old CSV-platform-list '
-        'form was an Intent Solutions invention and is not part of any published spec.'
+    "mode": "Use `disable-model-invocation: true` instead. Not in any published spec.",
+    "compatible-with": (
+        "Use `compatibility` (free-text per agentskills.io/specification) instead. "
+        "Example: `compatibility: Designed for Claude Code` or "
+        "`compatibility: Requires Python 3.10+ and uv`. The old CSV-platform-list "
+        "form was an Intent Solutions invention and is not part of any published spec."
     ),
 }
 
@@ -185,10 +202,22 @@ RE_YAML_SHELL_SUBST = re.compile(r"(?:\$\(|`)")
 # All Claude Code documented substitutions per code.claude.com/docs/en/skills
 # "Available string substitutions" table.
 YAML_VALUE_ALLOWED_VARS = {
-    "${CLAUDE_SKILL_DIR}", "${CLAUDE_PLUGIN_ROOT}", "${CLAUDE_PLUGIN_DATA}",
-    "${CLAUDE_SESSION_ID}", "${CLAUDE_EFFORT}",
+    "${CLAUDE_SKILL_DIR}",
+    "${CLAUDE_PLUGIN_ROOT}",
+    "${CLAUDE_PLUGIN_DATA}",
+    "${CLAUDE_SESSION_ID}",
+    "${CLAUDE_EFFORT}",
     "$ARGUMENTS",
-    "$0", "$1", "$2", "$3", "$4", "$5", "$6", "$7", "$8", "$9",
+    "$0",
+    "$1",
+    "$2",
+    "$3",
+    "$4",
+    "$5",
+    "$6",
+    "$7",
+    "$8",
+    "$9",
 }
 RE_DESCRIPTION_USE_WHEN = re.compile(r"\bUse when\b", re.IGNORECASE)
 RE_DESCRIPTION_TRIGGER_WITH = re.compile(r"\bTrigger with\b", re.IGNORECASE)
@@ -210,7 +239,10 @@ RE_XML_TAG = re.compile(r"[<>]")
 RE_TIME_SENSITIVE = [
     re.compile(r"\b(20\d{2}[-/]\d{2}[-/]\d{2})\b"),
     re.compile(r"\b(v\d+\.\d+\.\d+)\b", re.IGNORECASE),
-    re.compile(r"\b(as of|since|after|before) (January|February|March|April|May|June|July|August|September|October|November|December)\b", re.IGNORECASE),
+    re.compile(
+        r"\b(as of|since|after|before) (January|February|March|April|May|June|July|August|September|October|November|December)\b",
+        re.IGNORECASE,
+    ),
 ]
 
 # === SCHEMA REGISTRY (Single Source of Truth) ===
@@ -221,73 +253,115 @@ SKILL_FIELDS = {
     # All fields below are documented at code.claude.com/docs/en/skills as of 2026-04-28.
     # `name` and `description` are required at every tier. The remaining Anthropic
     # fields are accepted as valid optional and validated for type/format only.
-    'name': {'type': 'string', 'source': 'anthropic', 'tier': 'standard'},
-    'description': {'type': 'string', 'source': 'anthropic', 'tier': 'standard'},
-    'when_to_use': {'type': 'string', 'source': 'anthropic', 'tier': 'standard'},
-    'argument-hint': {'type': 'string', 'source': 'anthropic', 'tier': 'standard'},
-    'arguments': {'type': 'string|array', 'source': 'anthropic', 'tier': 'standard'},
-    'disable-model-invocation': {'type': 'boolean', 'source': 'anthropic', 'tier': 'standard', 'default': False},
-    'user-invocable': {'type': 'boolean', 'source': 'anthropic', 'tier': 'standard', 'default': True},
-    'allowed-tools': {'type': 'string|array', 'source': 'anthropic', 'tier': 'standard'},
-    'model': {'type': 'string', 'source': 'anthropic', 'tier': 'standard', 'valid': ['sonnet', 'haiku', 'opus', 'inherit']},
-    'effort': {'type': 'string', 'source': 'anthropic', 'tier': 'standard', 'valid': ['low', 'medium', 'high', 'xhigh', 'max']},
-    'context': {'type': 'string', 'source': 'anthropic', 'tier': 'standard', 'valid': ['fork']},
-    'agent': {'type': 'string', 'source': 'anthropic', 'tier': 'standard'},
-    'hooks': {'type': 'object', 'source': 'anthropic', 'tier': 'standard'},
-    'paths': {'type': 'string|array', 'source': 'anthropic', 'tier': 'standard'},
-    'shell': {'type': 'string', 'source': 'anthropic', 'tier': 'standard', 'valid': ['bash', 'powershell']},
+    "name": {"type": "string", "source": "anthropic", "tier": "standard"},
+    "description": {"type": "string", "source": "anthropic", "tier": "standard"},
+    "when_to_use": {"type": "string", "source": "anthropic", "tier": "standard"},
+    "argument-hint": {"type": "string", "source": "anthropic", "tier": "standard"},
+    "arguments": {"type": "string|array", "source": "anthropic", "tier": "standard"},
+    "disable-model-invocation": {
+        "type": "boolean",
+        "source": "anthropic",
+        "tier": "standard",
+        "default": False,
+    },
+    "user-invocable": {
+        "type": "boolean",
+        "source": "anthropic",
+        "tier": "standard",
+        "default": True,
+    },
+    "allowed-tools": {"type": "string|array", "source": "anthropic", "tier": "standard"},
+    "model": {
+        "type": "string",
+        "source": "anthropic",
+        "tier": "standard",
+        "valid": ["sonnet", "haiku", "opus", "inherit"],
+    },
+    "effort": {
+        "type": "string",
+        "source": "anthropic",
+        "tier": "standard",
+        "valid": ["low", "medium", "high", "xhigh", "max"],
+    },
+    "context": {"type": "string", "source": "anthropic", "tier": "standard", "valid": ["fork"]},
+    "agent": {"type": "string", "source": "anthropic", "tier": "standard"},
+    "hooks": {"type": "object", "source": "anthropic", "tier": "standard"},
+    "paths": {"type": "string|array", "source": "anthropic", "tier": "standard"},
+    "shell": {
+        "type": "string",
+        "source": "anthropic",
+        "tier": "standard",
+        "valid": ["bash", "powershell"],
+    },
     # === AgentSkills.io open standard (agentskills.io/specification) ===
     # Claude Code skills follow the AgentSkills.io standard per code.claude.com.
     # Free-text, max 500 chars. Replaces the IS-invented `compatible-with` CSV list.
-    'compatibility': {'type': 'string', 'source': 'agentskills.io', 'tier': 'standard', 'max_length': 500},
+    "compatibility": {
+        "type": "string",
+        "source": "agentskills.io",
+        "tier": "standard",
+        "max_length": 500,
+    },
     # Arbitrary key-value mapping (e.g. metadata.version, metadata.author)
-    'metadata': {'type': 'object', 'source': 'agentskills.io', 'tier': 'standard'},
-    'license': {'type': 'string', 'source': 'agentskills.io', 'tier': 'standard'},
+    "metadata": {"type": "object", "source": "agentskills.io", "tier": "standard"},
+    "license": {"type": "string", "source": "agentskills.io", "tier": "standard"},
     # === Intent Solutions enterprise extensions (required at marketplace tier) ===
     # Top-level tracking + governance metadata. Required at marketplace tier
     # via ALWAYS_REQUIRED; missing any of these = ERROR.
-    'version': {'type': 'string', 'source': 'enterprise', 'tier': 'enterprise'},
-    'author': {'type': 'string', 'source': 'enterprise', 'tier': 'enterprise'},
-    'tags': {'type': 'array', 'source': 'enterprise', 'tier': 'enterprise'},
+    "version": {"type": "string", "source": "enterprise", "tier": "enterprise"},
+    "author": {"type": "string", "source": "enterprise", "tier": "enterprise"},
+    "tags": {"type": "array", "source": "enterprise", "tier": "enterprise"},
     # === Deprecated alias (kept for backward compat) ===
     # Was an IS-invented field with VALID_PLATFORMS allow-list. Not in any spec.
     # Validator emits deprecation warning + migration suggestion. Still parsed so
     # existing 3,385 public-repo SKILL.md files keep passing.
-    'compatible-with': {'type': 'string', 'source': 'deprecated-is-extension', 'tier': 'standard'},
+    "compatible-with": {"type": "string", "source": "deprecated-is-extension", "tier": "standard"},
 }
 
 AGENT_FIELDS = {
-    'name': {'type': 'string', 'source': 'anthropic', 'required': True},
-    'description': {'type': 'string', 'source': 'anthropic', 'required': True},
-    'model': {'type': 'string', 'source': 'anthropic', 'valid': ['sonnet', 'haiku', 'opus', 'inherit']},
-    'effort': {'type': 'string', 'source': 'anthropic', 'valid': ['low', 'medium', 'high', 'xhigh', 'max']},
-    'maxTurns': {'type': 'integer', 'source': 'anthropic'},
-    'tools': {'type': 'string', 'source': 'anthropic'},
-    'disallowedTools': {'type': 'array', 'source': 'anthropic'},
-    'skills': {'type': 'array', 'source': 'anthropic'},
-    'mcpServers': {'type': 'object', 'source': 'anthropic'},
-    'hooks': {'type': 'object', 'source': 'anthropic'},
-    'memory': {'type': 'string', 'source': 'anthropic', 'valid': ['user', 'project', 'local']},
-    'background': {'type': 'boolean', 'source': 'anthropic'},
-    'isolation': {'type': 'string', 'source': 'anthropic', 'valid': ['worktree']},
-    'permissionMode': {'type': 'string', 'source': 'anthropic', 'valid': ['default', 'acceptEdits', 'dontAsk', 'bypassPermissions', 'plan']},
+    "name": {"type": "string", "source": "anthropic", "required": True},
+    "description": {"type": "string", "source": "anthropic", "required": True},
+    "model": {
+        "type": "string",
+        "source": "anthropic",
+        "valid": ["sonnet", "haiku", "opus", "inherit"],
+    },
+    "effort": {
+        "type": "string",
+        "source": "anthropic",
+        "valid": ["low", "medium", "high", "xhigh", "max"],
+    },
+    "maxTurns": {"type": "integer", "source": "anthropic"},
+    "tools": {"type": "string", "source": "anthropic"},
+    "disallowedTools": {"type": "array", "source": "anthropic"},
+    "skills": {"type": "array", "source": "anthropic"},
+    "mcpServers": {"type": "object", "source": "anthropic"},
+    "hooks": {"type": "object", "source": "anthropic"},
+    "memory": {"type": "string", "source": "anthropic", "valid": ["user", "project", "local"]},
+    "background": {"type": "boolean", "source": "anthropic"},
+    "isolation": {"type": "string", "source": "anthropic", "valid": ["worktree"]},
+    "permissionMode": {
+        "type": "string",
+        "source": "anthropic",
+        "valid": ["default", "acceptEdits", "dontAsk", "bypassPermissions", "plan"],
+    },
 }
 
 # Fields NOT supported in plugin agents (silently ignored by runtime)
-AGENT_PLUGIN_RESTRICTED = {'hooks', 'mcpServers', 'permissionMode'}
+AGENT_PLUGIN_RESTRICTED = {"hooks", "mcpServers", "permissionMode"}
 
 # Fields that are NOT in Anthropic spec — ERROR if found
 INVALID_AGENT_FIELDS = {}  # Cleared — all non-standard fields demoted to deprecated for migration
 
 # Non-standard fields used across existing agents — WARN now, batch-fix, then promote to ERROR
 DEPRECATED_AGENT_FIELDS = {
-    'capabilities': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
-    'expertise_level': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
-    'activation_priority': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
-    'color': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
-    'activation_triggers': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
-    'type': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
-    'category': 'Non-standard field. Not in Anthropic spec. Will be removed in future validation.',
+    "capabilities": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
+    "expertise_level": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
+    "activation_priority": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
+    "color": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
+    "activation_triggers": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
+    "type": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
+    "category": "Non-standard field. Not in Anthropic spec. Will be removed in future validation.",
 }
 
 # Truly-invalid fields are now empty: `compatibility` and `metadata` are documented
@@ -298,21 +372,21 @@ DEPRECATED_AGENT_FIELDS = {
 INVALID_SKILL_FIELDS = {}
 
 PLUGIN_JSON_FIELDS = {
-    'name': {'type': 'string', 'required': True},
-    'version': {'type': 'string'},
-    'description': {'type': 'string'},
-    'author': {'type': 'object'},
-    'homepage': {'type': 'string'},
-    'repository': {'type': 'string'},
-    'license': {'type': 'string'},
-    'keywords': {'type': 'array'},
-    'commands': {'type': 'string|array'},
-    'agents': {'type': 'string|array'},
-    'skills': {'type': 'string|array'},
-    'hooks': {'type': 'string|array|object'},
-    'mcpServers': {'type': 'string|array|object'},
-    'outputStyles': {'type': 'string|array'},
-    'lspServers': {'type': 'string|array|object'},
+    "name": {"type": "string", "required": True},
+    "version": {"type": "string"},
+    "description": {"type": "string"},
+    "author": {"type": "object"},
+    "homepage": {"type": "string"},
+    "repository": {"type": "string"},
+    "license": {"type": "string"},
+    "keywords": {"type": "array"},
+    "commands": {"type": "string|array"},
+    "agents": {"type": "string|array"},
+    "skills": {"type": "string|array"},
+    "hooks": {"type": "string|array|object"},
+    "mcpServers": {"type": "string|array|object"},
+    "outputStyles": {"type": "string|array"},
+    "lspServers": {"type": "string|array|object"},
 }
 
 # Intent Solutions enterprise / marketplace standard: 8 required fields.
@@ -322,7 +396,16 @@ PLUGIN_JSON_FIELDS = {
 # This is the canonical IS standard, restored 2026-04-28. The brief experiment with
 # reducing this to {name, description} (schema 3.0–3.1) is reverted; the only kept
 # change is `compatible-with` → `compatibility` (free-text per agentskills.io).
-ALWAYS_REQUIRED = {'name', 'description', 'allowed-tools', 'version', 'author', 'license', 'compatibility', 'tags'}
+ALWAYS_REQUIRED = {
+    "name",
+    "description",
+    "allowed-tools",
+    "version",
+    "author",
+    "license",
+    "compatibility",
+    "tags",
+}
 
 # Conditional fields: relevant when other fields are set.
 # Triggers a "missing conditional field" warning at marketplace tier when the
@@ -340,14 +423,14 @@ ALWAYS_REQUIRED = {'name', 'description', 'allowed-tools', 'version', 'author', 
 #     invocation: true` doesn't affect the / menu — only Claude's auto-load,
 #     so it should NOT be in this conditional.
 CONDITIONAL_FIELDS = {
-    'context': lambda fm: fm.get('agent') is not None,
-    'argument-hint': lambda fm: fm.get('user-invocable', True),
+    "context": lambda fm: fm.get("agent") is not None,
+    "argument-hint": lambda fm: fm.get("user-invocable", True),
 }
 
 # Facelift opportunities: optional fields that could improve the skill
 FACELIFT_FIELDS = {
-    'model': "Setting an explicit model prevents unexpected behavior when session model changes",
-    'effort': "Setting effort level optimizes reasoning for this skill's complexity",
+    "model": "Setting an explicit model prevents unexpected behavior when session model changes",
+    "effort": "Setting effort level optimizes reasoning for this skill's complexity",
 }
 
 
@@ -357,35 +440,37 @@ def detect_component(path: Path) -> tuple:
     - component_type: 'skill', 'agent', 'command', 'plugin', 'unknown'
     - context: 'plugin', 'standalone', 'unknown'
     """
-    component = 'unknown'
+    component = "unknown"
 
     def find_plugin_root(p: Path):
         for parent in [p] + list(p.parents):
-            if (parent / '.claude-plugin' / 'plugin.json').exists():
+            if (parent / ".claude-plugin" / "plugin.json").exists():
                 return parent
         return None
 
     plugin_root = find_plugin_root(path)
-    context = 'plugin' if plugin_root else 'standalone'
+    context = "plugin" if plugin_root else "standalone"
 
     if path.is_dir():
-        if (path / '.claude-plugin' / 'plugin.json').exists():
-            component = 'plugin'
-        elif (path / 'SKILL.md').exists():
-            component = 'skill'
-    elif path.name == 'SKILL.md':
-        component = 'skill'
-    elif path.parent.name == 'agents':
-        component = 'agent'
-    elif path.parent.name == 'commands':
-        component = 'command'
+        if (path / ".claude-plugin" / "plugin.json").exists():
+            component = "plugin"
+        elif (path / "SKILL.md").exists():
+            component = "skill"
+    elif path.name == "SKILL.md":
+        component = "skill"
+    elif path.parent.name == "agents":
+        component = "agent"
+    elif path.parent.name == "commands":
+        component = "command"
 
     return (component, context)
 
 
 # OPTIONAL_FIELDS: all fields recognized by the validator (from schema registry + deprecated)
 # Used for unknown-field detection. Defined here after SKILL_FIELDS is available.
-OPTIONAL_FIELDS = set(SKILL_FIELDS.keys()) | set(INVALID_SKILL_FIELDS.keys()) | set(DEPRECATED_FIELDS.keys())
+OPTIONAL_FIELDS = (
+    set(SKILL_FIELDS.keys()) | set(INVALID_SKILL_FIELDS.keys()) | set(DEPRECATED_FIELDS.keys())
+)
 
 # Defaults
 DEFAULT_AUTHOR = "Jeremy Longshore <jeremy@intentsolutions.io>"
@@ -416,15 +501,15 @@ TOTAL_DESCRIPTION_BUDGET_ERROR = 15_000
 def calculate_grade(score: int) -> str:
     """Convert numeric score to letter grade."""
     if score >= 90:
-        return 'A'
+        return "A"
     elif score >= 80:
-        return 'B'
+        return "B"
     elif score >= 70:
-        return 'C'
+        return "C"
     elif score >= 60:
-        return 'D'
+        return "D"
     else:
-        return 'F'
+        return "F"
 
 
 def score_progressive_disclosure(path: Path, body: str, fm: dict) -> dict:
@@ -442,13 +527,13 @@ def score_progressive_disclosure(path: Path, body: str, fm: dict) -> dict:
     # Token Economy (10 pts) - Per Anthropic: SKILL.md should be concise
     # ≤150=10, 151-300=7, 301-500=4, >500=0
     if lines <= 150:
-        breakdown['token_economy'] = (10, "Excellent: ≤150 lines")
+        breakdown["token_economy"] = (10, "Excellent: ≤150 lines")
     elif lines <= 300:
-        breakdown['token_economy'] = (7, f"Good: {lines} lines (target ≤150)")
+        breakdown["token_economy"] = (7, f"Good: {lines} lines (target ≤150)")
     elif lines <= 500:
-        breakdown['token_economy'] = (4, f"Acceptable: {lines} lines (target ≤150)")
+        breakdown["token_economy"] = (4, f"Acceptable: {lines} lines (target ≤150)")
     else:
-        breakdown['token_economy'] = (0, f"Too long: {lines} lines (target ≤150)")
+        breakdown["token_economy"] = (0, f"Too long: {lines} lines (target ≤150)")
 
     # Layered Structure (10 pts) - Has references/ or resources/ with markdown files
     refs_dir = skill_dir / "references"
@@ -457,51 +542,54 @@ def score_progressive_disclosure(path: Path, body: str, fm: dict) -> dict:
     if refs_dir.exists():
         ref_files = list(refs_dir.glob("*.md"))
         if ref_files:
-            breakdown['layered_structure'] = (10, f"Has references/ with {len(ref_files)} files")
+            breakdown["layered_structure"] = (10, f"Has references/ with {len(ref_files)} files")
         else:
-            breakdown['layered_structure'] = (3, "references/ exists but empty")
+            breakdown["layered_structure"] = (3, "references/ exists but empty")
     else:
         # Penalty scales with file length - short files don't need references
         if lines <= 100:
-            breakdown['layered_structure'] = (8, "No references/ (acceptable for short skill)")
+            breakdown["layered_structure"] = (8, "No references/ (acceptable for short skill)")
         elif lines <= 200:
-            breakdown['layered_structure'] = (4, "No references/ (should extract content)")
+            breakdown["layered_structure"] = (4, "No references/ (should extract content)")
         else:
-            breakdown['layered_structure'] = (0, "No references/ (long skill needs extraction)")
+            breakdown["layered_structure"] = (0, "No references/ (long skill needs extraction)")
 
     # Info note: dynamic injection + references/ = sophisticated progressive disclosure
-    has_dynamic_injection = bool(re.search(r'(?m)^!\`[^`]+\`\s*$', body))
+    has_dynamic_injection = bool(re.search(r"(?m)^!\`[^`]+\`\s*$", body))
     if has_dynamic_injection and refs_dir.exists() and refs_dir.glob("*.md"):
-        score, msg = breakdown['layered_structure']
-        breakdown['layered_structure'] = (score, msg + " + dynamic injection")
+        score, msg = breakdown["layered_structure"]
+        breakdown["layered_structure"] = (score, msg + " + dynamic injection")
 
     # Reference Depth (5 pts) - One level deep only (no nested subdirs in references/)
     if refs_dir.exists():
         nested_dirs = [d for d in refs_dir.iterdir() if d.is_dir()]
         if not nested_dirs:
-            breakdown['reference_depth'] = (5, "References are flat (good)")
+            breakdown["reference_depth"] = (5, "References are flat (good)")
         else:
-            breakdown['reference_depth'] = (2, f"Nested dirs in references/: {len(nested_dirs)}")
+            breakdown["reference_depth"] = (2, f"Nested dirs in references/: {len(nested_dirs)}")
     else:
-        breakdown['reference_depth'] = (5, "N/A - no references/")
+        breakdown["reference_depth"] = (5, "N/A - no references/")
 
     # Navigation Signals (5 pts) - Well-structured sections for navigability
     # Note: No published standard mandates specific sections. Scoring is softened
     # to reflect that these are best practices, not requirements.
-    sections = len(re.findall(r'(?m)^##\s+', body))
+    sections = len(re.findall(r"(?m)^##\s+", body))
     if lines <= 100:
-        breakdown['navigation_signals'] = (5, "Short file, navigation implicit")
+        breakdown["navigation_signals"] = (5, "Short file, navigation implicit")
     elif sections >= 7:
-        breakdown['navigation_signals'] = (5, f"Well-structured: {sections} section headers")
+        breakdown["navigation_signals"] = (5, f"Well-structured: {sections} section headers")
     elif sections >= 4:
-        breakdown['navigation_signals'] = (4, f"Adequate structure: {sections} sections (7+ ideal)")
+        breakdown["navigation_signals"] = (4, f"Adequate structure: {sections} sections (7+ ideal)")
     elif sections >= 2:
-        breakdown['navigation_signals'] = (2, f"Minimal structure: {sections} sections (4+ recommended)")
+        breakdown["navigation_signals"] = (
+            2,
+            f"Minimal structure: {sections} sections (4+ recommended)",
+        )
     else:
-        breakdown['navigation_signals'] = (0, f"Poor structure: only {sections} sections")
+        breakdown["navigation_signals"] = (0, f"Poor structure: only {sections} sections")
 
     total = sum(v[0] for v in breakdown.values())
-    return {'score': total, 'max': 30, 'breakdown': breakdown}
+    return {"score": total, "max": 30, "breakdown": breakdown}
 
 
 def score_ease_of_use(path: Path, body: str, fm: dict) -> dict:
@@ -513,72 +601,92 @@ def score_ease_of_use(path: Path, body: str, fm: dict) -> dict:
     - Workflow Clarity (5): Clear step-by-step instructions
     """
     breakdown = {}
-    desc = str(fm.get('description', '')).lower()
+    desc = str(fm.get("description", "")).lower()
 
     # Metadata Quality (10 pts)
     meta_score = 0
     meta_notes = []
-    if fm.get('name'):
+    if fm.get("name"):
         meta_score += 2
     else:
         meta_notes.append("missing name")
-    if fm.get('description') and len(str(fm.get('description', ''))) >= 50:
+    if fm.get("description") and len(str(fm.get("description", ""))) >= 50:
         meta_score += 3
     else:
         meta_notes.append("description too short")
-    if fm.get('version'):
+    if fm.get("version"):
         meta_score += 2
     else:
         meta_notes.append("missing version")
-    if fm.get('allowed-tools'):
+    if fm.get("allowed-tools"):
         meta_score += 2
     else:
         meta_notes.append("missing allowed-tools")
-    if fm.get('author') and '@' in str(fm.get('author', '')):
+    if fm.get("author") and "@" in str(fm.get("author", "")):
         meta_score += 1
-    if fm.get('tags') and isinstance(fm.get('tags'), list) and len(fm['tags']) > 0:
+    if fm.get("tags") and isinstance(fm.get("tags"), list) and len(fm["tags"]) > 0:
         meta_score += 1
     else:
         meta_notes.append("missing tags")
     # Accept either `compatibility` (current spec) or legacy `compatible-with`
     # (deprecated alias) for credit, but don't reward both stacked.
-    if fm.get('compatibility') or fm.get('compatible-with'):
+    if fm.get("compatibility") or fm.get("compatible-with"):
         meta_score += 1
     else:
         meta_notes.append("missing compatibility")
     meta_score = min(meta_score, 10)
-    breakdown['metadata_quality'] = (meta_score, ", ".join(meta_notes) if meta_notes else "Complete metadata")
+    breakdown["metadata_quality"] = (
+        meta_score,
+        ", ".join(meta_notes) if meta_notes else "Complete metadata",
+    )
 
     # Discoverability (6 pts) — trigger quality assessment
     disc_score = 0
     disc_notes = []
-    if 'use when' in desc:
+    if "use when" in desc:
         disc_score += 2
         disc_notes.append("has 'Use when'")
-    if 'trigger with' in desc or 'trigger phrase' in desc:
+    if "trigger with" in desc or "trigger phrase" in desc:
         disc_score += 2
         disc_notes.append("has trigger phrases")
     # Bonus: description contains action verbs that help model match intent
-    trigger_verbs = ['analyze', 'audit', 'build', 'check', 'create', 'debug',
-                     'deploy', 'detect', 'fix', 'generate', 'implement', 'manage',
-                     'monitor', 'optimize', 'review', 'scan', 'test', 'validate']
+    trigger_verbs = [
+        "analyze",
+        "audit",
+        "build",
+        "check",
+        "create",
+        "debug",
+        "deploy",
+        "detect",
+        "fix",
+        "generate",
+        "implement",
+        "manage",
+        "monitor",
+        "optimize",
+        "review",
+        "scan",
+        "test",
+        "validate",
+    ]
     verb_matches = [v for v in trigger_verbs if v in desc]
     if len(verb_matches) >= 2:
         disc_score += 1
         disc_notes.append(f"action verbs: {', '.join(verb_matches[:3])}")
     # Bonus: description length in sweet spot for matching (50-300 chars)
-    desc_len = len(str(fm.get('description', '')))
+    desc_len = len(str(fm.get("description", "")))
     if 50 <= desc_len <= 300:
         disc_score += 1
         disc_notes.append("description length in trigger sweet spot")
     disc_score = min(disc_score, 6)
     if not disc_notes:
         disc_notes.append("missing discovery cues")
-    breakdown['discoverability'] = (disc_score, ", ".join(disc_notes))
+    breakdown["discoverability"] = (disc_score, ", ".join(disc_notes))
 
     # Terminology Consistency (4 pts)
     # Check for consistent naming patterns in the skill
-    name = str(fm.get('name', ''))
+    name = str(fm.get("name", ""))
     folder = path.parent.name
     term_score = 4  # Start with full score
     term_notes = []
@@ -586,20 +694,23 @@ def score_ease_of_use(path: Path, body: str, fm: dict) -> dict:
         term_score -= 2
         term_notes.append("name differs from folder")
     # Check for mixed case in description
-    if any(w.isupper() and len(w) > 3 for w in str(fm.get('description', '')).split()):
+    if any(w.isupper() and len(w) > 3 for w in str(fm.get("description", "")).split()):
         term_score -= 1
         term_notes.append("inconsistent casing")
-    breakdown['terminology'] = (max(0, term_score), ", ".join(term_notes) if term_notes else "Consistent terminology")
+    breakdown["terminology"] = (
+        max(0, term_score),
+        ", ".join(term_notes) if term_notes else "Consistent terminology",
+    )
 
     # Workflow Clarity (5 pts)
     workflow_score = 0
     workflow_notes = []
     # Check for numbered steps
-    if re.search(r'(?m)^\s*1\.\s+', body):
+    if re.search(r"(?m)^\s*1\.\s+", body):
         workflow_score += 3
         workflow_notes.append("has numbered steps")
     # Check for clear section headers
-    section_count = len(re.findall(r'(?m)^##\s+', body))
+    section_count = len(re.findall(r"(?m)^##\s+", body))
     if section_count >= 5:
         workflow_score += 2
         workflow_notes.append(f"{section_count} sections")
@@ -608,10 +719,10 @@ def score_ease_of_use(path: Path, body: str, fm: dict) -> dict:
         workflow_notes.append(f"{section_count} sections (add more)")
     if not workflow_notes:
         workflow_notes.append("unclear workflow")
-    breakdown['workflow_clarity'] = (workflow_score, ", ".join(workflow_notes))
+    breakdown["workflow_clarity"] = (workflow_score, ", ".join(workflow_notes))
 
     total = sum(v[0] for v in breakdown.values())
-    return {'score': total, 'max': 25, 'breakdown': breakdown}
+    return {"score": total, "max": 25, "breakdown": breakdown}
 
 
 def score_utility(path: Path, body: str, fm: dict) -> dict:
@@ -630,68 +741,73 @@ def score_utility(path: Path, body: str, fm: dict) -> dict:
     problem_score = 0
     problem_notes = []
     # Check for Overview section with substance
-    if '## overview' in body_lower:
-        overview_match = re.search(r'## overview\s*\n(.*?)(?=\n##|\Z)', body, re.IGNORECASE | re.DOTALL)
+    if "## overview" in body_lower:
+        overview_match = re.search(
+            r"## overview\s*\n(.*?)(?=\n##|\Z)", body, re.IGNORECASE | re.DOTALL
+        )
         if overview_match and len(overview_match.group(1).strip()) > 50:
             problem_score += 4
             problem_notes.append("has overview")
     # Check for Prerequisites (shows understanding of requirements)
-    if '## prerequisites' in body_lower:
+    if "## prerequisites" in body_lower:
         problem_score += 2
         problem_notes.append("has prerequisites")
     # Check for Output section
-    if '## output' in body_lower:
+    if "## output" in body_lower:
         problem_score += 2
         problem_notes.append("has output spec")
     if not problem_notes:
         problem_notes.append("unclear problem/solution")
-    breakdown['problem_solving'] = (problem_score, ", ".join(problem_notes))
+    breakdown["problem_solving"] = (problem_score, ", ".join(problem_notes))
 
     # Degrees of Freedom (2 pts) — reduced from 5 to make room for content_density
     freedom_score = 0
     freedom_notes = []
     # Check for configuration options
-    if re.search(r'(?i)(optional|configur|parameter|argument|flag|option)', body):
+    if re.search(r"(?i)(optional|configur|parameter|argument|flag|option)", body):
         freedom_score += 1
         freedom_notes.append("has options")
     # Check for multiple approaches or extensibility
-    if re.search(r'(?i)(alternatively|or use|another approach|you can also|extend|customize|modify|adapt)', body):
+    if re.search(
+        r"(?i)(alternatively|or use|another approach|you can also|extend|customize|modify|adapt)",
+        body,
+    ):
         freedom_score += 1
         freedom_notes.append("shows alternatives/extensibility")
     if not freedom_notes:
         freedom_notes.append("rigid implementation")
-    breakdown['degrees_of_freedom'] = (freedom_score, ", ".join(freedom_notes))
+    breakdown["degrees_of_freedom"] = (freedom_score, ", ".join(freedom_notes))
 
     # Feedback Loops (4 pts)
     feedback_score = 0
     feedback_notes = []
-    if '## error handling' in body_lower:
+    if "## error handling" in body_lower:
         feedback_score += 2
         feedback_notes.append("has error handling")
-    if re.search(r'(?i)(validate|verify|check|test|confirm)', body):
+    if re.search(r"(?i)(validate|verify|check|test|confirm)", body):
         feedback_score += 1
         feedback_notes.append("has validation")
-    if re.search(r'(?i)(troubleshoot|debug|diagnose|fix)', body):
+    if re.search(r"(?i)(troubleshoot|debug|diagnose|fix)", body):
         feedback_score += 1
         feedback_notes.append("has troubleshooting")
     if not feedback_notes:
         feedback_notes.append("no feedback mechanisms")
-    breakdown['feedback_loops'] = (feedback_score, ", ".join(feedback_notes))
+    breakdown["feedback_loops"] = (feedback_score, ", ".join(feedback_notes))
 
     # Examples & Templates (3 pts)
     examples_score = 0
     examples_notes = []
-    if '## examples' in body_lower or '**example' in body_lower:
+    if "## examples" in body_lower or "**example" in body_lower:
         examples_score += 2
         examples_notes.append("has examples")
-    if '```' in body:
-        code_blocks = len(re.findall(r'```', body)) // 2
+    if "```" in body:
+        code_blocks = len(re.findall(r"```", body)) // 2
         if code_blocks >= 2:
             examples_score += 1
             examples_notes.append(f"{code_blocks} code blocks")
     if not examples_notes:
         examples_notes.append("no examples")
-    breakdown['examples'] = (examples_score, ", ".join(examples_notes))
+    breakdown["examples"] = (examples_score, ", ".join(examples_notes))
 
     # Content Density (3 pts) — based on word count in body
     body_word_count = len(body.split())
@@ -707,10 +823,10 @@ def score_utility(path: Path, body: str, fm: dict) -> dict:
     else:
         density_score = 3
         density_note = f"substantial content ({body_word_count} words)"
-    breakdown['content_density'] = (density_score, density_note)
+    breakdown["content_density"] = (density_score, density_note)
 
     total = sum(v[0] for v in breakdown.values())
-    return {'score': total, 'max': 20, 'breakdown': breakdown}
+    return {"score": total, "max": 20, "breakdown": breakdown}
 
 
 def score_spec_compliance(path: Path, body: str, fm: dict) -> dict:
@@ -722,8 +838,8 @@ def score_spec_compliance(path: Path, body: str, fm: dict) -> dict:
     - Optional Fields (2): Proper use of optional fields
     """
     breakdown = {}
-    name = str(fm.get('name', ''))
-    desc = str(fm.get('description', ''))
+    name = str(fm.get("name", ""))
+    desc = str(fm.get("description", ""))
 
     # Frontmatter Validity (5 pts)
     fm_score = 5  # Start with full score
@@ -735,12 +851,12 @@ def score_spec_compliance(path: Path, body: str, fm: dict) -> dict:
         fm_notes.append(f"missing: {', '.join(missing)}")
     if not fm_notes:
         fm_notes.append("valid frontmatter")
-    breakdown['frontmatter_validity'] = (max(0, fm_score), ", ".join(fm_notes))
+    breakdown["frontmatter_validity"] = (max(0, fm_score), ", ".join(fm_notes))
 
     # Name Conventions (4 pts)
     name_score = 4
     name_notes = []
-    if not re.match(r'^[a-z0-9][a-z0-9-]*[a-z0-9]$', name) and len(name) > 1:
+    if not re.match(r"^[a-z0-9][a-z0-9-]*[a-z0-9]$", name) and len(name) > 1:
         name_score -= 2
         name_notes.append("not kebab-case")
     if len(name) > 64:
@@ -751,7 +867,7 @@ def score_spec_compliance(path: Path, body: str, fm: dict) -> dict:
         name_notes.append("name/folder mismatch")
     if not name_notes:
         name_notes.append("proper naming")
-    breakdown['name_conventions'] = (max(0, name_score), ", ".join(name_notes))
+    breakdown["name_conventions"] = (max(0, name_score), ", ".join(name_notes))
 
     # Description Quality (4 pts)
     desc_score = 4
@@ -763,43 +879,57 @@ def score_spec_compliance(path: Path, body: str, fm: dict) -> dict:
         desc_score -= 2
         desc_notes.append("too long")
     desc_lower = desc.lower()
-    if 'i can' in desc_lower or 'i will' in desc_lower:
+    if "i can" in desc_lower or "i will" in desc_lower:
         desc_score -= 1
         desc_notes.append("uses first person")
-    if 'you can' in desc_lower or 'you should' in desc_lower:
+    if "you can" in desc_lower or "you should" in desc_lower:
         desc_score -= 1
         desc_notes.append("uses second person")
     if not desc_notes:
         desc_notes.append("good description")
-    breakdown['description_quality'] = (max(0, desc_score), ", ".join(desc_notes))
+    breakdown["description_quality"] = (max(0, desc_score), ", ".join(desc_notes))
 
     # Optional Fields (2 pts)
     opt_score = 2
     opt_notes = []
-    if 'model' in fm:
-        model = fm['model']
-        if model not in ['inherit', 'sonnet', 'haiku', 'opus'] and not str(model).startswith('claude-'):
+    if "model" in fm:
+        model = fm["model"]
+        if model not in ["inherit", "sonnet", "haiku", "opus"] and not str(model).startswith(
+            "claude-"
+        ):
             opt_score -= 1
             opt_notes.append("invalid model value")
     if not opt_notes:
         opt_notes.append("optional fields ok")
-    breakdown['optional_fields'] = (opt_score, ", ".join(opt_notes))
+    breakdown["optional_fields"] = (opt_score, ", ".join(opt_notes))
 
     # Field Coverage (3 pts) — percentage of applicable fields present
     all_applicable = set(SKILL_FIELDS.keys())
     present_fields = set(fm.keys()) & all_applicable
     coverage_pct = len(present_fields) / len(all_applicable) * 100 if all_applicable else 0
     if coverage_pct >= 80:
-        breakdown['field_coverage'] = (3, f"Excellent: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)")
+        breakdown["field_coverage"] = (
+            3,
+            f"Excellent: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)",
+        )
     elif coverage_pct >= 60:
-        breakdown['field_coverage'] = (2, f"Good: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)")
+        breakdown["field_coverage"] = (
+            2,
+            f"Good: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)",
+        )
     elif coverage_pct >= 40:
-        breakdown['field_coverage'] = (1, f"Fair: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)")
+        breakdown["field_coverage"] = (
+            1,
+            f"Fair: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)",
+        )
     else:
-        breakdown['field_coverage'] = (0, f"Low: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)")
+        breakdown["field_coverage"] = (
+            0,
+            f"Low: {len(present_fields)}/{len(all_applicable)} fields ({coverage_pct:.0f}%)",
+        )
 
     total = min(sum(v[0] for v in breakdown.values()), 15)
-    return {'score': total, 'max': 15, 'breakdown': breakdown}
+    return {"score": total, "max": 15, "breakdown": breakdown}
 
 
 def score_writing_style(path: Path, body: str, fm: dict) -> dict:
@@ -815,28 +945,41 @@ def score_writing_style(path: Path, body: str, fm: dict) -> dict:
     voice_score = 4
     voice_notes = []
     # Check for imperative language (good)
-    imperative_verbs = ['create', 'use', 'run', 'execute', 'configure', 'set', 'add', 'remove', 'check', 'verify']
-    has_imperative = any(re.search(rf'(?m)^\s*\d+\.\s*{v}', body, re.IGNORECASE) for v in imperative_verbs)
+    imperative_verbs = [
+        "create",
+        "use",
+        "run",
+        "execute",
+        "configure",
+        "set",
+        "add",
+        "remove",
+        "check",
+        "verify",
+    ]
+    has_imperative = any(
+        re.search(rf"(?m)^\s*\d+\.\s*{v}", body, re.IGNORECASE) for v in imperative_verbs
+    )
     if not has_imperative:
         voice_score -= 2
         voice_notes.append("use imperative voice")
     if not voice_notes:
         voice_notes.append("good voice")
-    breakdown['voice_tense'] = (voice_score, ", ".join(voice_notes))
+    breakdown["voice_tense"] = (voice_score, ", ".join(voice_notes))
 
     # Objectivity (3 pts)
     obj_score = 3
     obj_notes = []
     body_lower = body.lower()
-    if 'you should' in body_lower or 'you can' in body_lower or 'you will' in body_lower:
+    if "you should" in body_lower or "you can" in body_lower or "you will" in body_lower:
         obj_score -= 1
         obj_notes.append("has second person")
-    if ' i ' in body_lower or 'i can' in body_lower or "i'll" in body_lower:
+    if " i " in body_lower or "i can" in body_lower or "i'll" in body_lower:
         obj_score -= 1
         obj_notes.append("has first person")
     if not obj_notes:
         obj_notes.append("objective")
-    breakdown['objectivity'] = (max(0, obj_score), ", ".join(obj_notes))
+    breakdown["objectivity"] = (max(0, obj_score), ", ".join(obj_notes))
 
     # Conciseness (3 pts)
     conc_score = 3
@@ -854,10 +997,10 @@ def score_writing_style(path: Path, body: str, fm: dict) -> dict:
         conc_notes.append(f"many lines ({lines})")
     if not conc_notes:
         conc_notes.append("concise")
-    breakdown['conciseness'] = (max(0, conc_score), ", ".join(conc_notes))
+    breakdown["conciseness"] = (max(0, conc_score), ", ".join(conc_notes))
 
     total = sum(v[0] for v in breakdown.values())
-    return {'score': total, 'max': 10, 'breakdown': breakdown}
+    return {"score": total, "max": 10, "breakdown": breakdown}
 
 
 def calculate_modifiers(path: Path, body: str, fm: dict) -> dict:
@@ -867,84 +1010,104 @@ def calculate_modifiers(path: Path, body: str, fm: dict) -> dict:
     Penalties: first/second person description, unnecessary TOC
     """
     modifiers = {}
-    name = str(fm.get('name', ''))
-    desc = str(fm.get('description', ''))
+    name = str(fm.get("name", ""))
+    desc = str(fm.get("description", ""))
     lines = len(body.splitlines())
 
     # Bonuses (up to +5)
     # Gerund-style name (verb-ing pattern) +1
-    gerund_suffixes = ['ing', 'tion', 'ment', 'ness']
-    if any(name.endswith(f'-{s}') or name.endswith(s) for s in ['ing']):
-        modifiers['gerund_name'] = (+1, "gerund-style name")
+    gerund_suffixes = ["ing", "tion", "ment", "ness"]
+    if any(name.endswith(f"-{s}") or name.endswith(s) for s in ["ing"]):
+        modifiers["gerund_name"] = (+1, "gerund-style name")
 
     # Grep-friendly structure (clear section markers) +1
-    sections = len(re.findall(r'(?m)^##\s+', body))
+    sections = len(re.findall(r"(?m)^##\s+", body))
     if sections >= 7:
-        modifiers['grep_friendly'] = (+1, "grep-friendly structure")
+        modifiers["grep_friendly"] = (+1, "grep-friendly structure")
 
     # Exemplary examples (multiple labeled examples) +2
-    example_count = len(re.findall(r'(?i)\*\*example[:\s]', body))
+    example_count = len(re.findall(r"(?i)\*\*example[:\s]", body))
     if example_count >= 3:
-        modifiers['exemplary_examples'] = (+2, f"{example_count} labeled examples")
+        modifiers["exemplary_examples"] = (+2, f"{example_count} labeled examples")
 
     # Resources section with external links +1
-    if '## resources' in body.lower():
-        external_links = len(re.findall(r'\[.*?\]\(https?://', body))
+    if "## resources" in body.lower():
+        external_links = len(re.findall(r"\[.*?\]\(https?://", body))
         if external_links >= 2:
-            modifiers['external_resources'] = (+1, f"{external_links} external links")
+            modifiers["external_resources"] = (+1, f"{external_links} external links")
 
     # Penalties (up to -5)
     # First/second person in description -2
     desc_lower = desc.lower()
-    if 'i can' in desc_lower or 'i will' in desc_lower or 'you can' in desc_lower or 'you should' in desc_lower:
-        modifiers['person_in_desc'] = (-2, "first/second person in description")
+    if (
+        "i can" in desc_lower
+        or "i will" in desc_lower
+        or "you can" in desc_lower
+        or "you should" in desc_lower
+    ):
+        modifiers["person_in_desc"] = (-2, "first/second person in description")
 
     # TOC wastes tokens — Anthropic spec doesn't require it, progressive disclosure does
-    has_toc = bool(re.search(r'(?mi)^##?\s*(table of contents|contents|toc)\b', body))
+    has_toc = bool(re.search(r"(?mi)^##?\s*(table of contents|contents|toc)\b", body))
     if has_toc:
-        modifiers['unnecessary_toc'] = (-1, "TOC wastes tokens — use clear section headers instead")
+        modifiers["unnecessary_toc"] = (-1, "TOC wastes tokens — use clear section headers instead")
 
     # Dynamic context injection (Anthropic spec feature) +1
-    has_dynamic_injection = bool(re.search(r'(?m)^!\`[^`]+\`\s*$', body))
+    has_dynamic_injection = bool(re.search(r"(?m)^!\`[^`]+\`\s*$", body))
     if has_dynamic_injection:
-        injection_count = len(re.findall(r'(?m)^!\`[^`]+\`\s*$', body))
-        modifiers['dynamic_injection'] = (+1, f"Uses preprocessing injection ({injection_count} directives)")
+        injection_count = len(re.findall(r"(?m)^!\`[^`]+\`\s*$", body))
+        modifiers["dynamic_injection"] = (
+            +1,
+            f"Uses preprocessing injection ({injection_count} directives)",
+        )
 
     # XML tags in body (anti-pattern) -1
-    if '<' in body and '>' in body and re.search(r'<[a-z]+>', body):
-        modifiers['xml_tags'] = (-1, "XML-like tags in body")
+    if "<" in body and ">" in body and re.search(r"<[a-z]+>", body):
+        modifiers["xml_tags"] = (-1, "XML-like tags in body")
 
     # === ANTI-PATTERN DETECTION (graduated penalty system) ===
     # Each detected anti-pattern reduces score by 1pt, floor at -5
     skill_dir = path.parent
-    code_blocks = len(re.findall(r'```', body)) // 2
-    md_links = len(re.findall(r'\[.*?\]\((?!https?://)[^)]+\)', body))
+    code_blocks = len(re.findall(r"```", body)) // 2
+    md_links = len(re.findall(r"\[.*?\]\((?!https?://)[^)]+\)", body))
     body_word_count = len(body.split())
 
     anti_patterns_found = []
 
     # AP1: Over-constrained — excessive MUST/NEVER/ALWAYS keywords
-    constraint_words = len(re.findall(r'\b(MUST|NEVER|ALWAYS|SHALL NOT|REQUIRED)\b', body))
+    constraint_words = len(re.findall(r"\b(MUST|NEVER|ALWAYS|SHALL NOT|REQUIRED)\b", body))
     if constraint_words > 15:
-        anti_patterns_found.append(f"over-constrained ({constraint_words} MUST/NEVER/ALWAYS — reduces flexibility)")
+        anti_patterns_found.append(
+            f"over-constrained ({constraint_words} MUST/NEVER/ALWAYS — reduces flexibility)"
+        )
     elif constraint_words > 10:
         anti_patterns_found.append(f"moderately constrained ({constraint_words} MUST/NEVER/ALWAYS)")
 
     # AP2: Missing trigger phrase — description lacks activation cues
     desc_lower_ap = desc.lower()
-    has_trigger_cue = any(phrase in desc_lower_ap for phrase in [
-        'use when', 'use this', 'trigger', 'use proactively', 'activate',
-        'use for', 'invoke when',
-    ])
+    has_trigger_cue = any(
+        phrase in desc_lower_ap
+        for phrase in [
+            "use when",
+            "use this",
+            "trigger",
+            "use proactively",
+            "activate",
+            "use for",
+            "invoke when",
+        ]
+    )
     if not has_trigger_cue and len(desc) > 20:
-        anti_patterns_found.append("missing trigger phrase in description — autonomous activation impossible")
+        anti_patterns_found.append(
+            "missing trigger phrase in description — autonomous activation impossible"
+        )
 
     refs_dir = skill_dir / "references"
 
     # AP3: Orphan references — markdown links to files that don't exist
     if refs_dir.exists():
         orphan_refs = []
-        for match in re.finditer(r'\[([^\]]*)\]\((references/[^)]+)\)', body):
+        for match in re.finditer(r"\[([^\]]*)\]\((references/[^)]+)\)", body):
             ref_target = skill_dir / match.group(2)
             if not ref_target.exists():
                 orphan_refs.append(match.group(2))
@@ -952,11 +1115,10 @@ def calculate_modifiers(path: Path, body: str, fm: dict) -> dict:
             anti_patterns_found.append(f"orphan references: {', '.join(orphan_refs[:3])}")
 
     # AP5: Stub detection (replaces old flat -3 penalty with graduated system)
-    placeholder_tokens = ['TODO', 'FIXME', 'REPLACE_ME', 'TBD', '[YOUR_', '<insert']
+    placeholder_tokens = ["TODO", "FIXME", "REPLACE_ME", "TBD", "[YOUR_", "<insert"]
     placeholder_count = sum(
-        len(re.findall(re.escape(tok), body, re.IGNORECASE))
-        for tok in placeholder_tokens
-    ) + len(re.findall(r'\{[a-z_]+\}', body))
+        len(re.findall(re.escape(tok), body, re.IGNORECASE)) for tok in placeholder_tokens
+    ) + len(re.findall(r"\{[a-z_]+\}", body))
     placeholder_density = placeholder_count / body_word_count if body_word_count > 0 else 0.0
     stub_signals = 0
     stub_reasons_mod = []
@@ -976,26 +1138,34 @@ def calculate_modifiers(path: Path, body: str, fm: dict) -> dict:
         anti_patterns_found.append(f"stub skill: {', '.join(stub_reasons_mod)}")
 
     # AP6: Ecosystem coherence — bonus for cross-referencing siblings
-    has_cross_ref = bool(re.search(r'(?i)(see also|related skill|sibling|cross-reference|companion)', body))
-    has_see_also_links = bool(re.search(r'\[.*?\]\(\.\./.*?/SKILL\.md\)', body))
+    has_cross_ref = bool(
+        re.search(r"(?i)(see also|related skill|sibling|cross-reference|companion)", body)
+    )
+    has_see_also_links = bool(re.search(r"\[.*?\]\(\.\./.*?/SKILL\.md\)", body))
     if has_cross_ref or has_see_also_links:
-        modifiers['ecosystem_coherence'] = (+1, "cross-references sibling skills")
+        modifiers["ecosystem_coherence"] = (+1, "cross-references sibling skills")
 
     # Apply graduated anti-pattern penalty: -1 per pattern, max -5
     if anti_patterns_found:
         penalty = min(len(anti_patterns_found), 5)
-        modifiers['anti_pattern_penalty'] = (-penalty, f"{len(anti_patterns_found)} anti-pattern(s): {'; '.join(anti_patterns_found)}")
+        modifiers["anti_pattern_penalty"] = (
+            -penalty,
+            f"{len(anti_patterns_found)} anti-pattern(s): {'; '.join(anti_patterns_found)}",
+        )
 
     # Supporting files bonus: has references/ with real content +1
     if refs_dir.exists():
         ref_files = [f for f in refs_dir.glob("*.md") if f.stat().st_size > 100]
         if ref_files:
-            modifiers['supporting_files'] = (+1, f"Has references/ with {len(ref_files)} substantial files")
+            modifiers["supporting_files"] = (
+                +1,
+                f"Has references/ with {len(ref_files)} substantial files",
+            )
 
     total = sum(v[0] for v in modifiers.values())
     # Cap modifiers at ±15
     total = max(-15, min(15, total))
-    return {'score': total, 'max_bonus': 8, 'max_penalty': -10, 'items': modifiers}
+    return {"score": total, "max_bonus": 8, "max_penalty": -10, "items": modifiers}
 
 
 def grade_skill(path: Path, body: str, fm: dict) -> dict:
@@ -1014,23 +1184,23 @@ def grade_skill(path: Path, body: str, fm: dict) -> dict:
     style = score_writing_style(path, body, fm)
     mods = calculate_modifiers(path, body, fm)
 
-    base_score = pda['score'] + ease['score'] + utility['score'] + spec['score'] + style['score']
-    total_score = base_score + mods['score']
+    base_score = pda["score"] + ease["score"] + utility["score"] + spec["score"] + style["score"]
+    total_score = base_score + mods["score"]
 
     # Clamp to 0-100
     total_score = max(0, min(100, total_score))
 
     return {
-        'score': total_score,
-        'grade': calculate_grade(total_score),
-        'breakdown': {
-            'progressive_disclosure': pda,
-            'ease_of_use': ease,
-            'utility': utility,
-            'spec_compliance': spec,
-            'writing_style': style,
-            'modifiers': mods,
-        }
+        "score": total_score,
+        "grade": calculate_grade(total_score),
+        "breakdown": {
+            "progressive_disclosure": pda,
+            "ease_of_use": ease,
+            "utility": utility,
+            "spec_compliance": spec,
+            "writing_style": style,
+            "modifiers": mods,
+        },
     }
 
 
@@ -1038,12 +1208,24 @@ def grade_skill(path: Path, body: str, fm: dict) -> dict:
 
 # Valid categories for commands
 VALID_CMD_CATEGORIES = [
-    'git', 'deployment', 'security', 'testing', 'documentation',
-    'database', 'api', 'frontend', 'backend', 'devops', 'forecasting',
-    'analytics', 'migration', 'monitoring', 'other'
+    "git",
+    "deployment",
+    "security",
+    "testing",
+    "documentation",
+    "database",
+    "api",
+    "frontend",
+    "backend",
+    "devops",
+    "forecasting",
+    "analytics",
+    "migration",
+    "monitoring",
+    "other",
 ]
 
-VALID_DIFFICULTIES = ['beginner', 'intermediate', 'advanced', 'expert']
+VALID_DIFFICULTIES = ["beginner", "intermediate", "advanced", "expert"]
 
 
 def check_yaml_shell_substitution(fm: Dict[str, Any]) -> List[str]:
@@ -1094,19 +1276,19 @@ def find_command_files(root: Path) -> List[Path]:
 def validate_command(path: Path) -> Dict[str, Any]:
     """Validate a command markdown file."""
     try:
-        content = path.read_text(encoding='utf-8')
+        content = path.read_text(encoding="utf-8")
     except Exception as e:
-        return {'fatal': f'Cannot read file: {e}'}
+        return {"fatal": f"Cannot read file: {e}"}
 
     # Extract frontmatter
     m = RE_FRONTMATTER.match(content)
     if not m:
-        return {'fatal': 'No frontmatter found'}
+        return {"fatal": "No frontmatter found"}
 
     try:
         fm = yaml.safe_load(m.group(1)) or {}
     except yaml.YAMLError as e:
-        return {'fatal': f'Invalid YAML: {e}'}
+        return {"fatal": f"Invalid YAML: {e}"}
 
     errors: List[str] = []
     warnings: List[str] = []
@@ -1115,28 +1297,28 @@ def validate_command(path: Path) -> Dict[str, Any]:
     errors.extend(check_yaml_shell_substitution(fm))
 
     # Required: name
-    if 'name' not in fm:
+    if "name" not in fm:
         errors.append("[command] Missing required field: name")
     else:
-        name = str(fm['name'])
-        if not re.match(r'^[a-z][a-z0-9-]*[a-z0-9]$', name) and len(name) > 1:
+        name = str(fm["name"])
+        if not re.match(r"^[a-z][a-z0-9-]*[a-z0-9]$", name) and len(name) > 1:
             warnings.append("[command] 'name' should be kebab-case")
         if name != path.stem:
             warnings.append(f"[command] 'name' '{name}' should match filename '{path.stem}.md'")
 
     # Required: description
-    if 'description' not in fm:
+    if "description" not in fm:
         errors.append("[command] Missing required field: description")
     else:
-        desc = str(fm['description'])
+        desc = str(fm["description"])
         if len(desc) < 10:
             errors.append("[command] 'description' must be at least 10 characters")
         if len(desc) > 80:
             warnings.append("[command] 'description' should be 80 characters or less")
 
     # Optional: shortcut
-    if 'shortcut' in fm:
-        shortcut = str(fm['shortcut'])
+    if "shortcut" in fm:
+        shortcut = str(fm["shortcut"])
         if len(shortcut) < 1 or len(shortcut) > 4:
             warnings.append("[command] 'shortcut' should be 1-4 characters")
         elif not shortcut.islower():
@@ -1145,21 +1327,21 @@ def validate_command(path: Path) -> Dict[str, Any]:
             warnings.append("[command] 'shortcut' should contain only letters")
 
     # Optional: category
-    if 'category' in fm:
-        if fm['category'] not in VALID_CMD_CATEGORIES:
+    if "category" in fm:
+        if fm["category"] not in VALID_CMD_CATEGORIES:
             warnings.append(f"[command] Unknown category: {fm['category']}")
 
     # Optional: difficulty
-    if 'difficulty' in fm:
-        if fm['difficulty'] not in VALID_DIFFICULTIES:
+    if "difficulty" in fm:
+        if fm["difficulty"] not in VALID_DIFFICULTIES:
             warnings.append(f"[command] Unknown difficulty: {fm['difficulty']}")
 
-    return {'errors': errors, 'warnings': warnings, 'type': 'command'}
+    return {"errors": errors, "warnings": warnings, "type": "command"}
 
 
 # === AGENT VALIDATION ===
 
-VALID_EFFORT_LEVELS = ['low', 'medium', 'high', 'max']
+VALID_EFFORT_LEVELS = ["low", "medium", "high", "max"]
 
 
 def find_agent_files(root: Path) -> List[Path]:
@@ -1215,14 +1397,14 @@ def validate_plugin_json(path: Path) -> Dict[str, Any]:
     warnings: List[str] = []
 
     try:
-        pj = json_module.loads(path.read_text(encoding='utf-8'))
+        pj = json_module.loads(path.read_text(encoding="utf-8"))
     except json_module.JSONDecodeError as e:
-        return {'errors': [f"Invalid JSON: {e}"], 'warnings': []}
+        return {"errors": [f"Invalid JSON: {e}"], "warnings": []}
 
     if not isinstance(pj, dict):
-        return {'errors': ["Must be a JSON object"], 'warnings': []}
+        return {"errors": ["Must be a JSON object"], "warnings": []}
 
-    if 'name' not in pj:
+    if "name" not in pj:
         errors.append("Missing required field: 'name'")
 
     valid_fields = set(PLUGIN_JSON_FIELDS.keys())
@@ -1230,35 +1412,35 @@ def validate_plugin_json(path: Path) -> Dict[str, Any]:
         if key not in valid_fields:
             errors.append(f"Unknown field: '{key}' — not in Anthropic spec")
 
-    TYPE_MAP = {'string': str, 'object': dict, 'array': list}
+    TYPE_MAP = {"string": str, "object": dict, "array": list}
     for key, value in pj.items():
         if key in PLUGIN_JSON_FIELDS:
-            expected = PLUGIN_JSON_FIELDS[key].get('type', '')
-            allowed = tuple(TYPE_MAP[t] for t in expected.split('|') if t in TYPE_MAP)
+            expected = PLUGIN_JSON_FIELDS[key].get("type", "")
+            allowed = tuple(TYPE_MAP[t] for t in expected.split("|") if t in TYPE_MAP)
             if allowed and not isinstance(value, allowed):
                 errors.append(f"Field '{key}' must be {expected}, got {type(value).__name__}")
 
-    if isinstance(pj.get('author'), dict) and 'name' not in pj['author']:
+    if isinstance(pj.get("author"), dict) and "name" not in pj["author"]:
         errors.append("author object must have 'name' field")
 
-    return {'errors': errors, 'warnings': warnings}
+    return {"errors": errors, "warnings": warnings}
 
 
 def validate_agent(path: Path) -> Dict[str, Any]:
     """Validate an agent markdown file against Anthropic 2026 spec."""
     try:
-        content = path.read_text(encoding='utf-8')
+        content = path.read_text(encoding="utf-8")
     except Exception as e:
-        return {'fatal': f'Cannot read file: {e}'}
+        return {"fatal": f"Cannot read file: {e}"}
 
     m = RE_FRONTMATTER.match(content)
     if not m:
-        return {'fatal': 'No frontmatter found'}
+        return {"fatal": "No frontmatter found"}
 
     try:
         fm = yaml.safe_load(m.group(1)) or {}
     except yaml.YAMLError as e:
-        return {'fatal': f'Invalid YAML: {e}'}
+        return {"fatal": f"Invalid YAML: {e}"}
 
     errors: List[str] = []
     warnings: List[str] = []
@@ -1268,11 +1450,11 @@ def validate_agent(path: Path) -> Dict[str, Any]:
 
     # Detect context (plugin vs standalone)
     _, context = detect_component(path)
-    is_plugin_agent = context == 'plugin'
+    is_plugin_agent = context == "plugin"
 
     # Required fields (Anthropic spec)
     for field_name, field_def in AGENT_FIELDS.items():
-        if field_def.get('required') and field_name not in fm:
+        if field_def.get("required") and field_name not in fm:
             errors.append(f"[agent] Missing required field: {field_name}")
 
     # Validate present fields against schema
@@ -1281,67 +1463,86 @@ def validate_agent(path: Path) -> Dict[str, Any]:
             field_def = AGENT_FIELDS[field_name]
 
             # Type checking
-            expected_type = field_def.get('type')
-            if expected_type == 'string' and not isinstance(value, str):
-                errors.append(f"[agent] '{field_name}' must be a string, got: {type(value).__name__}")
-            elif expected_type == 'integer' and not isinstance(value, int):
-                errors.append(f"[agent] '{field_name}' must be an integer, got: {type(value).__name__}")
-            elif expected_type == 'boolean' and not isinstance(value, bool):
-                errors.append(f"[agent] '{field_name}' must be a boolean, got: {type(value).__name__}")
-            elif expected_type == 'array' and not isinstance(value, list):
-                errors.append(f"[agent] '{field_name}' must be an array, got: {type(value).__name__}")
-            elif expected_type == 'object' and not isinstance(value, dict):
-                errors.append(f"[agent] '{field_name}' must be an object, got: {type(value).__name__}")
+            expected_type = field_def.get("type")
+            if expected_type == "string" and not isinstance(value, str):
+                errors.append(
+                    f"[agent] '{field_name}' must be a string, got: {type(value).__name__}"
+                )
+            elif expected_type == "integer" and not isinstance(value, int):
+                errors.append(
+                    f"[agent] '{field_name}' must be an integer, got: {type(value).__name__}"
+                )
+            elif expected_type == "boolean" and not isinstance(value, bool):
+                errors.append(
+                    f"[agent] '{field_name}' must be a boolean, got: {type(value).__name__}"
+                )
+            elif expected_type == "array" and not isinstance(value, list):
+                errors.append(
+                    f"[agent] '{field_name}' must be an array, got: {type(value).__name__}"
+                )
+            elif expected_type == "object" and not isinstance(value, dict):
+                errors.append(
+                    f"[agent] '{field_name}' must be an object, got: {type(value).__name__}"
+                )
 
             # Value validation
-            if 'valid' in field_def and isinstance(value, str):
-                if value not in field_def['valid']:
-                    errors.append(f"[agent] '{field_name}' value '{value}' not valid. Must be one of: {', '.join(field_def['valid'])}")
+            if "valid" in field_def and isinstance(value, str):
+                if value not in field_def["valid"]:
+                    errors.append(
+                        f"[agent] '{field_name}' value '{value}' not valid. Must be one of: {', '.join(field_def['valid'])}"
+                    )
 
             # Plugin-restricted fields
             if is_plugin_agent and field_name in AGENT_PLUGIN_RESTRICTED:
-                warnings.append(f"[agent] '{field_name}' is not supported in plugin agents (ignored by runtime)")
+                warnings.append(
+                    f"[agent] '{field_name}' is not supported in plugin agents (ignored by runtime)"
+                )
 
         elif field_name in INVALID_AGENT_FIELDS:
-            errors.append(f"[agent] Invalid field '{field_name}': {INVALID_AGENT_FIELDS[field_name]}")
+            errors.append(
+                f"[agent] Invalid field '{field_name}': {INVALID_AGENT_FIELDS[field_name]}"
+            )
         elif field_name in DEPRECATED_AGENT_FIELDS:
-            warnings.append(f"[agent] Deprecated field '{field_name}': {DEPRECATED_AGENT_FIELDS[field_name]}")
+            warnings.append(
+                f"[agent] Deprecated field '{field_name}': {DEPRECATED_AGENT_FIELDS[field_name]}"
+            )
         else:
             warnings.append(f"[agent] Unknown field: '{field_name}'")
 
     # Additional validation for specific fields
-    if 'name' in fm:
-        name = str(fm['name']).strip()
+    if "name" in fm:
+        name = str(fm["name"]).strip()
         if not name:
             errors.append("[agent] 'name' must be non-empty")
-        elif not re.match(r'^[a-z0-9]+(?:-[a-z0-9]+)*$', name):
+        elif not re.match(r"^[a-z0-9]+(?:-[a-z0-9]+)*$", name):
             warnings.append(f"[agent] 'name' should be kebab-case: {name}")
 
-    if 'description' in fm:
-        desc = str(fm['description']).strip()
+    if "description" in fm:
+        desc = str(fm["description"]).strip()
         if len(desc) < 20:
             errors.append("[agent] 'description' must be at least 20 characters")
         if len(desc) > 200:
             warnings.append("[agent] 'description' should be 200 characters or less")
 
-    if 'maxTurns' in fm and isinstance(fm['maxTurns'], int):
-        if fm['maxTurns'] < 1:
+    if "maxTurns" in fm and isinstance(fm["maxTurns"], int):
+        if fm["maxTurns"] < 1:
             errors.append("[agent] 'maxTurns' must be a positive integer")
 
-    if 'disallowedTools' in fm and isinstance(fm['disallowedTools'], list):
-        for i, tool in enumerate(fm['disallowedTools']):
+    if "disallowedTools" in fm and isinstance(fm["disallowedTools"], list):
+        for i, tool in enumerate(fm["disallowedTools"]):
             if not isinstance(tool, str):
                 errors.append(f"[agent] 'disallowedTools[{i}]' must be a string")
 
-    if 'skills' in fm and isinstance(fm['skills'], list):
-        for i, skill in enumerate(fm['skills']):
+    if "skills" in fm and isinstance(fm["skills"], list):
+        for i, skill in enumerate(fm["skills"]):
             if not isinstance(skill, str):
                 errors.append(f"[agent] 'skills[{i}]' must be a string")
 
-    return {'errors': errors, 'warnings': warnings, 'type': 'agent'}
+    return {"errors": errors, "warnings": warnings, "type": "agent"}
 
 
 # === UTILITY FUNCTIONS ===
+
 
 def find_skill_files(root: Path) -> List[Path]:
     """Find all SKILL.md files in plugins/ and skills/ directories."""
@@ -1435,49 +1636,49 @@ def parse_allowed_tools(tools_value: Any) -> List[str]:
     if not s:
         return []
     # If commas present, split on commas (preserves spaces inside parens).
-    if ',' in s:
-        return [t.strip() for t in s.split(',') if t.strip()]
+    if "," in s:
+        return [t.strip() for t in s.split(",") if t.strip()]
     # Otherwise space-separated. Walk the string respecting paren depth so
     # `Bash(git add *)` stays as one token.
     tokens: List[str] = []
     buf: List[str] = []
     depth = 0
     for ch in s:
-        if ch == '(':
+        if ch == "(":
             depth += 1
             buf.append(ch)
-        elif ch == ')':
+        elif ch == ")":
             depth = max(0, depth - 1)
             buf.append(ch)
         elif ch.isspace() and depth == 0:
             if buf:
-                tokens.append(''.join(buf).strip())
+                tokens.append("".join(buf).strip())
                 buf = []
         else:
             buf.append(ch)
     if buf:
-        tokens.append(''.join(buf).strip())
+        tokens.append("".join(buf).strip())
     return [t for t in tokens if t]
 
 
 def validate_tool_permission(tool: str) -> Tuple[bool, str]:
     """Validate a single tool permission including wildcards like Bash(git:*)."""
-    base_tool = tool.split('(')[0].strip()
+    base_tool = tool.split("(")[0].strip()
 
     # Handle malformed scopes like "mysql:*)" - extract actual tool name
-    if ':' in base_tool:
-        base_tool = base_tool.split(':')[0].strip()
+    if ":" in base_tool:
+        base_tool = base_tool.split(":")[0].strip()
 
     if base_tool not in VALID_TOOLS:
         # Warn instead of error for unknown patterns (may be valid Bash commands)
         return True, f"Unknown tool pattern: {tool} (assuming Bash command)"
 
     # Validate wildcard syntax if present - warn instead of error
-    if '(' in tool:
-        if not tool.endswith(')'):
+    if "(" in tool:
+        if not tool.endswith(")"):
             return True, f"Malformed wildcard syntax: {tool}"
-        inner = tool[tool.index('(')+1:-1]
-        if ':' not in inner:
+        inner = tool[tool.index("(") + 1 : -1]
+        if ":" not in inner:
             return True, f"Wildcard should use cmd:* format: {tool}"
 
     return True, ""
@@ -1486,13 +1687,16 @@ def validate_tool_permission(tool: str) -> Tuple[bool, str]:
 def estimate_word_count(content: str) -> int:
     """Estimate word count for content length check."""
     # Remove frontmatter
-    content_body = re.sub(r'^---\n.*?\n---\n?', '', content, flags=re.DOTALL)
+    content_body = re.sub(r"^---\n.*?\n---\n?", "", content, flags=re.DOTALL)
     return len(content_body.split())
 
 
 # === VALIDATION FUNCTIONS ===
 
-def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tuple[List[str], List[str], List[str]]:
+
+def validate_frontmatter(
+    path: Path, fm: dict, tier: str = TIER_STANDARD
+) -> Tuple[List[str], List[str], List[str]]:
     """
     Validate SKILL.md frontmatter.
     Returns: (errors, warnings, infos)
@@ -1506,7 +1710,7 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # Marketplace tier: full IS enterprise standard — all 8 ALWAYS_REQUIRED fields
     # must be present. Missing any of them = ERROR.
 
-    metadata = fm.get('metadata', {}) if isinstance(fm.get('metadata'), dict) else {}
+    metadata = fm.get("metadata", {}) if isinstance(fm.get("metadata"), dict) else {}
 
     if tier == TIER_MARKETPLACE:
         for key in ALWAYS_REQUIRED:
@@ -1515,27 +1719,33 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
         # Conditional fields
         for key, condition in CONDITIONAL_FIELDS.items():
             if condition(fm) and key not in fm:
-                warnings.append(f"[frontmatter] Missing conditional field: '{key}' (relevant for this skill's configuration)")
+                warnings.append(
+                    f"[frontmatter] Missing conditional field: '{key}' (relevant for this skill's configuration)"
+                )
         # Facelift opportunities
         for key, reason in FACELIFT_FIELDS.items():
             if key not in fm:
                 infos.append(f"[frontmatter] Consider adding '{key}': {reason}")
     else:
         # Standard tier: only description is recommended
-        if 'description' not in fm:
-            warnings.append("[frontmatter] Missing recommended field: 'description' (recommended by Anthropic spec)")
+        if "description" not in fm:
+            warnings.append(
+                "[frontmatter] Missing recommended field: 'description' (recommended by Anthropic spec)"
+            )
 
     # === FIELD-SPECIFIC VALIDATION ===
 
     # name field
-    if 'name' in fm:
-        name = str(fm['name']).strip()
+    if "name" in fm:
+        name = str(fm["name"]).strip()
         if not name:
             errors.append("[frontmatter] 'name' must be non-empty")
         else:
             # Kebab-case check (WARN for now - some skills use human-readable names)
-            if not re.match(r'^[a-z0-9][a-z0-9-]*[a-z0-9]$', name) and len(name) > 1:
-                warnings.append(f"[frontmatter] 'name' should be kebab-case (lowercase + hyphens): {name}")
+            if not re.match(r"^[a-z0-9][a-z0-9-]*[a-z0-9]$", name) and len(name) > 1:
+                warnings.append(
+                    f"[frontmatter] 'name' should be kebab-case (lowercase + hyphens): {name}"
+                )
 
             # Length check
             if len(name) > 64:
@@ -1543,55 +1753,75 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
 
             # Reserved words
             name_lower = name.lower()
-            if 'anthropic' in name_lower or 'claude' in name_lower:
+            if "anthropic" in name_lower or "claude" in name_lower:
                 errors.append(f"[frontmatter] 'name' contains reserved word: {name}")
 
             # Folder match check (best practice, not error)
             folder_name = path.parent.name
             if name != folder_name:
-                warnings.append(f"[frontmatter] 'name' '{name}' differs from folder '{folder_name}' (best practice: match them)")
+                warnings.append(
+                    f"[frontmatter] 'name' '{name}' differs from folder '{folder_name}' (best practice: match them)"
+                )
 
             if RE_XML_TAG.search(str(name)):
                 errors.append("'name' must not contain XML tags (< or >)")
 
     # description field
-    if 'description' in fm:
-        desc = str(fm['description']).strip()
+    if "description" in fm:
+        desc = str(fm["description"]).strip()
 
         if not desc:
             errors.append("[frontmatter] 'description' must be non-empty")
         else:
             # Length checks
             if len(desc) < 20:
-                warnings.append("[frontmatter] 'description' too short (< 20 chars) - may not trigger well")
+                warnings.append(
+                    "[frontmatter] 'description' too short (< 20 chars) - may not trigger well"
+                )
             if len(desc) > 1024:
                 errors.append("[frontmatter] 'description' exceeds 1024 characters")
 
             # Discoverability checks (tier-aware)
             if not RE_DESCRIPTION_USE_WHEN.search(desc):
                 if tier == TIER_ENTERPRISE:
-                    warnings.append("[frontmatter] 'description' should include 'Use when ...' phrase for model discoverability (marketplace)")
+                    warnings.append(
+                        "[frontmatter] 'description' should include 'Use when ...' phrase for model discoverability (marketplace)"
+                    )
                 else:
-                    infos.append("[frontmatter] Consider adding 'Use when ...' phrase to description for better discoverability")
+                    infos.append(
+                        "[frontmatter] Consider adding 'Use when ...' phrase to description for better discoverability"
+                    )
 
             if not RE_DESCRIPTION_TRIGGER_WITH.search(desc):
                 if tier == TIER_ENTERPRISE:
-                    warnings.append("[frontmatter] 'description' should include 'Trigger with ...' phrase for user discoverability (marketplace)")
+                    warnings.append(
+                        "[frontmatter] 'description' should include 'Trigger with ...' phrase for user discoverability (marketplace)"
+                    )
                 else:
-                    infos.append("[frontmatter] Consider adding 'Trigger with ...' phrase to description")
+                    infos.append(
+                        "[frontmatter] Consider adding 'Trigger with ...' phrase to description"
+                    )
 
             # Voice checks (tier-aware)
             if RE_FIRST_PERSON.search(desc):
                 if tier == TIER_ENTERPRISE:
-                    warnings.append("[frontmatter] 'description' should NOT use first person (I can / I will / etc.) - use third person")
+                    warnings.append(
+                        "[frontmatter] 'description' should NOT use first person (I can / I will / etc.) - use third person"
+                    )
                 else:
-                    warnings.append("[frontmatter] 'description' uses first person - third person recommended")
+                    warnings.append(
+                        "[frontmatter] 'description' uses first person - third person recommended"
+                    )
 
             if RE_SECOND_PERSON.search(desc):
                 if tier == TIER_ENTERPRISE:
-                    warnings.append("[frontmatter] 'description' should NOT use second person (You can / You should) - use third person")
+                    warnings.append(
+                        "[frontmatter] 'description' should NOT use second person (You can / You should) - use third person"
+                    )
                 else:
-                    warnings.append("[frontmatter] 'description' uses second person - third person recommended")
+                    warnings.append(
+                        "[frontmatter] 'description' uses second person - third person recommended"
+                    )
 
             if RE_XML_TAG.search(str(desc)):
                 errors.append("'description' must not contain XML tags (< or >)")
@@ -1600,19 +1830,48 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
             desc_lower = desc.lower()
             for bad in FORBIDDEN_WORDS:
                 if bad in desc_lower:
-                    warnings.append(f"[frontmatter] 'description' contains reserved word: '{bad}' (ok for Claude/AI context)")
+                    warnings.append(
+                        f"[frontmatter] 'description' contains reserved word: '{bad}' (ok for Claude/AI context)"
+                    )
 
             # Imperative language check (best practice)
             imperative_starts = [
-                'analyze', 'audit', 'build', 'compare', 'configure', 'convert', 'create',
-                'debug', 'deploy', 'detect', 'extract', 'fix', 'forecast', 'generate',
-                'implement', 'log', 'manage', 'migrate', 'monitor', 'optimize',
-                'process', 'review', 'route', 'scan', 'set up', 'setup', 'test',
-                'track', 'transform', 'validate',
+                "analyze",
+                "audit",
+                "build",
+                "compare",
+                "configure",
+                "convert",
+                "create",
+                "debug",
+                "deploy",
+                "detect",
+                "extract",
+                "fix",
+                "forecast",
+                "generate",
+                "implement",
+                "log",
+                "manage",
+                "migrate",
+                "monitor",
+                "optimize",
+                "process",
+                "review",
+                "route",
+                "scan",
+                "set up",
+                "setup",
+                "test",
+                "track",
+                "transform",
+                "validate",
             ]
             has_imperative = any(v in desc_lower for v in imperative_starts)
             if not has_imperative:
-                warnings.append("[frontmatter] Consider using action verbs (analyze, detect, forecast, etc.)")
+                warnings.append(
+                    "[frontmatter] Consider using action verbs (analyze, detect, forecast, etc.)"
+                )
 
     # allowed-tools field
     # Per code.claude.com/docs/en/skills (Frontmatter reference):
@@ -1620,8 +1879,8 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # parse_allowed_tools() handles: YAML list, space-separated string,
     # comma-separated string, or mixed. Paren-depth aware so `Bash(git add *)`
     # stays one token in space-separated form.
-    if 'allowed-tools' in fm:
-        raw_tools = fm['allowed-tools']
+    if "allowed-tools" in fm:
+        raw_tools = fm["allowed-tools"]
         tools_type_error = False
         if isinstance(raw_tools, (str, list)):
             tools: List[str] = parse_allowed_tools(raw_tools)
@@ -1642,18 +1901,22 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
                 errors.append(f"[frontmatter] allowed-tools: {msg}")
 
         # Unscoped Bash check (tier-aware)
-        if 'Bash' in tools:
+        if "Bash" in tools:
             if tier == TIER_ENTERPRISE:
-                errors.append("[frontmatter] allowed-tools: unscoped 'Bash' is not allowed - use scoped Bash(git:*), Bash(npm:*), etc.")
+                errors.append(
+                    "[frontmatter] allowed-tools: unscoped 'Bash' is not allowed - use scoped Bash(git:*), Bash(npm:*), etc."
+                )
             else:
-                warnings.append("[frontmatter] allowed-tools: unscoped 'Bash' - consider scoping (Bash(git:*), Bash(npm:*), etc.)")
+                warnings.append(
+                    "[frontmatter] allowed-tools: unscoped 'Bash' - consider scoping (Bash(git:*), Bash(npm:*), etc.)"
+                )
 
         # Info about over-permissioning
         # Count unique base tools (Bash scopes like Bash(git:*) should not inflate the tool count).
         def _base_tool(tool: str) -> str:
-            base = tool.split('(')[0].strip()
-            if ':' in base:
-                base = base.split(':')[0].strip()
+            base = tool.split("(")[0].strip()
+            if ":" in base:
+                base = base.split(":")[0].strip()
             return base
 
         unique_tool_count = len({_base_tool(t) for t in tools})
@@ -1663,46 +1926,52 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
             )
 
     # version field
-    if 'version' in fm:
-        version = str(fm['version'])
-        if not re.match(r'^\d+\.\d+\.\d+', version):
+    if "version" in fm:
+        version = str(fm["version"])
+        if not re.match(r"^\d+\.\d+\.\d+", version):
             errors.append(f"[frontmatter] 'version' should be semver format (X.Y.Z): {version}")
 
     # author field
-    if 'author' in fm:
-        author = str(fm['author']).strip()
+    if "author" in fm:
+        author = str(fm["author"]).strip()
         if not author:
             errors.append("[frontmatter] 'author' must be non-empty")
         # Recommend email format
-        if '@' not in author:
+        if "@" not in author:
             warnings.append("[frontmatter] 'author' best practice: include email (Name <email>)")
 
     # license field
-    if 'license' in fm:
-        license_val = str(fm['license']).strip()
+    if "license" in fm:
+        license_val = str(fm["license"]).strip()
         if not license_val:
             errors.append("[frontmatter] 'license' must be non-empty")
 
     # === OPTIONAL FIELDS ===
 
     # model field
-    if 'model' in fm:
-        model = fm['model']
-        valid_models = ['inherit', 'sonnet', 'haiku', 'opus']
-        if model not in valid_models and not str(model).startswith('claude-'):
-            warnings.append(f"[frontmatter] 'model' value '{model}' not standard (use: inherit, sonnet, haiku, opus, or claude-*)")
+    if "model" in fm:
+        model = fm["model"]
+        valid_models = ["inherit", "sonnet", "haiku", "opus"]
+        if model not in valid_models and not str(model).startswith("claude-"):
+            warnings.append(
+                f"[frontmatter] 'model' value '{model}' not standard (use: inherit, sonnet, haiku, opus, or claude-*)"
+            )
 
     # disable-model-invocation field
-    if 'disable-model-invocation' in fm:
-        dmi = fm['disable-model-invocation']
+    if "disable-model-invocation" in fm:
+        dmi = fm["disable-model-invocation"]
         if not isinstance(dmi, bool):
-            errors.append(f"[frontmatter] 'disable-model-invocation' must be boolean, got: {type(dmi).__name__}")
+            errors.append(
+                f"[frontmatter] 'disable-model-invocation' must be boolean, got: {type(dmi).__name__}"
+            )
 
     # tags field
-    if 'tags' in fm:
-        tags = fm['tags']
+    if "tags" in fm:
+        tags = fm["tags"]
         if not isinstance(tags, list):
-            errors.append(f"[frontmatter] 'tags' must be array of strings, got: {type(tags).__name__}")
+            errors.append(
+                f"[frontmatter] 'tags' must be array of strings, got: {type(tags).__name__}"
+            )
         elif not all(isinstance(t, str) for t in tags):
             errors.append("[frontmatter] 'tags' must contain only strings")
 
@@ -1712,8 +1981,8 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     #   compatibility: "Designed for Claude Code"
     #   compatibility: "Requires Python 3.10+ with uv installed"
     #   compatibility: "Designed for Claude Code, also compatible with Codex and OpenClaw"
-    if 'compatibility' in fm:
-        compat = fm['compatibility']
+    if "compatibility" in fm:
+        compat = fm["compatibility"]
         if not isinstance(compat, str):
             errors.append(
                 f"[frontmatter] 'compatibility' must be a string (free-text per "
@@ -1735,12 +2004,12 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # not appear in any of the 7 verified Anthropic / open-standard sources. Kept
     # parsing for backward compatibility; emits deprecation warning + migration
     # suggestion. Use `compatibility` (free-text) instead.
-    if 'compatible-with' in fm:
-        compat = fm['compatible-with']
+    if "compatible-with" in fm:
+        compat = fm["compatible-with"]
         if isinstance(compat, str):
             sample = compat
         elif isinstance(compat, list):
-            sample = ', '.join(str(p).strip() for p in compat)
+            sample = ", ".join(str(p).strip() for p in compat)
         else:
             sample = str(compat)
         # Deprecation message. Validator continues to accept the value; do not
@@ -1755,34 +2024,36 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # === NEW CLAUDE CODE SPEC FIELDS ===
 
     # context field (fork for subagent execution)
-    if 'context' in fm:
-        ctx = fm['context']
-        if ctx not in ('fork',):
+    if "context" in fm:
+        ctx = fm["context"]
+        if ctx not in ("fork",):
             warnings.append(f"[frontmatter] 'context' value '{ctx}' not standard (use: fork)")
 
     # agent field (subagent type)
-    if 'agent' in fm:
-        agent_val = str(fm['agent']).strip()
+    if "agent" in fm:
+        agent_val = str(fm["agent"]).strip()
         if not agent_val:
             errors.append("[frontmatter] 'agent' must be non-empty if specified")
 
     # user-invocable field (boolean)
-    if 'user-invocable' in fm:
-        ui = fm['user-invocable']
+    if "user-invocable" in fm:
+        ui = fm["user-invocable"]
         if not isinstance(ui, bool):
-            errors.append(f"[frontmatter] 'user-invocable' must be boolean, got: {type(ui).__name__}")
+            errors.append(
+                f"[frontmatter] 'user-invocable' must be boolean, got: {type(ui).__name__}"
+            )
 
     # argument-hint field (string autocomplete hint)
-    if 'argument-hint' in fm:
-        hint = str(fm['argument-hint']).strip()
+    if "argument-hint" in fm:
+        hint = str(fm["argument-hint"]).strip()
         if len(hint) > 200:
             warnings.append("[frontmatter] 'argument-hint' exceeds 200 chars - keep hints concise")
 
     # arguments field — named positional arguments per code.claude.com/docs/en/skills
     # "Accepts a space-separated string or a YAML list. Names map to argument
     # positions in order."
-    if 'arguments' in fm:
-        args_val = fm['arguments']
+    if "arguments" in fm:
+        args_val = fm["arguments"]
         if not isinstance(args_val, (str, list)):
             errors.append(
                 f"[frontmatter] 'arguments' must be a space-separated string or YAML "
@@ -1792,8 +2063,8 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # paths field — glob patterns limiting when the skill auto-activates
     # (code.claude.com/docs/en/skills "Frontmatter reference"). Accepts CSV
     # string or YAML list.
-    if 'paths' in fm:
-        paths_val = fm['paths']
+    if "paths" in fm:
+        paths_val = fm["paths"]
         if not isinstance(paths_val, (str, list)):
             errors.append(
                 f"[frontmatter] 'paths' must be a comma-separated string or YAML list, "
@@ -1801,9 +2072,9 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
             )
 
     # shell field — bash (default) or powershell (code.claude.com/docs/en/skills)
-    if 'shell' in fm:
-        shell_val = fm['shell']
-        if shell_val not in ('bash', 'powershell'):
+    if "shell" in fm:
+        shell_val = fm["shell"]
+        if shell_val not in ("bash", "powershell"):
             warnings.append(
                 f"[frontmatter] 'shell' value '{shell_val}' not standard "
                 f"(use: bash or powershell)"
@@ -1813,14 +2084,16 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # "Additional context for when Claude should invoke the skill, such as trigger
     # phrases or example requests. Appended to `description` in the skill listing
     # and counts toward the 1,536-character cap."
-    if 'when_to_use' in fm:
-        wtu = fm['when_to_use']
+    if "when_to_use" in fm:
+        wtu = fm["when_to_use"]
         if not isinstance(wtu, str):
-            errors.append(f"[frontmatter] 'when_to_use' must be a string, got: {type(wtu).__name__}")
+            errors.append(
+                f"[frontmatter] 'when_to_use' must be a string, got: {type(wtu).__name__}"
+            )
         else:
             wtu_str = wtu.strip()
             # description+when_to_use combined cap is 1,536 chars per Anthropic doc.
-            desc_len = len(str(fm.get('description', '')).strip())
+            desc_len = len(str(fm.get("description", "")).strip())
             combined_len = desc_len + len(wtu_str)
             if combined_len > 1536:
                 warnings.append(
@@ -1830,10 +2103,12 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
                 )
 
     # hooks field (skill-scoped lifecycle hooks)
-    if 'hooks' in fm:
-        hooks_val = fm['hooks']
+    if "hooks" in fm:
+        hooks_val = fm["hooks"]
         if not isinstance(hooks_val, dict):
-            errors.append(f"[frontmatter] 'hooks' must be a mapping, got: {type(hooks_val).__name__}")
+            errors.append(
+                f"[frontmatter] 'hooks' must be a mapping, got: {type(hooks_val).__name__}"
+            )
 
     # Invalid fields — ERROR. Currently empty (see INVALID_SKILL_FIELDS comment),
     # but kept as an extension point.
@@ -1844,7 +2119,7 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # === DEPRECATED FIELDS ===
     # `compatible-with` is handled above with a custom migration suggestion that
     # quotes the user's actual value. Skip here to avoid double-warning.
-    deprecated_handled_inline = {'compatible-with'}
+    deprecated_handled_inline = {"compatible-with"}
     for field, message in DEPRECATED_FIELDS.items():
         if field in fm and field not in deprecated_handled_inline:
             warnings.append(f"[frontmatter] Deprecated field '{field}': {message}")
@@ -1852,7 +2127,9 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     # === UNKNOWN FIELDS ===
     # Fields outside the schema registry. At marketplace tier we still warn
     # rather than error so that ad-hoc experimentation isn't blocked.
-    known_fields = set(SKILL_FIELDS.keys()) | set(INVALID_SKILL_FIELDS.keys()) | set(DEPRECATED_FIELDS.keys())
+    known_fields = (
+        set(SKILL_FIELDS.keys()) | set(INVALID_SKILL_FIELDS.keys()) | set(DEPRECATED_FIELDS.keys())
+    )
     unknown_fields = set(fm.keys()) - known_fields
     for field in unknown_fields:
         warnings.append(
@@ -1864,7 +2141,9 @@ def validate_frontmatter(path: Path, fm: dict, tier: str = TIER_STANDARD) -> Tup
     return errors, warnings, infos
 
 
-def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = None) -> Tuple[List[str], List[str], List[str]]:
+def validate_body(
+    path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = None
+) -> Tuple[List[str], List[str], List[str]]:
     """
     Validate SKILL.md body content.
     Returns: (errors, warnings, infos)
@@ -1880,16 +2159,22 @@ def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = N
 
     # Line limit
     if len(lines) > 500:
-        errors.append(f"[body] SKILL.md body has {len(lines)} lines — exceeds Anthropic 500-line limit. Extract to references/")
+        errors.append(
+            f"[body] SKILL.md body has {len(lines)} lines — exceeds Anthropic 500-line limit. Extract to references/"
+        )
     elif len(lines) > 300:
-        warnings.append(f"[body] SKILL.md body has {len(lines)} lines (301-500 approaching limit). Consider extracting to references/")
+        warnings.append(
+            f"[body] SKILL.md body has {len(lines)} lines (301-500 approaching limit). Consider extracting to references/"
+        )
 
     # Word count check
     word_count = len(body.split())
     if word_count > 5000:
         warnings.append(f"[body] Content exceeds 5000 words ({word_count}) - may overwhelm context")
     elif word_count > 3500:
-        warnings.append(f"[body] Content is lengthy ({word_count} words) - consider references/ directory")
+        warnings.append(
+            f"[body] Content is lengthy ({word_count} words) - consider references/ directory"
+        )
 
     # === SECTION CHECKS (enterprise tier only) ===
     # IMPORTANT: Detect headings outside fenced code blocks to avoid false positives from examples.
@@ -1991,7 +2276,9 @@ def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = N
             has_step_heading = bool(re.search(r"(?mi)^\s*#{2,6}\s*step\s*\d+", instructions))
             has_step_label = bool(re.search(r"(?mi)^\s*step\s*\d+[:\-]", instructions))
             if not (has_numbered or has_step_heading or has_step_label):
-                warnings.append("[body] '## Instructions' should include step-by-step steps (numbered list or Step headings) (marketplace)")
+                warnings.append(
+                    "[body] '## Instructions' should include step-by-step steps (numbered list or Step headings) (marketplace)"
+                )
 
     # === LEE HAN CHUNG: PURPOSE STATEMENT (1-2 sentences near top) ===
 
@@ -2056,7 +2343,9 @@ def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = N
 
     if tier == TIER_ENTERPRISE:
         if not purpose_text:
-            warnings.append("[body] Missing purpose statement near the top (marketplace quality standard)")
+            warnings.append(
+                "[body] Missing purpose statement near the top (marketplace quality standard)"
+            )
         else:
             sc = _sentence_count(purpose_text)
             if sc == 0:
@@ -2066,7 +2355,9 @@ def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = N
             if len(purpose_text) > 400:
                 warnings.append("[body] Purpose statement is long (>400 chars) - keep it crisp")
             if purpose_location is not None and purpose_location > 120:
-                warnings.append("[body] Purpose statement appears late in the document - keep it near the top")
+                warnings.append(
+                    "[body] Purpose statement appears late in the document - keep it near the top"
+                )
 
     # === LEE HAN CHUNG: AVOID HUGE EMBEDDED BLOCKS ===
 
@@ -2089,8 +2380,8 @@ def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = N
     # Remove all code blocks and inline code BEFORE scanning
     # This eliminates false positives from code examples
 
-    body_no_code = re.sub(r'```.*?```', '', body, flags=re.DOTALL)  # Remove fenced code blocks
-    body_no_code = re.sub(r'`[^`]+`', '', body_no_code)  # Remove inline code
+    body_no_code = re.sub(r"```.*?```", "", body, flags=re.DOTALL)  # Remove fenced code blocks
+    body_no_code = re.sub(r"`[^`]+`", "", body_no_code)  # Remove inline code
 
     # Now check for absolute paths in the cleaned content
     for i, line in enumerate(body_no_code.splitlines(), start=1):
@@ -2109,61 +2400,99 @@ def validate_body(path: Path, body: str, tier: str = TIER_STANDARD, fm: dict = N
     # === TIME-SENSITIVE INFORMATION ===
     # Check for date-specific logic that will become stale
     time_patterns = [
-        (r'\b(before|after|until|since)\s+20\d{2}\b', "date-specific logic"),
-        (r'\bas of\s+20\d{2}\b', "date-specific reference"),
-        (r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+20\d{2}\b', "specific date"),
-        (r'\bQ[1-4]\s+20\d{2}\b', "quarter reference"),
-        (r'\bdeprecated\s+(in|since)\s+v?\d', "version deprecation note"),
+        (r"\b(before|after|until|since)\s+20\d{2}\b", "date-specific logic"),
+        (r"\bas of\s+20\d{2}\b", "date-specific reference"),
+        (
+            r"\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+20\d{2}\b",
+            "specific date",
+        ),
+        (r"\bQ[1-4]\s+20\d{2}\b", "quarter reference"),
+        (r"\bdeprecated\s+(in|since)\s+v?\d", "version deprecation note"),
     ]
     for pattern, desc in time_patterns:
         matches = list(re.finditer(pattern, body, re.IGNORECASE))
         for m in matches:
-            warnings.append(f"[body] Time-sensitive information found: '{m.group()}' ({desc}) - may become stale")
+            warnings.append(
+                f"[body] Time-sensitive information found: '{m.group()}' ({desc}) - may become stale"
+            )
 
     # Time-sensitive information (skip code blocks to avoid false positives)
     stripped = re.sub(r"```[\s\S]*?```", "", body)
     stripped = re.sub(r"`[^`]+`", "", stripped)
     for pat in RE_TIME_SENSITIVE:
         if pat.search(stripped):
-            warnings.append("Body may contain time-sensitive information (dates, versions) that could go stale")
+            warnings.append(
+                "Body may contain time-sensitive information (dates, versions) that could go stale"
+            )
             break
 
     # === SCRIPT QUALITY CHECKS ===
     # Check embedded scripts for error handling
-    code_blocks = re.findall(r'```(?:bash|sh|python|py)?\n(.*?)```', body, re.DOTALL | re.IGNORECASE)
+    code_blocks = re.findall(
+        r"```(?:bash|sh|python|py)?\n(.*?)```", body, re.DOTALL | re.IGNORECASE
+    )
     for i, block in enumerate(code_blocks):
         # Check for error handling in bash scripts (only for substantial scripts, not examples)
-        if 'set -e' not in block and '|| ' not in block and 'if [' not in block:
+        if "set -e" not in block and "|| " not in block and "if [" not in block:
             if len(block.strip().splitlines()) > 15:  # Only warn for substantial scripts
-                if re.search(r'\b(rm|mv|cp|curl|wget|pip|npm)\b', block):
-                    warnings.append(f"[scripts] Code block {i+1}: Consider adding error handling (set -e or || exit)")
+                if re.search(r"\b(rm|mv|cp|curl|wget|pip|npm)\b", block):
+                    warnings.append(
+                        f"[scripts] Code block {i+1}: Consider adding error handling (set -e or || exit)"
+                    )
 
         # Check for unexplained magic numbers (voodoo constants)
         # Whitelist well-known HTTP status codes and common port numbers
         KNOWN_NUMBERS = {
-            '200', '201', '204', '301', '302', '304', '307', '308',
-            '400', '401', '403', '404', '405', '408', '409', '422', '429',
-            '500', '502', '503', '504',
-            '3000', '5000', '8000', '8080', '8443', '9090',  # common ports
+            "200",
+            "201",
+            "204",
+            "301",
+            "302",
+            "304",
+            "307",
+            "308",
+            "400",
+            "401",
+            "403",
+            "404",
+            "405",
+            "408",
+            "409",
+            "422",
+            "429",
+            "500",
+            "502",
+            "503",
+            "504",
+            "3000",
+            "5000",
+            "8000",
+            "8080",
+            "8443",
+            "9090",  # common ports
         }
-        magic_numbers = re.findall(r'(?<![.\d])\b(?:(?:[2-9]\d{2,})|(?:1\d{3,}))\b(?![.\d])', block)
+        magic_numbers = re.findall(r"(?<![.\d])\b(?:(?:[2-9]\d{2,})|(?:1\d{3,}))\b(?![.\d])", block)
         for num in magic_numbers[:3]:  # Limit warnings
             if num in KNOWN_NUMBERS:
                 continue
-            if not re.search(rf'#.*{num}', block):  # No comment explaining it
-                warnings.append(f"[scripts] Code block {i+1}: Magic number '{num}' - add comment explaining why")
+            if not re.search(rf"#.*{num}", block):  # No comment explaining it
+                warnings.append(
+                    f"[scripts] Code block {i+1}: Magic number '{num}' - add comment explaining why"
+                )
 
     # === STRING SUBSTITUTION CHECKS ===
     # Detect $ARGUMENTS / $ARGUMENTS[N] / $0-$9 usage and validate argument-hint presence
-    has_arguments = bool(re.search(r'\$ARGUMENTS', body))
-    has_positional = bool(re.search(r'\$[0-9]', body))
-    if (has_arguments or has_positional) and 'argument-hint' not in fm:
-        infos.append("[body] Uses $ARGUMENTS/$N but 'argument-hint' frontmatter is missing — "
-                     "add argument-hint for autocomplete support (per official docs)")
+    has_arguments = bool(re.search(r"\$ARGUMENTS", body))
+    has_positional = bool(re.search(r"\$[0-9]", body))
+    if (has_arguments or has_positional) and "argument-hint" not in fm:
+        infos.append(
+            "[body] Uses $ARGUMENTS/$N but 'argument-hint' frontmatter is missing — "
+            "add argument-hint for autocomplete support (per official docs)"
+        )
 
     # === VOICE CHECKS ===
 
-    if re.search(r'\byou should\b|\byou can\b|\byou will\b', body, re.IGNORECASE):
+    if re.search(r"\byou should\b|\byou can\b|\byou will\b", body, re.IGNORECASE):
         warnings.append("[body] Consider imperative language instead of 'you should/can/will'")
 
     return errors, warnings, infos
@@ -2255,7 +2584,7 @@ def validate_relative_links(path: Path, body: str) -> Tuple[List[str], List[str]
             in_code_block = not in_code_block
         if not in_code_block:
             # Strip inline code spans to avoid matching example links
-            filtered_lines.append(re.sub(r'`[^`]+`', '', line))
+            filtered_lines.append(re.sub(r"`[^`]+`", "", line))
     filtered_body = "\n".join(filtered_lines)
 
     for match in RE_RELATIVE_MD_LINK.finditer(filtered_body):
@@ -2272,7 +2601,9 @@ def validate_relative_links(path: Path, body: str) -> Tuple[List[str], List[str]
         try:
             target_path.relative_to(skill_dir)
         except ValueError:
-            errors.append(f"[relative-link] Link escapes skill directory: [{link_text}]({link_target})")
+            errors.append(
+                f"[relative-link] Link escapes skill directory: [{link_text}]({link_target})"
+            )
             continue
 
         if not target_path.exists():
@@ -2294,35 +2625,35 @@ def validate_relative_links(path: Path, body: str) -> Tuple[List[str], List[str]
 
 # Patterns for detecting stub scripts
 STUB_SCRIPT_PATTERNS = [
-    re.compile(r'def\s+\w+\([^)]*\):\s*\n\s*pass\s*$', re.MULTILINE),  # Function with only pass
-    re.compile(r'Add processing logic here', re.IGNORECASE),
-    re.compile(r'This is a template', re.IGNORECASE),
-    re.compile(r'Customize based on', re.IGNORECASE),
-    re.compile(r'#\s*TODO:\s*implement', re.IGNORECASE),
-    re.compile(r'raise NotImplementedError'),
+    re.compile(r"def\s+\w+\([^)]*\):\s*\n\s*pass\s*$", re.MULTILINE),  # Function with only pass
+    re.compile(r"Add processing logic here", re.IGNORECASE),
+    re.compile(r"This is a template", re.IGNORECASE),
+    re.compile(r"Customize based on", re.IGNORECASE),
+    re.compile(r"#\s*TODO:\s*implement", re.IGNORECASE),
+    re.compile(r"raise NotImplementedError"),
 ]
 
 # Patterns for detecting placeholder text
 PLACEHOLDER_PATTERNS = [
-    re.compile(r'\{[a-z_]+\}'),           # {table_name}, {database}, etc.
-    re.compile(r'REPLACE_ME', re.IGNORECASE),
-    re.compile(r'\[YOUR_[A-Z_]+\]'),      # [YOUR_API_KEY], etc.
-    re.compile(r'<insert\s+.+>', re.IGNORECASE),  # <insert description here>
-    re.compile(r'\bTBD\b'),
-    re.compile(r'\bFIXME\b'),
-    re.compile(r'to be determined', re.IGNORECASE),
-    re.compile(r'\bplaceholder\b', re.IGNORECASE),
+    re.compile(r"\{[a-z_]+\}"),  # {table_name}, {database}, etc.
+    re.compile(r"REPLACE_ME", re.IGNORECASE),
+    re.compile(r"\[YOUR_[A-Z_]+\]"),  # [YOUR_API_KEY], etc.
+    re.compile(r"<insert\s+.+>", re.IGNORECASE),  # <insert description here>
+    re.compile(r"\bTBD\b"),
+    re.compile(r"\bFIXME\b"),
+    re.compile(r"to be determined", re.IGNORECASE),
+    re.compile(r"\bplaceholder\b", re.IGNORECASE),
 ]
 
 # Patterns for detecting generic boilerplate
 BOILERPLATE_PATTERNS = [
-    re.compile(r'This skill provides automated assistance for \[?\w*\]? tasks', re.IGNORECASE),
-    re.compile(r'This skill enables Claude to', re.IGNORECASE),
-    re.compile(r'Step \d+: Assess Current State\s*$', re.MULTILINE | re.IGNORECASE),
-    re.compile(r'Step \d+: Design Solution\s*$', re.MULTILINE | re.IGNORECASE),
-    re.compile(r'Step \d+: Implement Changes\s*$', re.MULTILINE | re.IGNORECASE),
-    re.compile(r'This is a template that can be customized', re.IGNORECASE),
-    re.compile(r'Customize based on your requirements', re.IGNORECASE),
+    re.compile(r"This skill provides automated assistance for \[?\w*\]? tasks", re.IGNORECASE),
+    re.compile(r"This skill enables Claude to", re.IGNORECASE),
+    re.compile(r"Step \d+: Assess Current State\s*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"Step \d+: Design Solution\s*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"Step \d+: Implement Changes\s*$", re.MULTILINE | re.IGNORECASE),
+    re.compile(r"This is a template that can be customized", re.IGNORECASE),
+    re.compile(r"Customize based on your requirements", re.IGNORECASE),
 ]
 
 
@@ -2343,9 +2674,9 @@ def validate_references_readme(skill_path: Path) -> Tuple[List[str], List[str]]:
     refs_readme = skill_dir / "references" / "README.md"
     if refs_readme.exists():
         try:
-            content = refs_readme.read_text(encoding='utf-8')
+            content = refs_readme.read_text(encoding="utf-8")
             # Match checkbox patterns: - [x] filename.md or - [ ] filename.md
-            checkbox_pattern = re.compile(r'-\s*\[[ xX]\]\s*([^\s:]+\.(?:md|yaml|json|py|sh))')
+            checkbox_pattern = re.compile(r"-\s*\[[ xX]\]\s*([^\s:]+\.(?:md|yaml|json|py|sh))")
             matches = checkbox_pattern.findall(content)
 
             for filename in matches:
@@ -2361,8 +2692,10 @@ def validate_references_readme(skill_path: Path) -> Tuple[List[str], List[str]]:
     assets_readme = skill_dir / "assets" / "README.md"
     if assets_readme.exists():
         try:
-            content = assets_readme.read_text(encoding='utf-8')
-            checkbox_pattern = re.compile(r'-\s*\[[ xX]\]\s*([^\s:]+\.(?:md|yaml|json|py|sh|template))')
+            content = assets_readme.read_text(encoding="utf-8")
+            checkbox_pattern = re.compile(
+                r"-\s*\[[ xX]\]\s*([^\s:]+\.(?:md|yaml|json|py|sh|template))"
+            )
             matches = checkbox_pattern.findall(content)
 
             for filename in matches:
@@ -2396,7 +2729,7 @@ def detect_stub_scripts(skill_path: Path) -> Tuple[List[str], List[str]]:
 
     for script in scripts_dir.glob("*.py"):
         try:
-            content = script.read_text(encoding='utf-8')
+            content = script.read_text(encoding="utf-8")
             script_name = script.name
 
             # Check for stub patterns
@@ -2408,8 +2741,12 @@ def detect_stub_scripts(skill_path: Path) -> Tuple[List[str], List[str]]:
                     break  # One warning per file is enough
 
             # Additional check: file is mostly empty or just imports
-            lines = [l.strip() for l in content.splitlines() if l.strip() and not l.strip().startswith('#')]
-            non_import_lines = [l for l in lines if not l.startswith(('import ', 'from '))]
+            lines = [
+                l.strip()
+                for l in content.splitlines()
+                if l.strip() and not l.strip().startswith("#")
+            ]
+            non_import_lines = [l for l in lines if not l.startswith(("import ", "from "))]
             if len(non_import_lines) < 5 and len(lines) > 0:
                 warnings.append(
                     f"[content-quality] scripts/{script_name} has minimal implementation ({len(non_import_lines)} non-import lines)"
@@ -2439,7 +2776,7 @@ def detect_placeholder_text(skill_path: Path) -> Tuple[List[str], List[str]]:
     ]
 
     # Add templates and config files
-    for pattern in ['assets/*.yaml', 'assets/*.yml', 'config/*.yaml', 'config/*.yml']:
+    for pattern in ["assets/*.yaml", "assets/*.yml", "config/*.yaml", "config/*.yml"]:
         files_to_scan.extend(skill_dir.glob(pattern))
 
     for file_path in files_to_scan:
@@ -2447,13 +2784,13 @@ def detect_placeholder_text(skill_path: Path) -> Tuple[List[str], List[str]]:
             continue
 
         try:
-            content = file_path.read_text(encoding='utf-8')
+            content = file_path.read_text(encoding="utf-8")
             rel_path = file_path.relative_to(skill_dir)
 
             # Skip checking inside code blocks for SKILL.md
-            if file_path.name == 'SKILL.md':
+            if file_path.name == "SKILL.md":
                 # Remove code blocks before checking
-                content_no_code = re.sub(r'```.*?```', '', content, flags=re.DOTALL)
+                content_no_code = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
             else:
                 content_no_code = content
 
@@ -2520,7 +2857,7 @@ def detect_stub_sections(body: str) -> Tuple[List[str], List[str]]:
     warnings: List[str] = []
 
     # Split body into sections on level-2 headings
-    section_pattern = re.compile(r'^## .+', re.MULTILINE)
+    section_pattern = re.compile(r"^## .+", re.MULTILINE)
     positions = [m.start() for m in section_pattern.finditer(body)]
 
     if not positions:
@@ -2530,12 +2867,12 @@ def detect_stub_sections(body: str) -> Tuple[List[str], List[str]]:
     for i, start in enumerate(positions):
         end = positions[i + 1] if i + 1 < len(positions) else len(body)
         chunk = body[start:end]
-        header_end = chunk.index('\n') if '\n' in chunk else len(chunk)
+        header_end = chunk.index("\n") if "\n" in chunk else len(chunk)
         header = chunk[:header_end].strip()
         content = chunk[header_end:].strip()
         sections.append((header, content))
 
-    stub_markers = re.compile(r'\b(TODO|TBD|WIP|Coming soon)\b', re.IGNORECASE)
+    stub_markers = re.compile(r"\b(TODO|TBD|WIP|Coming soon)\b", re.IGNORECASE)
 
     for header, content in sections:
         words = content.split()
@@ -2553,7 +2890,7 @@ def detect_stub_sections(body: str) -> Tuple[List[str], List[str]]:
             )
 
         # Count sentences (rough: split on sentence-ending punctuation)
-        sentence_count = len(re.findall(r'[.!?]+', content))
+        sentence_count = len(re.findall(r"[.!?]+", content))
         if word_count < 15 and sentence_count <= 1:
             warnings.append(
                 f"[stub-section] Section '{header}' appears to be a stub ({word_count} words, {sentence_count} sentence)"
@@ -2578,7 +2915,7 @@ def validate_reference_file_quality(path: Path) -> Tuple[List[str], List[str]]:
 
     for ref_file in sorted(refs_dir.glob("*.md")):
         try:
-            raw = ref_file.read_text(encoding='utf-8')
+            raw = ref_file.read_text(encoding="utf-8")
             # Strip YAML frontmatter if present
             fm_match = RE_FRONTMATTER.match(raw)
             content = fm_match.group(2) if fm_match else raw
@@ -2593,9 +2930,7 @@ def validate_reference_file_quality(path: Path) -> Tuple[List[str], List[str]]:
                 )
 
         except Exception as e:
-            warnings.append(
-                f"[reference-quality] Could not read references/{ref_file.name}: {e}"
-            )
+            warnings.append(f"[reference-quality] Could not read references/{ref_file.name}: {e}")
 
     return errors, warnings
 
@@ -2609,17 +2944,17 @@ def validate_dci_fallbacks(body: str) -> Tuple[List[str], List[str]]:
     errors: List[str] = []
     warnings: List[str] = []
     in_fence = False
-    dci_pattern = re.compile(r'^!`([^`]+)`\s*$')
+    dci_pattern = re.compile(r"^!`([^`]+)`\s*$")
     fallback_patterns = (
-        r'\|\| echo',
-        r'2>/dev/null',
-        r'\|\| true',
-        r'\[ -f',
-        r'command -v',
-        r'which ',
-        r'\btype ',
+        r"\|\| echo",
+        r"2>/dev/null",
+        r"\|\| true",
+        r"\[ -f",
+        r"command -v",
+        r"which ",
+        r"\btype ",
     )
-    fallback_re = re.compile('|'.join(fallback_patterns))
+    fallback_re = re.compile("|".join(fallback_patterns))
 
     for line in body.splitlines():
         if CODE_FENCE_PATTERN.match(line):
@@ -2652,14 +2987,14 @@ def detect_boilerplate(skill_path: Path) -> Tuple[List[str], List[str]]:
     warnings: List[str] = []
 
     try:
-        content = skill_path.read_text(encoding='utf-8')
+        content = skill_path.read_text(encoding="utf-8")
 
         for pattern in BOILERPLATE_PATTERNS:
             if pattern.search(content):
                 match = pattern.search(content)
                 if match:
                     # Truncate long matches
-                    matched_text = match.group()[:60] + ('...' if len(match.group()) > 60 else '')
+                    matched_text = match.group()[:60] + ("..." if len(match.group()) > 60 else "")
                     warnings.append(
                         f"[content-quality] SKILL.md contains generic boilerplate: '{matched_text}'"
                     )
@@ -2672,7 +3007,7 @@ def detect_boilerplate(skill_path: Path) -> Tuple[List[str], List[str]]:
 
 # === STRUCTURAL ADVISORS (suggest architecture improvements) ===
 
-RE_OPERATION_HEADER = re.compile(r'^##\s+[\w-]+(?:\s*\(.*\))?\s*$', re.MULTILINE)
+RE_OPERATION_HEADER = re.compile(r"^##\s+[\w-]+(?:\s*\(.*\))?\s*$", re.MULTILINE)
 
 
 def advise_split_to_commands(path: Path, body: str) -> List[str]:
@@ -2694,9 +3029,7 @@ def advise_split_to_commands(path: Path, body: str) -> List[str]:
 
     # Find ## headers that look like distinct user-invocable operations
     # Only matches kebab-case names (## verb-noun) — the clearest signal
-    operation_pattern = re.compile(
-        r'^##\s+(?:\d+\.\s+)?([\w]+-[\w]+(?:-[\w]+)*)\s*$', re.MULTILINE
-    )
+    operation_pattern = re.compile(r"^##\s+(?:\d+\.\s+)?([\w]+-[\w]+(?:-[\w]+)*)\s*$", re.MULTILINE)
     operations = operation_pattern.findall(body)
 
     if len(operations) >= 3:
@@ -2740,8 +3073,16 @@ def advise_offload_to_references(path: Path, body: str) -> List[str]:
         sections.append((current_header, current_lines))
 
     # Flag sections >20 lines that are good candidates for references
-    offload_candidates = ["Output", "Error Handling", "Examples", "Resources",
-                          "Reference", "API", "Configuration", "Schema"]
+    offload_candidates = [
+        "Output",
+        "Error Handling",
+        "Examples",
+        "Resources",
+        "Reference",
+        "API",
+        "Configuration",
+        "Schema",
+    ]
     for header, line_count in sections:
         if line_count > 20:
             is_candidate = any(kw.lower() in header.lower() for kw in offload_candidates)
@@ -2763,20 +3104,32 @@ def advise_dci_opportunities(path: Path, body: str) -> List[str]:
     infos: List[str] = []
 
     # Already has DCI? Skip.
-    has_dci = bool(re.search(r'(?m)^!\`[^`]+\`\s*$', body))
+    has_dci = bool(re.search(r"(?m)^!\`[^`]+\`\s*$", body))
     if has_dci:
         return infos
 
     # Patterns that suggest DCI would help
     dci_triggers = [
-        (r'(?i)check if .+ exists', "file existence check",
-         '!`[ -f FILE ] && echo "exists" || echo "not found"`'),
-        (r'(?i)read .+\.md', "file reading at start",
-         '!`[ -f FILE ] && head -5 FILE || echo "not found"`'),
-        (r'(?i)git status|git log|git branch', "git state discovery",
-         '!`git status --short 2>/dev/null || echo "not a git repo"`'),
-        (r'(?i)check (?:which |if )?(?:node|python|docker|terraform|npm|pnpm)', "tool version check",
-         '!`command -v TOOL 2>/dev/null && TOOL --version 2>/dev/null || echo "not installed"`'),
+        (
+            r"(?i)check if .+ exists",
+            "file existence check",
+            '!`[ -f FILE ] && echo "exists" || echo "not found"`',
+        ),
+        (
+            r"(?i)read .+\.md",
+            "file reading at start",
+            '!`[ -f FILE ] && head -5 FILE || echo "not found"`',
+        ),
+        (
+            r"(?i)git status|git log|git branch",
+            "git state discovery",
+            '!`git status --short 2>/dev/null || echo "not a git repo"`',
+        ),
+        (
+            r"(?i)check (?:which |if )?(?:node|python|docker|terraform|npm|pnpm)",
+            "tool version check",
+            '!`command -v TOOL 2>/dev/null && TOOL --version 2>/dev/null || echo "not installed"`',
+        ),
     ]
 
     for pattern, desc, example in dci_triggers:
@@ -2802,7 +3155,9 @@ def validate_supporting_files(path: Path) -> Tuple[List[str], List[str]]:
 
     refs_dir = skill_dir / "references"
     if not refs_dir.exists():
-        warnings.append("[supporting] Missing references/ directory — create it for progressive disclosure")
+        warnings.append(
+            "[supporting] Missing references/ directory — create it for progressive disclosure"
+        )
     elif refs_dir.exists():
         ref_files = list(refs_dir.glob("*.md"))
         if not ref_files:
@@ -2814,7 +3169,9 @@ def validate_supporting_files(path: Path) -> Tuple[List[str], List[str]]:
 
     # Check for singular reference.md (anti-pattern)
     if (skill_dir / "reference.md").exists():
-        errors.append("[supporting] Found 'reference.md' (singular) — rename to references/ directory with .md files inside")
+        errors.append(
+            "[supporting] Found 'reference.md' (singular) — rename to references/ directory with .md files inside"
+        )
 
     return errors, warnings
 
@@ -2832,7 +3189,7 @@ def detect_stub_skill(path: Path, body: str, fm: dict) -> Tuple[List[str], List[
     lines = body.strip().splitlines()
 
     # Skip stub detection for fork skills (they're intentionally minimal)
-    if fm.get('context') == 'fork':
+    if fm.get("context") == "fork":
         return errors, warnings
 
     stub_reasons = []
@@ -2840,17 +3197,17 @@ def detect_stub_skill(path: Path, body: str, fm: dict) -> Tuple[List[str], List[
     if len(lines) < 30:
         stub_reasons.append(f"body is only {len(lines)} lines (minimum 30)")
 
-    code_blocks = len(re.findall(r'```', body)) // 2
-    md_links = len(re.findall(r'\[.*?\]\((?!https?://)[^)]+\)', body))
+    code_blocks = len(re.findall(r"```", body)) // 2
+    md_links = len(re.findall(r"\[.*?\]\((?!https?://)[^)]+\)", body))
     if code_blocks == 0 and md_links == 0:
         stub_reasons.append("no code blocks and no relative links to supporting files")
 
-    desc = str(fm.get('description', '')).lower()
-    generic_patterns = ['a helpful tool', 'this skill provides', 'enables claude to']
-    if any(p in desc for p in generic_patterns) and 'use when' not in desc:
+    desc = str(fm.get("description", "")).lower()
+    generic_patterns = ["a helpful tool", "this skill provides", "enables claude to"]
+    if any(p in desc for p in generic_patterns) and "use when" not in desc:
         stub_reasons.append("description is generic with no 'use when' phrase")
 
-    has_instructions = bool(re.search(r'(?mi)^##\s+instructions', body))
+    has_instructions = bool(re.search(r"(?mi)^##\s+instructions", body))
     if not has_instructions:
         stub_reasons.append("missing ## Instructions section")
 
@@ -2866,14 +3223,14 @@ def validate_skill(path: Path, tier: str = TIER_STANDARD) -> Dict[str, Any]:
     Returns dict with errors, warnings, infos, and metadata.
     """
     try:
-        content = path.read_text(encoding='utf-8')
+        content = path.read_text(encoding="utf-8")
     except Exception as e:
-        return {'fatal': f'Cannot read file: {e}'}
+        return {"fatal": f"Cannot read file: {e}"}
 
     try:
         fm, body = parse_frontmatter(content)
     except Exception as e:
-        return {'fatal': str(e)}
+        return {"fatal": str(e)}
 
     errors: List[str] = []
     warnings: List[str] = []
@@ -2952,14 +3309,13 @@ def validate_skill(path: Path, tier: str = TIER_STANDARD) -> Dict[str, Any]:
     warnings.extend(stub_skill_warnings)
 
     # Placeholder density check
-    _body_no_code = re.sub(r'```.*?```', '', body, flags=re.DOTALL)
-    _body_no_code = re.sub(r'`[^`]+`', '', _body_no_code)
+    _body_no_code = re.sub(r"```.*?```", "", body, flags=re.DOTALL)
+    _body_no_code = re.sub(r"`[^`]+`", "", _body_no_code)
     _body_word_count = len(_body_no_code.split())
-    _placeholder_tokens = ['TODO', 'FIXME', 'REPLACE_ME', 'TBD', '[YOUR_', '<insert']
+    _placeholder_tokens = ["TODO", "FIXME", "REPLACE_ME", "TBD", "[YOUR_", "<insert"]
     _placeholder_count = sum(
-        len(re.findall(re.escape(tok), _body_no_code, re.IGNORECASE))
-        for tok in _placeholder_tokens
-    ) + len(re.findall(r'\{[a-z_]+\}', _body_no_code))
+        len(re.findall(re.escape(tok), _body_no_code, re.IGNORECASE)) for tok in _placeholder_tokens
+    ) + len(re.findall(r"\{[a-z_]+\}", _body_no_code))
     if _body_word_count > 0:
         _placeholder_density = _placeholder_count / _body_word_count
         if _placeholder_density > 0.10:
@@ -3002,13 +3358,13 @@ def validate_skill(path: Path, tier: str = TIER_STANDARD) -> Dict[str, Any]:
     grade_result = grade_skill(path, body, fm)
 
     return {
-        'errors': errors,
-        'warnings': warnings,
-        'infos': infos,
-        'word_count': estimate_word_count(content),
-        'line_count': len(body.splitlines()),
-        'description_length': len(description),
-        'grade': grade_result,
+        "errors": errors,
+        "warnings": warnings,
+        "infos": infos,
+        "word_count": estimate_word_count(content),
+        "line_count": len(body.splitlines()),
+        "description_length": len(description),
+        "grade": grade_result,
     }
 
 
@@ -3020,57 +3376,59 @@ def validate_plugin(plugin_dir: Path, tier: str = TIER_STANDARD) -> Dict[str, An
     warnings: List[str] = []
     infos: List[str] = []
 
-    plugin_json_path = plugin_dir / '.claude-plugin' / 'plugin.json'
+    plugin_json_path = plugin_dir / ".claude-plugin" / "plugin.json"
 
     # 1. Validate plugin.json — delegate to validate_plugin_json to avoid duplicating logic
     if plugin_json_path.exists():
         pj_result = validate_plugin_json(plugin_json_path)
-        for err in pj_result['errors']:
+        for err in pj_result["errors"]:
             errors.append(f"[plugin.json] {err}")
-        for warn in pj_result['warnings']:
+        for warn in pj_result["warnings"]:
             warnings.append(f"[plugin.json] {warn}")
     else:
         warnings.append("[plugin.json] No .claude-plugin/plugin.json found")
 
     # 2. Validate skills
     skill_results = []
-    skills_dir = plugin_dir / 'skills'
+    skills_dir = plugin_dir / "skills"
     if skills_dir.exists():
-        for skill_md in skills_dir.rglob('SKILL.md'):
+        for skill_md in skills_dir.rglob("SKILL.md"):
             result = validate_skill(skill_md, tier)
             skill_results.append((skill_md, result))
 
     # 3. Validate agents
     agent_results = []
-    agents_dir = plugin_dir / 'agents'
+    agents_dir = plugin_dir / "agents"
     if agents_dir.exists():
-        for agent_md in agents_dir.glob('*.md'):
+        for agent_md in agents_dir.glob("*.md"):
             result = validate_agent(agent_md)
             agent_results.append((agent_md, result))
 
     # 4. Validate commands (legacy — warn to migrate)
-    commands_dir = plugin_dir / 'commands'
+    commands_dir = plugin_dir / "commands"
     if commands_dir.exists():
-        cmd_files = list(commands_dir.glob('*.md'))
+        cmd_files = list(commands_dir.glob("*.md"))
         if cmd_files:
-            infos.append(f"[plugin] commands/ directory has {len(cmd_files)} files — consider migrating to skills/")
+            infos.append(
+                f"[plugin] commands/ directory has {len(cmd_files)} files — consider migrating to skills/"
+            )
         for cmd_md in cmd_files:
             result = validate_command(cmd_md)
-            if result.get('errors'):
-                errors.extend(result['errors'])
-            if result.get('warnings'):
-                warnings.extend(result['warnings'])
+            if result.get("errors"):
+                errors.extend(result["errors"])
+            if result.get("warnings"):
+                warnings.extend(result["warnings"])
 
     # 5. Check optional config files
-    if (plugin_dir / 'hooks' / 'hooks.json').exists():
+    if (plugin_dir / "hooks" / "hooks.json").exists():
         try:
-            json_module.loads((plugin_dir / 'hooks' / 'hooks.json').read_text(encoding='utf-8'))
+            json_module.loads((plugin_dir / "hooks" / "hooks.json").read_text(encoding="utf-8"))
         except (json_module.JSONDecodeError, Exception) as e:
             errors.append(f"[plugin] hooks/hooks.json is invalid: {e}")
 
-    if (plugin_dir / '.mcp.json').exists():
+    if (plugin_dir / ".mcp.json").exists():
         try:
-            json_module.loads((plugin_dir / '.mcp.json').read_text(encoding='utf-8'))
+            json_module.loads((plugin_dir / ".mcp.json").read_text(encoding="utf-8"))
         except (json_module.JSONDecodeError, Exception) as e:
             errors.append(f"[plugin] .mcp.json is invalid: {e}")
 
@@ -3078,39 +3436,42 @@ def validate_plugin(plugin_dir: Path, tier: str = TIER_STANDARD) -> Dict[str, An
     skill_scores = []
     for skill_path, result in skill_results:
         rel = skill_path.relative_to(plugin_dir)
-        if result.get('fatal'):
+        if result.get("fatal"):
             errors.append(f"[skill] {rel}: FATAL - {result['fatal']}")
         else:
-            errors.extend(result.get('errors', []))
-            warnings.extend(result.get('warnings', []))
-            grade = result.get('grade', {})
-            if grade.get('score'):
-                skill_scores.append(grade['score'])
+            errors.extend(result.get("errors", []))
+            warnings.extend(result.get("warnings", []))
+            grade = result.get("grade", {})
+            if grade.get("score"):
+                skill_scores.append(grade["score"])
 
     for agent_path, result in agent_results:
         rel = agent_path.relative_to(plugin_dir)
-        if result.get('fatal'):
+        if result.get("fatal"):
             errors.append(f"[agent] {rel}: FATAL - {result['fatal']}")
         else:
-            errors.extend(result.get('errors', []))
-            warnings.extend(result.get('warnings', []))
+            errors.extend(result.get("errors", []))
+            warnings.extend(result.get("warnings", []))
 
     avg_score = sum(skill_scores) / len(skill_scores) if skill_scores else 0
 
     return {
-        'errors': errors,
-        'warnings': warnings,
-        'infos': infos,
-        'skill_count': len(skill_results),
-        'agent_count': len(agent_results),
-        'avg_skill_score': avg_score,
-        'type': 'plugin',
+        "errors": errors,
+        "warnings": warnings,
+        "infos": infos,
+        "skill_count": len(skill_results),
+        "agent_count": len(agent_results),
+        "avg_skill_score": avg_score,
+        "type": "plugin",
     }
 
 
 # === COMPLIANCE DATABASE ===
 
-def populate_compliance_db(db_path: str, skill_results: list, agent_results: list = None, validator_version: str = "5.0.0"):
+
+def populate_compliance_db(
+    db_path: str, skill_results: list, agent_results: list = None, validator_version: str = "5.0.0"
+):
     """Write validation results to SQLite compliance tables.
 
     Writes are tagged with the latest discovery_runs.id so freshie queries
@@ -3163,7 +3524,8 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
                 pass
         return str(p)
 
-    c.execute('''CREATE TABLE IF NOT EXISTS skill_compliance (
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS skill_compliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         skill_path TEXT UNIQUE,
         total_fields INTEGER,
@@ -3191,9 +3553,11 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
         reference_file_count INTEGER DEFAULT 0,
         has_config_dir INTEGER DEFAULT 0,
         gold_standard_pct INTEGER DEFAULT 0
-    )''')
+    )"""
+    )
 
-    c.execute('''CREATE TABLE IF NOT EXISTS agent_compliance (
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS agent_compliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         agent_path TEXT UNIQUE,
         total_fields INTEGER,
@@ -3207,9 +3571,11 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
         validated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         validator_version TEXT,
         run_id INTEGER
-    )''')
+    )"""
+    )
 
-    c.execute('''CREATE TABLE IF NOT EXISTS plugin_compliance (
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS plugin_compliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         plugin_path TEXT UNIQUE,
         plugin_json_valid INTEGER,
@@ -3227,12 +3593,15 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
         validated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         validator_version TEXT,
         run_id INTEGER
-    )''')
+    )"""
+    )
 
     # Helpful index for run-scoped queries.
-    c.execute('CREATE INDEX IF NOT EXISTS idx_skill_compliance_run_id ON skill_compliance(run_id)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_agent_compliance_run_id ON agent_compliance(run_id)')
-    c.execute('CREATE INDEX IF NOT EXISTS idx_plugin_compliance_run_id ON plugin_compliance(run_id)')
+    c.execute("CREATE INDEX IF NOT EXISTS idx_skill_compliance_run_id ON skill_compliance(run_id)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_agent_compliance_run_id ON agent_compliance(run_id)")
+    c.execute(
+        "CREATE INDEX IF NOT EXISTS idx_plugin_compliance_run_id ON plugin_compliance(run_id)"
+    )
 
     # Purge legacy rows that pre-date run_id tagging. These rows have NULL
     # run_id and absolute /SKILL.md paths, and cannot be joined against
@@ -3240,42 +3609,46 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
     # delete because the current populate will regenerate any still-valid
     # rows using the new relative-path scheme.
     if current_run_id is not None:
-        for tbl in ('skill_compliance', 'agent_compliance', 'plugin_compliance'):
-            c.execute(f'DELETE FROM {tbl} WHERE run_id IS NULL')
+        for tbl in ("skill_compliance", "agent_compliance", "plugin_compliance"):
+            c.execute(f"DELETE FROM {tbl} WHERE run_id IS NULL")
 
     now = datetime.now(timezone.utc).isoformat()
 
     for result in skill_results:
-        raw_skill_path = result.get('path', '')
+        raw_skill_path = result.get("path", "")
         # Read the file via the raw (possibly absolute) path before normalizing
         # for storage — keeps file-system lookups working regardless of form.
         skill_path = _normalize_skill_path(raw_skill_path)
-        score = result.get('score', 0)
-        grade = result.get('grade', 'F')
-        errors = result.get('errors', 0)
-        warnings = result.get('warnings', 0)
+        score = result.get("score", 0)
+        grade = result.get("grade", "F")
+        errors = result.get("errors", 0)
+        warnings = result.get("warnings", 0)
 
         # Locate the SKILL.md on disk regardless of which form was passed in.
         # skill_path is already normalized to a repo-relative directory
         # (e.g. plugins/foo/skills/bar). The file itself is <dir>/SKILL.md.
-        skill_file = Path(raw_skill_path) if raw_skill_path else Path(skill_path) / 'SKILL.md'
+        skill_file = Path(raw_skill_path) if raw_skill_path else Path(skill_path) / "SKILL.md"
         if not skill_file.is_absolute():
             skill_file = repo_root_for_paths / skill_file
         if skill_file.is_dir():
-            skill_file = skill_file / 'SKILL.md'
+            skill_file = skill_file / "SKILL.md"
 
         # Parse frontmatter and body from the file to count fields and detect stubs
         fm = {}
-        body_for_stub = ''
+        body_for_stub = ""
         try:
             if skill_file.exists():
-                content = skill_file.read_text(encoding='utf-8')
+                content = skill_file.read_text(encoding="utf-8")
                 fm_data, body_for_stub = parse_frontmatter(content)
                 fm = fm_data
         except Exception:
             pass  # Frontmatter parse failure — field counts default to 0
-        anthropic_fields = len([k for k in fm if k in SKILL_FIELDS and SKILL_FIELDS[k].get('source') == 'anthropic'])
-        enterprise_fields = len([k for k in fm if k in SKILL_FIELDS and SKILL_FIELDS[k].get('source') == 'enterprise'])
+        anthropic_fields = len(
+            [k for k in fm if k in SKILL_FIELDS and SKILL_FIELDS[k].get("source") == "anthropic"]
+        )
+        enterprise_fields = len(
+            [k for k in fm if k in SKILL_FIELDS and SKILL_FIELDS[k].get("source") == "enterprise"]
+        )
         total_fields = anthropic_fields + enterprise_fields
         missing = [k for k in ALWAYS_REQUIRED if k not in fm]
 
@@ -3283,15 +3656,17 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
         _db_stub_reasons: list = []
         if body_for_stub:
             _db_lines = len(body_for_stub.strip().splitlines())
-            _db_code_blocks = len(re.findall(r'```', body_for_stub)) // 2
-            _db_md_links = len(re.findall(r'\[.*?\]\((?!https?://)[^)]+\)', body_for_stub))
+            _db_code_blocks = len(re.findall(r"```", body_for_stub)) // 2
+            _db_md_links = len(re.findall(r"\[.*?\]\((?!https?://)[^)]+\)", body_for_stub))
             _db_word_count = len(body_for_stub.split())
-            _db_placeholder_tokens = ['TODO', 'FIXME', 'REPLACE_ME', 'TBD', '[YOUR_', '<insert']
+            _db_placeholder_tokens = ["TODO", "FIXME", "REPLACE_ME", "TBD", "[YOUR_", "<insert"]
             _db_placeholder_count = sum(
                 len(re.findall(re.escape(tok), body_for_stub, re.IGNORECASE))
                 for tok in _db_placeholder_tokens
-            ) + len(re.findall(r'\{[a-z_]+\}', body_for_stub))
-            _db_placeholder_density = _db_placeholder_count / _db_word_count if _db_word_count > 0 else 0.0
+            ) + len(re.findall(r"\{[a-z_]+\}", body_for_stub))
+            _db_placeholder_density = (
+                _db_placeholder_count / _db_word_count if _db_word_count > 0 else 0.0
+            )
             if _db_lines < 30:
                 _db_stub_reasons.append(f"body < 30 lines ({_db_lines})")
             if _db_code_blocks == 0 and _db_md_links == 0:
@@ -3304,48 +3679,87 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
         is_stub_val = 1 if len(_db_stub_reasons) >= 2 else 0
 
         try:
-            mtime = datetime.fromtimestamp(skill_file.stat().st_mtime, tz=timezone.utc).isoformat() if skill_file.exists() else None
+            mtime = (
+                datetime.fromtimestamp(skill_file.stat().st_mtime, tz=timezone.utc).isoformat()
+                if skill_file.exists()
+                else None
+            )
         except Exception:
             mtime = None
 
-        skill_dir = skill_file.parent if skill_file else Path('.')
-        has_refs = 1 if (skill_dir / 'references').exists() else 0
-        has_examples_dir = 1 if (skill_dir / 'examples').exists() else 0
-        has_scripts = 1 if (skill_dir / 'scripts').exists() else 0
+        skill_dir = skill_file.parent if skill_file else Path(".")
+        has_refs = 1 if (skill_dir / "references").exists() else 0
+        has_examples_dir = 1 if (skill_dir / "examples").exists() else 0
+        has_scripts = 1 if (skill_dir / "scripts").exists() else 0
 
         # Gold standard doc tracking (crypto pack = reference)
-        has_prd = 1 if (skill_dir / 'PRD.md').exists() else 0
-        has_ard = 1 if (skill_dir / 'ARD.md').exists() else 0
-        has_errors_md = 1 if (skill_dir / 'references' / 'errors.md').exists() else 0
-        has_examples_md = 1 if (skill_dir / 'references' / 'examples.md').exists() else 0
-        has_impl_md = 1 if (skill_dir / 'references' / 'implementation.md').exists() or (skill_dir / 'references' / 'implementation-guide.md').exists() else 0
-        has_config = 1 if (skill_dir / 'config').exists() else 0
-        ref_file_count = len(list((skill_dir / 'references').glob('*'))) if (skill_dir / 'references').exists() else 0
+        has_prd = 1 if (skill_dir / "PRD.md").exists() else 0
+        has_ard = 1 if (skill_dir / "ARD.md").exists() else 0
+        has_errors_md = 1 if (skill_dir / "references" / "errors.md").exists() else 0
+        has_examples_md = 1 if (skill_dir / "references" / "examples.md").exists() else 0
+        has_impl_md = (
+            1
+            if (skill_dir / "references" / "implementation.md").exists()
+            or (skill_dir / "references" / "implementation-guide.md").exists()
+            else 0
+        )
+        has_config = 1 if (skill_dir / "config").exists() else 0
+        ref_file_count = (
+            len(list((skill_dir / "references").glob("*")))
+            if (skill_dir / "references").exists()
+            else 0
+        )
 
         # Gold standard: 8 components (SKILL.md + PRD + ARD + refs/ + errors + examples + implementation + config)
-        gold_components = sum([1, has_prd, has_ard, has_refs, has_errors_md, has_examples_md, has_impl_md, has_config])
+        gold_components = sum(
+            [1, has_prd, has_ard, has_refs, has_errors_md, has_examples_md, has_impl_md, has_config]
+        )
         gold_pct = int(100 * gold_components / 8)
 
-        c.execute('''INSERT OR REPLACE INTO skill_compliance
+        c.execute(
+            """INSERT OR REPLACE INTO skill_compliance
             (skill_path, total_fields, anthropic_fields, enterprise_fields, missing_fields,
              has_references_dir, has_examples, has_scripts_dir, is_stub, stub_reasons,
              score, grade, error_count, warning_count, validated_at, source_modified_at, validator_version,
              has_prd, has_ard, has_errors_md, has_examples_md, has_implementation_md,
              reference_file_count, has_config_dir, gold_standard_pct, run_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-            (skill_path, total_fields, anthropic_fields, enterprise_fields,
-             json_module.dumps(missing), has_refs, has_examples_dir, has_scripts,
-             is_stub_val, json_module.dumps(_db_stub_reasons),
-             score, grade, errors, warnings, now, mtime, validator_version,
-             has_prd, has_ard, has_errors_md, has_examples_md, has_impl_md,
-             ref_file_count, has_config, gold_pct, current_run_id))
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                skill_path,
+                total_fields,
+                anthropic_fields,
+                enterprise_fields,
+                json_module.dumps(missing),
+                has_refs,
+                has_examples_dir,
+                has_scripts,
+                is_stub_val,
+                json_module.dumps(_db_stub_reasons),
+                score,
+                grade,
+                errors,
+                warnings,
+                now,
+                mtime,
+                validator_version,
+                has_prd,
+                has_ard,
+                has_errors_md,
+                has_examples_md,
+                has_impl_md,
+                ref_file_count,
+                has_config,
+                gold_pct,
+                current_run_id,
+            ),
+        )
 
     if agent_results:
         for result in agent_results:
-            raw_agent_path = result.get('path', '')
+            raw_agent_path = result.get("path", "")
             agent_path = _normalize_generic_path(raw_agent_path)
-            errors = result.get('errors', 0)
-            warnings = result.get('warnings', 0)
+            errors = result.get("errors", 0)
+            warnings = result.get("warnings", 0)
 
             # Resolve an absolute file path for reading, independent of the stored form.
             agent_file = Path(raw_agent_path) if raw_agent_path else Path(agent_path)
@@ -3356,19 +3770,34 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
             agent_fm = {}
             try:
                 if agent_file.exists():
-                    content = agent_file.read_text(encoding='utf-8')
+                    content = agent_file.read_text(encoding="utf-8")
                     agent_fm, _ = parse_frontmatter(content)
             except Exception:
                 pass
 
-            anthropic_agent_fields = {'name', 'description', 'model', 'effort', 'maxTurns',
-                                       'tools', 'disallowedTools', 'skills', 'mcpServers',
-                                       'hooks', 'memory', 'background', 'isolation', 'permissionMode'}
-            invalid_agent_set = set(DEPRECATED_AGENT_FIELDS.keys()) | set(INVALID_AGENT_FIELDS.keys())
+            anthropic_agent_fields = {
+                "name",
+                "description",
+                "model",
+                "effort",
+                "maxTurns",
+                "tools",
+                "disallowedTools",
+                "skills",
+                "mcpServers",
+                "hooks",
+                "memory",
+                "background",
+                "isolation",
+                "permissionMode",
+            }
+            invalid_agent_set = set(DEPRECATED_AGENT_FIELDS.keys()) | set(
+                INVALID_AGENT_FIELDS.keys()
+            )
 
             a_total = len(agent_fm)
             a_anthropic = len([k for k in agent_fm if k in anthropic_agent_fields])
-            a_missing = [k for k in ('name', 'description') if k not in agent_fm]
+            a_missing = [k for k in ("name", "description") if k not in agent_fm]
             a_invalid = [k for k in agent_fm if k in invalid_agent_set]
             a_has_invalid = 1 if a_invalid else 0
 
@@ -3376,36 +3805,49 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
             is_plugin = 0
             try:
                 for parent in agent_file.parents:
-                    if (parent / '.claude-plugin' / 'plugin.json').exists():
+                    if (parent / ".claude-plugin" / "plugin.json").exists():
                         is_plugin = 1
                         break
             except Exception:
                 pass
 
-            c.execute('''INSERT OR REPLACE INTO agent_compliance
+            c.execute(
+                """INSERT OR REPLACE INTO agent_compliance
                 (agent_path, total_fields, anthropic_fields, missing_fields,
                  has_invalid_fields, invalid_fields, is_plugin_agent,
                  error_count, warning_count, validated_at, validator_version, run_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                (agent_path, a_total, a_anthropic, json_module.dumps(a_missing),
-                 a_has_invalid, json_module.dumps(a_invalid), is_plugin,
-                 errors, warnings, now, validator_version, current_run_id))
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    agent_path,
+                    a_total,
+                    a_anthropic,
+                    json_module.dumps(a_missing),
+                    a_has_invalid,
+                    json_module.dumps(a_invalid),
+                    is_plugin,
+                    errors,
+                    warnings,
+                    now,
+                    validator_version,
+                    current_run_id,
+                ),
+            )
 
     # Populate plugin_compliance by rolling up skill scores per plugin
     if skill_results:
         plugin_skills: Dict[str, list] = {}  # absolute plugin root dir -> list of skill results
         for result in skill_results:
-            raw_path = result.get('path', '')
+            raw_path = result.get("path", "")
             # Walk up the real filesystem path to find the plugin root; stored
             # paths are repo-relative so we resolve against repo_root_for_paths.
             try:
                 fs_path = Path(raw_path)
                 if not fs_path.is_absolute():
                     fs_path = repo_root_for_paths / fs_path
-                if fs_path.name == 'SKILL.md':
+                if fs_path.name == "SKILL.md":
                     fs_path = fs_path.parent
                 for parent in fs_path.parents:
-                    if (parent / '.claude-plugin' / 'plugin.json').exists():
+                    if (parent / ".claude-plugin" / "plugin.json").exists():
                         plugin_path_key = str(parent)
                         if plugin_path_key not in plugin_skills:
                             plugin_skills[plugin_path_key] = []
@@ -3422,40 +3864,57 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
             pj_valid = 0
             pj_fields = 0
             try:
-                pj = p / '.claude-plugin' / 'plugin.json'
+                pj = p / ".claude-plugin" / "plugin.json"
                 if pj.exists():
-                    data = json_module.loads(pj.read_text(encoding='utf-8'))
+                    data = json_module.loads(pj.read_text(encoding="utf-8"))
                     pj_valid = 1
                     pj_fields = len(data)
             except Exception:
                 pass
 
             s_count = len(skills_list)
-            s_scores = [s.get('score', 0) for s in skills_list if s.get('score')]
+            s_scores = [s.get("score", 0) for s in skills_list if s.get("score")]
             s_avg = sum(s_scores) / len(s_scores) if s_scores else 0.0
 
             # Count agents
-            agents_dir = p / 'agents'
-            a_count = len(list(agents_dir.glob('*.md'))) if agents_dir.exists() else 0
+            agents_dir = p / "agents"
+            a_count = len(list(agents_dir.glob("*.md"))) if agents_dir.exists() else 0
 
             # Check optional files
-            has_hooks = 1 if (p / 'hooks' / 'hooks.json').exists() else 0
-            has_mcp = 1 if (p / '.mcp.json').exists() else 0
-            has_license = 1 if (p / 'LICENSE').exists() or (p / 'LICENSE.md').exists() else 0
-            has_changelog = 1 if (p / 'CHANGELOG.md').exists() else 0
+            has_hooks = 1 if (p / "hooks" / "hooks.json").exists() else 0
+            has_mcp = 1 if (p / ".mcp.json").exists() else 0
+            has_license = 1 if (p / "LICENSE").exists() or (p / "LICENSE.md").exists() else 0
+            has_changelog = 1 if (p / "CHANGELOG.md").exists() else 0
 
-            total_errors = sum(s.get('errors', 0) for s in skills_list)
-            total_warnings = sum(s.get('warnings', 0) for s in skills_list)
+            total_errors = sum(s.get("errors", 0) for s in skills_list)
+            total_warnings = sum(s.get("warnings", 0) for s in skills_list)
 
-            c.execute('''INSERT OR REPLACE INTO plugin_compliance
+            c.execute(
+                """INSERT OR REPLACE INTO plugin_compliance
                 (plugin_path, plugin_json_valid, plugin_json_fields, skill_count,
                  skill_avg_score, agent_count, has_hooks_json, has_mcp_json,
                  has_license, has_changelog, overall_score,
                  error_count, warning_count, validated_at, validator_version, run_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''',
-                (plugin_path, pj_valid, pj_fields, s_count, s_avg, a_count,
-                 has_hooks, has_mcp, has_license, has_changelog, s_avg,
-                 total_errors, total_warnings, now, validator_version, current_run_id))
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    plugin_path,
+                    pj_valid,
+                    pj_fields,
+                    s_count,
+                    s_avg,
+                    a_count,
+                    has_hooks,
+                    has_mcp,
+                    has_license,
+                    has_changelog,
+                    s_avg,
+                    total_errors,
+                    total_warnings,
+                    now,
+                    validator_version,
+                    current_run_id,
+                ),
+            )
 
     conn.commit()
     conn.close()
@@ -3463,11 +3922,14 @@ def populate_compliance_db(db_path: str, skill_results: list, agent_results: lis
 
 # === MAIN ===
 
+
 def main() -> int:
     repo_root = Path(__file__).resolve().parents[1]
 
     parser = argparse.ArgumentParser(add_help=True)
-    parser.add_argument("--verbose", "-v", action="store_true", help="Print per-file OK lines and grades")
+    parser.add_argument(
+        "--verbose", "-v", action="store_true", help="Print per-file OK lines and grades"
+    )
     parser.add_argument(
         "--standard",
         action="store_true",
@@ -3499,7 +3961,7 @@ def main() -> int:
         "--min-grade",
         type=str,
         default=None,
-        choices=['A', 'B', 'C', 'D'],
+        choices=["A", "B", "C", "D"],
         help="Fail if any skill scores below this grade (e.g., --min-grade B)",
     )
     parser.add_argument(
@@ -3578,7 +4040,7 @@ def main() -> int:
         tier = TIER_MARKETPLACE
     elif args.standard:
         tier = TIER_STANDARD
-    elif os.environ.get('CI') == 'true' or os.environ.get('GITHUB_ACTIONS') == 'true':
+    elif os.environ.get("CI") == "true" or os.environ.get("GITHUB_ACTIONS") == "true":
         tier = TIER_MARKETPLACE  # Auto-detect CI
     else:
         tier = TIER_STANDARD
@@ -3595,86 +4057,92 @@ def main() -> int:
             print(f"🔍 CLAUDE CODE PLUGIN VALIDATOR v7.0 / schema {SCHEMA_VERSION} ({tier} tier)")
             print(f"   Plugin mode: {target}")
             print(f"{'=' * 70}\n")
-            if result['errors']:
-                for error in result['errors']:
+            if result["errors"]:
+                for error in result["errors"]:
                     print(f"   ERROR: {error}")
-            if result['warnings']:
-                for warning in result['warnings']:
+            if result["warnings"]:
+                for warning in result["warnings"]:
                     print(f"   WARN: {warning}")
-            if result.get('infos'):
-                for info in result['infos']:
+            if result.get("infos"):
+                for info in result["infos"]:
                     print(f"   INFO: {info}")
             print(f"\n   Skills: {result['skill_count']}, Agents: {result['agent_count']}")
-            if result['avg_skill_score']:
+            if result["avg_skill_score"]:
                 print(f"   Average skill score: {result['avg_skill_score']:.1f}/100")
-            return 1 if result['errors'] else 0
-        elif target.name != 'SKILL.md' and not target.name.endswith('.md'):
-            print(f"ERROR: Expected a SKILL.md, .md file, or plugin directory: {args.path}", file=sys.stderr)
+            return 1 if result["errors"] else 0
+        elif target.name != "SKILL.md" and not target.name.endswith(".md"):
+            print(
+                f"ERROR: Expected a SKILL.md, .md file, or plugin directory: {args.path}",
+                file=sys.stderr,
+            )
             return 1
 
         print(f"🔍 CLAUDE CODE PLUGIN VALIDATOR v7.0 / schema {SCHEMA_VERSION} ({tier} tier)")
         print(f"   Single-file mode: {target}")
         print(f"{'=' * 70}\n")
 
-        if target.name == 'SKILL.md':
+        if target.name == "SKILL.md":
             result = validate_skill(target, tier)
-            if 'fatal' in result:
+            if "fatal" in result:
                 print(f"❌ FATAL: {result['fatal']}")
                 return 1
 
-            grade_info = result.get('grade', {})
-            score = grade_info.get('score', 0)
-            letter = grade_info.get('grade', 'F')
+            grade_info = result.get("grade", {})
+            score = grade_info.get("score", 0)
+            letter = grade_info.get("grade", "F")
 
-            if result['errors']:
-                for error in result['errors']:
+            if result["errors"]:
+                for error in result["errors"]:
                     print(f"   ERROR: {error}")
-            if result['warnings']:
-                for warning in result['warnings']:
+            if result["warnings"]:
+                for warning in result["warnings"]:
                     print(f"   WARN: {warning}")
-            if result.get('infos'):
-                for info in result['infos']:
+            if result.get("infos"):
+                for info in result["infos"]:
                     print(f"   INFO: {info}")
 
             # Always show grade in single-file mode
             print(f"\n{'=' * 70}")
             print(f"📊 GRADE: {letter} ({score}/100)")
             print(f"{'=' * 70}")
-            breakdown = grade_info.get('breakdown', {})
+            breakdown = grade_info.get("breakdown", {})
             for pillar_name, pillar_data in breakdown.items():
-                if pillar_name == 'modifiers':
-                    mod_score = pillar_data.get('score', 0)
+                if pillar_name == "modifiers":
+                    mod_score = pillar_data.get("score", 0)
                     print(f"  {'Modifiers':<30} {mod_score:+d}")
-                    for item_name, (pts, note) in pillar_data.get('items', {}).items():
+                    for item_name, (pts, note) in pillar_data.get("items", {}).items():
                         print(f"    {item_name:<28} {pts:+d} - {note}")
                 else:
-                    pil_score = pillar_data.get('score', 0)
-                    pil_max = pillar_data.get('max', 0)
+                    pil_score = pillar_data.get("score", 0)
+                    pil_max = pillar_data.get("max", 0)
                     print(f"  {pillar_name.replace('_', ' ').title():<30} {pil_score}/{pil_max}")
-                    for item_name, (pts, note) in pillar_data.get('breakdown', {}).items():
+                    for item_name, (pts, note) in pillar_data.get("breakdown", {}).items():
                         print(f"    {item_name:<28} {pts} - {note}")
             print(f"{'=' * 70}")
 
             # Deep eval in single-file mode
-            if args.deep and target.name == 'SKILL.md':
+            if args.deep and target.name == "SKILL.md":
                 try:
                     from deep_eval.engine import DeepEvalEngine
-                    from deep_eval.reporter import format_terminal, format_json
+                    from deep_eval.reporter import format_json, format_terminal
 
                     print(f"\n{'=' * 70}")
                     print(f"🔬 DEEP EVALUATION")
                     print(f"{'=' * 70}\n")
 
-                    content = target.read_text(encoding='utf-8')
+                    content = target.read_text(encoding="utf-8")
                     fm, body = parse_frontmatter(content)
                     engine = DeepEvalEngine(use_llm=args.thorough, verbose=verbose)
                     deep_result = engine.evaluate_skill(
-                        target, body, fm,
-                        letter_grade=letter, deterministic_score=score,
+                        target,
+                        body,
+                        fm,
+                        letter_grade=letter,
+                        deterministic_score=score,
                     )
                     deep_summary = engine.summary([deep_result])
 
-                    if args.report_format == 'json':
+                    if args.report_format == "json":
                         print(format_json([deep_result], deep_summary))
                     else:
                         print(format_terminal([deep_result], deep_summary, verbose=True))
@@ -3682,9 +4150,12 @@ def main() -> int:
                     # Write to DB if requested
                     if args.populate_db:
                         from deep_eval.db import populate_deep_eval_db
+
                         run_id = populate_deep_eval_db(
-                            args.populate_db, [deep_result], deep_summary,
-                            run_config={'single_file': True, 'use_llm': args.thorough},
+                            args.populate_db,
+                            [deep_result],
+                            deep_summary,
+                            run_config={"single_file": True, "use_llm": args.thorough},
                         )
                         print(f"📊 Deep eval written to {args.populate_db} (run_id={run_id})")
 
@@ -3693,27 +4164,27 @@ def main() -> int:
                 except Exception as e:
                     print(f"\n❌ Deep eval failed: {e}")
 
-            return 1 if result['errors'] else 0
+            return 1 if result["errors"] else 0
         else:
             # Command or agent file
-            if '/commands/' in str(target):
+            if "/commands/" in str(target):
                 result = validate_command(target)
-            elif '/agents/' in str(target):
+            elif "/agents/" in str(target):
                 result = validate_agent(target)
             else:
                 print(f"Cannot determine file type for: {target}")
                 print("File must be in a commands/ or agents/ directory, or named SKILL.md")
                 return 1
 
-            if 'fatal' in result:
+            if "fatal" in result:
                 print(f"❌ FATAL: {result['fatal']}")
                 return 1
-            if result.get('errors'):
-                for error in result['errors']:
+            if result.get("errors"):
+                for error in result["errors"]:
                     print(f"   ERROR: {error}")
                 return 1
-            if result.get('warnings'):
-                for warning in result['warnings']:
+            if result.get("warnings"):
+                for warning in result["warnings"]:
                     print(f"   WARN: {warning}")
             print(f"\n✅ Validation passed")
             return 0
@@ -3756,45 +4227,49 @@ def main() -> int:
     files_compliant = []
 
     # Grade tracking
-    grade_counts = {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0}
+    grade_counts = {"A": 0, "B": 0, "C": 0, "D": 0, "F": 0}
     grade_scores = []  # For average calculation
     low_grade_skills = []  # Skills with D or F
     below_min_grade = []  # Skills below --min-grade threshold
 
-    grade_thresholds = {'A': 90, 'B': 80, 'C': 70, 'D': 60}
+    grade_thresholds = {"A": 90, "B": 80, "C": 70, "D": 60}
     json_skill_results = []  # Collected for --json output
 
     for skill in skills:
         rel = skill.relative_to(repo_root)
         result = validate_skill(skill, tier)
 
-        if 'fatal' in result:
+        if "fatal" in result:
             if not args.json:
                 print(f"❌ {rel}: FATAL - {result['fatal']}")
             total_errors += 1
             files_with_errors.append(str(rel))
-            json_skill_results.append({
-                'path': str(rel),
-                'fatal': result['fatal'],
-            })
+            json_skill_results.append(
+                {
+                    "path": str(rel),
+                    "fatal": result["fatal"],
+                }
+            )
             continue
 
         has_issues = False
 
         # Track grade
-        grade_info = result.get('grade', {})
-        score = grade_info.get('score', 0)
-        letter = grade_info.get('grade', 'F')
+        grade_info = result.get("grade", {})
+        score = grade_info.get("score", 0)
+        letter = grade_info.get("grade", "F")
         grade_counts[letter] += 1
         grade_scores.append(score)
 
-        json_skill_results.append({
-            'path': str(skill),
-            'score': score,
-            'grade': letter,
-            'errors': len(result.get('errors', [])),
-            'warnings': len(result.get('warnings', [])),
-        })
+        json_skill_results.append(
+            {
+                "path": str(skill),
+                "score": score,
+                "grade": letter,
+                "errors": len(result.get("errors", [])),
+                "warnings": len(result.get("warnings", [])),
+            }
+        )
 
         # Check min-grade threshold
         if args.min_grade:
@@ -3803,39 +4278,41 @@ def main() -> int:
                 below_min_grade.append((str(rel), score, letter))
 
         # Track low grades
-        if letter in ['D', 'F']:
-            low_grade_skills.append((str(rel), score, letter, grade_info.get('breakdown', {})))
+        if letter in ["D", "F"]:
+            low_grade_skills.append((str(rel), score, letter, grade_info.get("breakdown", {})))
 
-        if result['errors']:
+        if result["errors"]:
             if not args.json:
                 print(f"❌ {rel}:")
-                for error in result['errors']:
+                for error in result["errors"]:
                     print(f"   ERROR: {error}")
-            total_errors += len(result['errors'])
+            total_errors += len(result["errors"])
             files_with_errors.append(str(rel))
             has_issues = True
 
-        if result['warnings']:
+        if result["warnings"]:
             if not args.json:
                 if not has_issues:
                     print(f"⚠️  {rel}:")
-                for warning in result['warnings']:
+                for warning in result["warnings"]:
                     print(f"   WARN: {warning}")
-            total_warnings += len(result['warnings'])
+            total_warnings += len(result["warnings"])
             if str(rel) not in files_with_errors:
                 files_with_warnings.append(str(rel))
             has_issues = True
 
-        if result.get('infos') and verbose and not args.json:
+        if result.get("infos") and verbose and not args.json:
             if not has_issues:
                 print(f"💡 {rel}:")
-            for info in result['infos']:
+            for info in result["infos"]:
                 print(f"   INFO: {info}")
 
-        if verbose and not has_issues and not result.get('infos') and not args.json:
-            print(f"✅ {rel} - {letter} ({score}/100) ({result['word_count']} words, {result['line_count']} lines)")
+        if verbose and not has_issues and not result.get("infos") and not args.json:
+            print(
+                f"✅ {rel} - {letter} ({score}/100) ({result['word_count']} words, {result['line_count']} lines)"
+            )
 
-        if not result['errors'] and not result['warnings']:
+        if not result["errors"] and not result["warnings"]:
             files_compliant.append(str(rel))
 
         total_description_chars += int(result.get("description_length") or 0)
@@ -3850,23 +4327,23 @@ def main() -> int:
         rel = cmd.relative_to(repo_root)
         result = validate_command(cmd)
 
-        if 'fatal' in result:
+        if "fatal" in result:
             print(f"❌ {rel} (command): FATAL - {result['fatal']}")
             total_errors += 1
             files_with_errors.append(str(rel))
             continue
 
-        if result['errors']:
+        if result["errors"]:
             print(f"❌ {rel} (command):")
-            for error in result['errors']:
+            for error in result["errors"]:
                 print(f"   ERROR: {error}")
-            total_errors += len(result['errors'])
+            total_errors += len(result["errors"])
             files_with_errors.append(str(rel))
-        elif result['warnings']:
+        elif result["warnings"]:
             print(f"⚠️  {rel} (command):")
-            for warning in result['warnings']:
+            for warning in result["warnings"]:
                 print(f"   WARN: {warning}")
-            total_warnings += len(result['warnings'])
+            total_warnings += len(result["warnings"])
             files_with_warnings.append(str(rel))
         else:
             files_compliant.append(str(rel))
@@ -3879,28 +4356,28 @@ def main() -> int:
         rel = agent.relative_to(repo_root)
         result = validate_agent(agent)
 
-        if 'fatal' in result:
+        if "fatal" in result:
             print(f"❌ {rel} (agent): FATAL - {result['fatal']}")
             total_errors += 1
             files_with_errors.append(str(rel))
-            json_agent_results.append({'path': str(agent), 'errors': 1, 'warnings': 0})
+            json_agent_results.append({"path": str(agent), "errors": 1, "warnings": 0})
             continue
 
-        err_count = len(result['errors'])
-        warn_count = len(result['warnings'])
-        json_agent_results.append({'path': str(agent), 'errors': err_count, 'warnings': warn_count})
+        err_count = len(result["errors"])
+        warn_count = len(result["warnings"])
+        json_agent_results.append({"path": str(agent), "errors": err_count, "warnings": warn_count})
 
-        if result['errors']:
+        if result["errors"]:
             print(f"❌ {rel} (agent):")
-            for error in result['errors']:
+            for error in result["errors"]:
                 print(f"   ERROR: {error}")
-            total_errors += len(result['errors'])
+            total_errors += len(result["errors"])
             files_with_errors.append(str(rel))
-        elif result['warnings']:
+        elif result["warnings"]:
             print(f"⚠️  {rel} (agent):")
-            for warning in result['warnings']:
+            for warning in result["warnings"]:
                 print(f"   WARN: {warning}")
-            total_warnings += len(result['warnings'])
+            total_warnings += len(result["warnings"])
             files_with_warnings.append(str(rel))
         else:
             files_compliant.append(str(rel))
@@ -3915,17 +4392,17 @@ def main() -> int:
         rel = pj_file.relative_to(repo_root)
         result = validate_plugin_json(pj_file)
 
-        if result['errors']:
+        if result["errors"]:
             print(f"❌ {rel} (plugin.json):")
-            for error in result['errors']:
+            for error in result["errors"]:
                 print(f"   ERROR: {error}")
-            total_errors += len(result['errors'])
+            total_errors += len(result["errors"])
             files_with_errors.append(str(rel))
-        elif result['warnings']:
+        elif result["warnings"]:
             print(f"⚠️  {rel} (plugin.json):")
-            for warning in result['warnings']:
+            for warning in result["warnings"]:
                 print(f"   WARN: {warning}")
-            total_warnings += len(result['warnings'])
+            total_warnings += len(result["warnings"])
             files_with_warnings.append(str(rel))
         else:
             files_compliant.append(str(rel))
@@ -3935,21 +4412,32 @@ def main() -> int:
     # Populate compliance database if requested (after all validations complete)
     if args.populate_db:
         try:
-            populate_compliance_db(args.populate_db, json_skill_results, agent_results=json_agent_results, validator_version="5.0.0")
+            populate_compliance_db(
+                args.populate_db,
+                json_skill_results,
+                agent_results=json_agent_results,
+                validator_version="5.0.0",
+            )
             print(f"\n📊 Compliance data written to {args.populate_db}", flush=True)
             print(f"   skill_compliance: {len(json_skill_results)} rows", flush=True)
             print(f"   agent_compliance: {len(json_agent_results)} rows", flush=True)
         except Exception as e:
             print(f"\n❌ Failed to write compliance DB: {e}", flush=True)
             import traceback
+
             traceback.print_exc()
 
     # === DEEP EVALUATION ENGINE ===
     if args.deep and skills:
         try:
-            from deep_eval.engine import DeepEvalEngine
-            from deep_eval.reporter import format_terminal, format_json, format_markdown, format_html
             from deep_eval.db import populate_deep_eval_db
+            from deep_eval.engine import DeepEvalEngine
+            from deep_eval.reporter import (
+                format_html,
+                format_json,
+                format_markdown,
+                format_terminal,
+            )
 
             print(f"\n{'=' * 70}")
             print(f"🔬 INTENT SOLUTIONS DEEP EVALUATION ENGINE v1.0")
@@ -3962,20 +4450,27 @@ def main() -> int:
             deep_eval_skills = []
             for skill_path in skills:
                 try:
-                    content = skill_path.read_text(encoding='utf-8')
+                    content = skill_path.read_text(encoding="utf-8")
                     fm, body = parse_frontmatter(content)
                     # Find matching json result for grade/score
-                    matching = [r for r in json_skill_results if Path(r.get('path', '')).resolve() == skill_path.resolve() or r.get('path', '').endswith(str(skill_path.relative_to(repo_root)))]
-                    grade = matching[0].get('grade', 'F') if matching else 'F'
-                    score = matching[0].get('score', 0) if matching else 0
-                    deep_eval_skills.append({
-                        'path': str(skill_path),
-                        'body': body,
-                        'fm': fm,
-                        'name': fm.get('name', skill_path.stem),
-                        'grade': grade,
-                        'score': score,
-                    })
+                    matching = [
+                        r
+                        for r in json_skill_results
+                        if Path(r.get("path", "")).resolve() == skill_path.resolve()
+                        or r.get("path", "").endswith(str(skill_path.relative_to(repo_root)))
+                    ]
+                    grade = matching[0].get("grade", "F") if matching else "F"
+                    score = matching[0].get("score", 0) if matching else 0
+                    deep_eval_skills.append(
+                        {
+                            "path": str(skill_path),
+                            "body": body,
+                            "fm": fm,
+                            "name": fm.get("name", skill_path.stem),
+                            "grade": grade,
+                            "score": score,
+                        }
+                    )
                 except Exception:
                     continue
 
@@ -3988,17 +4483,19 @@ def main() -> int:
                 deep_rankings = engine.rank_results(deep_results)
 
                 # Output in requested format
-                if args.report_format == 'json':
+                if args.report_format == "json":
                     print(format_json(deep_results, deep_summary, deep_rankings))
-                elif args.report_format == 'markdown':
+                elif args.report_format == "markdown":
                     print(format_markdown(deep_results, deep_summary, deep_rankings))
-                elif args.report_format == 'html':
+                elif args.report_format == "html":
                     html_output = format_html(deep_results, deep_summary, deep_rankings)
-                    html_path = repo_root / 'deep-eval-report.html'
-                    html_path.write_text(html_output, encoding='utf-8')
+                    html_path = repo_root / "deep-eval-report.html"
+                    html_path.write_text(html_output, encoding="utf-8")
                     print(f"HTML report written to: {html_path}")
                 else:
-                    print(format_terminal(deep_results, deep_summary, deep_rankings, verbose=verbose))
+                    print(
+                        format_terminal(deep_results, deep_summary, deep_rankings, verbose=verbose)
+                    )
 
                 # Write to freshie DB if --populate-db is set
                 if args.populate_db:
@@ -4008,9 +4505,11 @@ def main() -> int:
                             deep_results,
                             deep_summary,
                             rankings=deep_rankings,
-                            run_config={'use_llm': use_llm, 'thorough': args.thorough},
+                            run_config={"use_llm": use_llm, "thorough": args.thorough},
                         )
-                        print(f"\n📊 Deep eval data written to {args.populate_db} (run_id={run_id})")
+                        print(
+                            f"\n📊 Deep eval data written to {args.populate_db} (run_id={run_id})"
+                        )
                         print(f"   deep_eval_results: {len(deep_results)} rows")
                     except Exception as e:
                         print(f"\n❌ Failed to write deep eval DB: {e}")
@@ -4021,6 +4520,7 @@ def main() -> int:
         except Exception as e:
             print(f"\n❌ Deep eval failed: {e}")
             import traceback
+
             traceback.print_exc()
 
     # Show low grade skills if requested
@@ -4030,10 +4530,10 @@ def main() -> int:
         print(f"{'=' * 70}")
         for path, score, letter, breakdown in low_grade_skills:
             print(f"\n{letter} ({score}/100): {path}")
-            if 'progressive_disclosure' in breakdown:
-                pda = breakdown['progressive_disclosure']
+            if "progressive_disclosure" in breakdown:
+                pda = breakdown["progressive_disclosure"]
                 print(f"   PDA: {pda['score']}/{pda['max']}")
-                for key, (pts, note) in pda.get('breakdown', {}).items():
+                for key, (pts, note) in pda.get("breakdown", {}).items():
                     print(f"      {key}: {pts} pts - {note}")
 
     # Summary
@@ -4067,20 +4567,20 @@ def main() -> int:
     print(f"Average Score: {avg_score:.1f}/100 ({avg_grade})")
     print()
     print("Grade Distribution:")
-    for letter in ['A', 'B', 'C', 'D', 'F']:
+    for letter in ["A", "B", "C", "D", "F"]:
         count = grade_counts[letter]
         pct = (count / len(skills) * 100) if skills else 0
-        bar = '█' * int(pct / 2)
-        emoji = {'A': '🏆', 'B': '✅', 'C': '⚠️', 'D': '📉', 'F': '❌'}[letter]
+        bar = "█" * int(pct / 2)
+        emoji = {"A": "🏆", "B": "✅", "C": "⚠️", "D": "📉", "F": "❌"}[letter]
         print(f"  {emoji} {letter}: {count:4d} ({pct:5.1f}%) {bar}")
 
     # Quality metrics
     print()
-    a_b_count = grade_counts['A'] + grade_counts['B']
+    a_b_count = grade_counts["A"] + grade_counts["B"]
     a_b_pct = (a_b_count / len(skills) * 100) if skills else 0
     print(f"Production Ready (A+B): {a_b_count} ({a_b_pct:.1f}%)")
 
-    d_f_count = grade_counts['D'] + grade_counts['F']
+    d_f_count = grade_counts["D"] + grade_counts["F"]
     d_f_pct = (d_f_count / len(skills) * 100) if skills else 0
     print(f"Needs Work (D+F): {d_f_count} ({d_f_pct:.1f}%)")
 
@@ -4107,7 +4607,9 @@ def main() -> int:
     # This allows CI to enforce quality floor without requiring zero compliance gaps.
     if args.min_grade:
         if total_errors > 0:
-            print(f"\n⚠️  {total_errors} compliance errors reported ({tier} tier) — not blocking (--min-grade {args.min_grade} gate passed)")
+            print(
+                f"\n⚠️  {total_errors} compliance errors reported ({tier} tier) — not blocking (--min-grade {args.min_grade} gate passed)"
+            )
             print(f"   All graded skills meet minimum grade {args.min_grade}")
         else:
             print(f"\n✅ All skills fully compliant! ({tier} tier)")
@@ -4116,7 +4618,9 @@ def main() -> int:
     if total_errors > 0:
         print(f"\n❌ Validation FAILED with {total_errors} errors ({tier} tier)")
         if tier == TIER_MARKETPLACE:
-            print("\nTo fix: Address errors above. Marketplace polish fields are warnings, not errors.")
+            print(
+                "\nTo fix: Address errors above. Marketplace polish fields are warnings, not errors."
+            )
             print("Use --standard for Anthropic-spec-only validation.")
         return 1
     elif total_warnings > 0 and args.fail_on_warn:
@@ -4138,5 +4642,5 @@ def main() -> int:
         return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

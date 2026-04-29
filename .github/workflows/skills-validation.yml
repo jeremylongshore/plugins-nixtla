@@ -26,6 +26,6 @@ jobs:
             pip install pyyaml
           fi
 
-      - name: Validate Claude Skills (v2 - Enterprise + Strict)
+      - name: Validate Claude Skills (v7.0 marketplace tier, min-grade B)
         run: |
-          python 004-scripts/validate_skills_v2.py --fail-on-warn
+          python 004-scripts/validate_skills_v2.py --marketplace --min-grade B --show-low-grades
