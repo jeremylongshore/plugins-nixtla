@@ -1,6 +1,6 @@
 ---
 name: nixtla-batch-forecaster
-description: "Forecast multiple time series in parallel using TimeGPT. Use when processing 10-100+ contracts efficiently. Trigger with 'batch forecast' or 'parallel forecasting'."
+description: "Forecast multiple time series in parallel using TimeGPT with rate-limited batch processing, automatic fallback for failed series, and portfolio-level aggregation. Use when processing 10-100+ contracts efficiently or scaling forecasts across many series. Trigger with 'batch forecast', 'parallel forecasting', 'bulk prediction', 'multiple series forecast'."
 version: "1.0.0"
 author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
@@ -10,10 +10,6 @@ allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 # Nixtla Batch Forecaster
 
 Process multiple time series forecasts in parallel with optimized throughput.
-
-## Overview
-
-Leverages TimeGPT API to generate forecasts for many time series concurrently. Features parallel batch processing with rate limiting, automatic fallback for failed batches, and optional portfolio-level aggregation. Produces individual forecasts per series plus combined outputs.
 
 ## Prerequisites
 
@@ -41,10 +37,12 @@ Your CSV must have the Nixtla schema columns:
 | `ds` | datetime | Timestamp |
 | `y` | numeric | Value to forecast |
 
-Analyze your data:
+Validate your data before proceeding:
 ```bash
 python {baseDir}/scripts/prepare_data.py your_data.csv
 ```
+
+Verify the output reports no errors before continuing.
 
 ### Step 2: Set API Key
 
@@ -67,11 +65,19 @@ python {baseDir}/scripts/batch_forecast.py your_data.csv --horizon 14 --freq D
 - `--aggregate`: Create portfolio aggregation
 - `--delay`: Rate limit delay in seconds (default: 1.0)
 
-### Step 4: Generate Report
+### Step 4: Verify and report
 
-Create a summary report:
+Check the summary for batch failures, then generate the report:
 ```bash
+cat forecasts/summary.json | python -m json.tool
 python {baseDir}/scripts/generate_report.py forecasts/
+```
+
+The core API call used per batch:
+```python
+from nixtla import NixtlaClient
+client = NixtlaClient()
+forecast = client.forecast(df=batch_df, h=14, freq='D')
 ```
 
 ## Output
@@ -81,20 +87,6 @@ python {baseDir}/scripts/generate_report.py forecasts/
 - **forecasts/summary.json**: Processing metadata
 - **forecasts/aggregated_forecast.csv**: Portfolio aggregation (if --aggregate)
 - **forecasts/batch_report.md**: Human-readable summary
-
-## Error Handling
-
-1. **Error**: `NIXTLA_TIMEGPT_API_KEY not set`
-   **Solution**: `export NIXTLA_TIMEGPT_API_KEY=your_key`
-
-2. **Error**: `API Rate Limit Exceeded`
-   **Solution**: Increase `--delay` or reduce `--batch-size`
-
-3. **Error**: `Missing required columns`
-   **Solution**: Ensure CSV has `unique_id`, `ds`, `y` columns
-
-4. **Error**: `Batch failed, falling back to individual`
-   **Solution**: Normal behavior - some series may have issues
 
 ## Examples
 

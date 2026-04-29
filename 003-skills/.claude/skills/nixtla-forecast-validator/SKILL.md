@@ -1,6 +1,6 @@
 ---
 name: nixtla-forecast-validator
-description: "Validate forecast quality by comparing MASE and sMAPE against benchmarks. Use when detecting model degradation. Trigger with 'validate forecast' or 'check forecast quality'."
+description: "Validate forecast quality by comparing MASE and sMAPE against configurable thresholds, detect model degradation across multiple series, and generate alert reports with visualizations. Use when detecting model degradation, auditing forecast accuracy, or comparing model performance over time. Trigger with 'validate forecast', 'check forecast quality', 'compare model metrics', 'detect degradation'."
 version: "1.0.0"
 author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: MIT
@@ -11,25 +11,10 @@ allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 
 Validates time series forecast quality metrics and detects performance degradation using statistical measures. Compares current forecast accuracy against historical benchmarks to identify significant deviations in MASE and sMAPE metrics.
 
-## Overview
-
-This skill analyzes forecast quality by comparing current performance metrics against historical baselines. It detects significant increases in error metrics (MASE and sMAPE) that may indicate model degradation, data quality issues, or changing patterns in the time series. The skill generates comprehensive reports, alerts, and visualizations to help users identify and address forecast quality problems quickly.
-
-Activates automatically when Claude detects forecast validation needs, or when explicitly requested with phrases like "validate forecast quality", "check model performance", or "assess forecast accuracy".
-
 ## Prerequisites
 
-**Tools**: Read, Write, Bash, Glob, Grep
-
-**Environment**: No API keys required (operates on CSV metrics files)
-
-**Python Packages**:
-```bash
-pip install pandas matplotlib
-```
-
-**Required CSV Format**:
-CSV files must contain columns: `model`, `MASE`, `sMAPE`
+- `pandas`, `matplotlib`
+- No API keys required (operates on CSV metrics files)
 
 ## Instructions
 
@@ -83,43 +68,16 @@ Analyze the generated outputs to identify forecast quality issues:
 - Review `metrics_comparison.csv` for detailed metric changes
 - Examine `metrics_visualization.png` for visual comparison
 
-If degradation is detected, investigate potential causes such as data quality changes, concept drift, or model staleness.
+If `alert.log` contains warnings, either adjust thresholds for volatile series or investigate data quality and concept drift before re-running.
 
 ## Output
 
-The validation process generates four output files:
-
-1. **validation_report.txt**: Summary report indicating which models show significant degradation and overall validation status
-2. **metrics_comparison.csv**: Side-by-side comparison of historical vs current metrics for all models
-3. **alert.log**: Alert messages for models exceeding degradation thresholds
-4. **metrics_visualization.png**: Bar chart visualization comparing historical and current MASE and sMAPE values
-
-## Error Handling
-
-**Common errors and solutions**:
-
-1. **Missing required metrics column (MASE or sMAPE)**
-   - Ensure input CSV files contain columns named exactly `MASE` and `sMAPE` (case-sensitive)
-   - Verify column headers match expected format
-
-2. **Invalid threshold value**
-   - Provide positive numerical values for `--mase_threshold` and `--smape_threshold`
-   - Thresholds represent percentage increase (0.2 = 20%)
-
-3. **Historical data unavailable**
-   - Verify path to historical metrics CSV file is correct
-   - Ensure file exists and is readable
-   - Check file format matches required CSV structure
-
-4. **File not found error**
-   - Verify both `--historical` and `--current` file paths are correct
-   - Use absolute paths if relative paths fail
-   - Check file permissions
-
-5. **Empty DataFrame error**
-   - Ensure CSV files are not empty
-   - Verify CSV files contain data rows beyond the header
-   - Check for proper CSV formatting (commas as delimiters)
+| File | Purpose |
+|------|---------|
+| `validation_report.txt` | Summary of which models show degradation |
+| `metrics_comparison.csv` | Historical vs current metrics side-by-side |
+| `alert.log` | Models exceeding thresholds |
+| `metrics_visualization.png` | Bar chart comparing MASE/sMAPE |
 
 ## Examples
 
@@ -142,40 +100,9 @@ model_A,1.8,0.18
 python scripts/validate_forecast.py --historical historical_metrics.csv --current current_metrics.csv
 ```
 
-**Output** (validation_report.txt):
-```
-WARNING: Significant increase in MASE detected for model model_A.
-```
+**Output**: `WARNING: Significant increase in MASE detected for model model_A.` (50% increase exceeds 20% threshold)
 
-**Interpretation**: Model A shows 50% increase in MASE (from 1.2 to 1.8), exceeding the default 20% threshold. This indicates forecast quality degradation requiring investigation.
-
-### Example 2: Stable performance, no alerts
-
-**Input** (historical_metrics.csv):
-```
-model,MASE,sMAPE
-model_B,0.8,0.10
-```
-
-**Input** (current_metrics.csv):
-```
-model,MASE,sMAPE
-model_B,0.85,0.11
-```
-
-**Command**:
-```bash
-python scripts/validate_forecast.py --historical historical_metrics.csv --current current_metrics.csv
-```
-
-**Output** (validation_report.txt):
-```
-Forecast validation passed. No significant degradation detected.
-```
-
-**Interpretation**: Model B shows only 6.25% increase in MASE and 10% increase in sMAPE, both below the 20% threshold. Performance is stable.
-
-### Example 3: Multiple models with custom thresholds
+### Example 2: Custom thresholds for volatile models
 
 **Command**:
 ```bash

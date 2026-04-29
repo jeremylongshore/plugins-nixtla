@@ -1,6 +1,6 @@
 ---
 name: nixtla-prod-pipeline-generator
-description: "Transform forecasting experiments into Airflow/Prefect pipelines with monitoring. Use when deploying forecasts to production. Trigger with 'generate pipeline' or 'create Airflow DAG'."
+description: "Transform forecasting experiments into production Airflow DAGs, Prefect flows, or cron scripts with scheduling, drift-detection alerts, and retry monitoring. Use when deploying forecasts to production or automating inference pipelines. Trigger with 'generate pipeline', 'create Airflow DAG', 'deploy forecast', 'production pipeline'."
 allowed-tools: "Read,Write,Glob,Grep,Edit"
 version: "1.0.0"
 author: "Jeremy Longshore <jeremy@intentsolutions.io>"
@@ -10,16 +10,6 @@ license: MIT
 # Nixtla Production Pipeline Generator
 
 Transform validated forecasting experiments into production-ready inference pipelines with proper orchestration, monitoring, and error handling.
-
-## Overview
-
-This skill productionizes Nixtla forecasting workflows by generating complete deployment artifacts:
-
-- **Airflow DAGs**: Enterprise orchestration with dependencies and monitoring
-- **Prefect Flows**: Modern Python-native pipelines with better local testing
-- **Cron Scripts**: Simple single-machine batch processing
-
-All pipelines implement: Extract -> Transform -> Forecast -> Load -> Monitor
 
 ## Prerequisites
 
@@ -49,14 +39,7 @@ Load experiment from `forecasting/config.yml`:
 python {baseDir}/scripts/read_experiment.py --config forecasting/config.yml
 ```
 
-### Step 2: Select Orchestration Platform
-
-Choose based on requirements:
-- **Airflow**: Enterprise, complex dependencies, extensive monitoring
-- **Prefect**: Python-native, better local testing, modern error handling
-- **Cron**: Simple single-machine, no dependencies, quick setup
-
-### Step 3: Generate Pipeline
+### Step 2: Generate and validate pipeline
 
 ```bash
 python {baseDir}/scripts/generate_pipeline.py \
@@ -65,7 +48,14 @@ python {baseDir}/scripts/generate_pipeline.py \
     --output pipelines/
 ```
 
-### Step 4: Add Monitoring
+Platforms: `airflow` (enterprise), `prefect` (Python-native, better local testing), `cron` (simple single-machine).
+
+Verify the generated pipeline before deploying:
+```bash
+python pipelines/forecast_dag.py --dry-run
+```
+
+### Step 3: Add Monitoring
 
 ```bash
 python {baseDir}/scripts/add_monitoring.py \
@@ -73,7 +63,7 @@ python {baseDir}/scripts/add_monitoring.py \
     --metrics smape,mase
 ```
 
-### Step 5: Deploy
+### Step 4: Deploy
 
 Follow generated `pipelines/README.md` for deployment instructions.
 
@@ -83,20 +73,6 @@ Follow generated `pipelines/README.md` for deployment instructions.
 - **pipelines/monitoring.py**: Quality checks and fallback logic
 - **pipelines/README.md**: Deployment instructions
 - **pipelines/requirements.txt**: Dependencies
-
-## Error Handling
-
-1. **Error**: `Config file not found`
-   **Solution**: Run `nixtla-experiment-architect` first to create config
-
-2. **Error**: `NIXTLA_API_KEY not set`
-   **Solution**: Export your TimeGPT API key or use StatsForecast baselines
-
-3. **Error**: `Database connection failed`
-   **Solution**: Verify `FORECAST_DATA_SOURCE` connection string
-
-4. **Error**: `Forecast quality check failed`
-   **Solution**: Pipeline auto-falls back to baseline models
 
 ## Examples
 

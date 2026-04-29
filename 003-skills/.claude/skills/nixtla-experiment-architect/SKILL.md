@@ -1,6 +1,6 @@
 ---
 name: nixtla-experiment-architect
-description: "Generate production-ready forecasting experiments with StatsForecast and TimeGPT. Use when setting up model benchmarking or cross-validation. Trigger with 'scaffold experiment' or 'compare models'."
+description: "Generate production-ready forecasting experiments that create train/test splits, run cross-validation pipelines, and produce accuracy comparison tables using StatsForecast, MLForecast, and TimeGPT. Use when setting up model benchmarking or cross-validation. Trigger with 'scaffold experiment', 'compare models', 'benchmark forecasts', 'cross-validate'."
 allowed-tools: "Read,Write,Glob,Grep,Edit"
 version: "1.0.0"
 author: "Jeremy Longshore <jeremy@intentsolutions.io>"
@@ -10,15 +10,6 @@ license: MIT
 # Nixtla Experiment Architect
 
 Design and scaffold complete forecasting experiments using Nixtla's libraries.
-
-## Overview
-
-This skill creates production-ready experiment harnesses:
-
-- **Configuration management**: YAML-based experiment config
-- **Multi-model comparison**: StatsForecast + MLForecast + TimeGPT
-- **Cross-validation**: Rolling-origin or expanding-window
-- **Metrics evaluation**: SMAPE, MASE, MAE, RMSE
 
 ## Prerequisites
 
@@ -58,12 +49,17 @@ python {baseDir}/scripts/generate_config.py \
     --output forecasting/config.yml
 ```
 
-### Step 3: Scaffold Experiment
+### Step 3: Scaffold and validate experiment
 
 ```bash
 python {baseDir}/scripts/scaffold_experiment.py \
     --config forecasting/config.yml \
     --output forecasting/experiments.py
+```
+
+Verify the generated harness imports correctly before running:
+```bash
+python -c "import ast; ast.parse(open('forecasting/experiments.py').read()); print('OK')"
 ```
 
 ### Step 4: Run Experiment
@@ -83,20 +79,6 @@ cat forecasting/results/metrics_summary.csv
 - **forecasting/config.yml**: Experiment configuration
 - **forecasting/experiments.py**: Runnable experiment harness
 - **forecasting/results/**: Metrics and forecasts (after running)
-
-## Error Handling
-
-1. **Error**: `Data file not found`
-   **Solution**: Verify data source path in config
-
-2. **Error**: `Column not found`
-   **Solution**: Check column names match your data
-
-3. **Error**: `Missing required package`
-   **Solution**: Install missing dependencies with pip
-
-4. **Error**: `Cross-validation failed`
-   **Solution**: Ensure enough data for n_windows
 
 ## Examples
 

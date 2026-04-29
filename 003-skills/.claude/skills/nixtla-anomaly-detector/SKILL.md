@@ -1,6 +1,6 @@
 ---
 name: nixtla-anomaly-detector
-description: Detects anomalies in time series data using TimeGPT. Identifies outliers, level shifts, and trend breaks without model training. Use when identifying anomalies, outliers, or unusual patterns in time series. Trigger with "detect anomalies", "find outliers", "anomaly detection".
+description: "Detects anomalies in time series data using TimeGPT. Identifies outliers, level shifts, and trend breaks without model training. Use when identifying anomalies, outliers, or unusual patterns in time series. Trigger with 'detect anomalies', 'find outliers', 'anomaly detection', 'unusual patterns'."
 allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
 version: "1.0.0"
 author: "Jeremy Longshore <jeremy@intentsolutions.io>"
@@ -10,10 +10,6 @@ license: MIT
 # Nixtla Anomaly Detector
 
 Automatically detect and flag anomalies in time series data using TimeGPT.
-
-## Overview
-
-This skill leverages TimeGPT's anomaly detection capabilities to identify outliers, level shifts, and trend breaks in time series data without requiring model training. It accepts CSV data, runs anomaly detection via the Nixtla API, and produces a detailed report with visualizations.
 
 ## Prerequisites
 
@@ -41,10 +37,11 @@ Ensure your CSV file has the required Nixtla schema columns:
 | `ds` | datetime | Timestamp |
 | `y` | numeric | Value to analyze |
 
-### Step 2: Set API Key
+### Step 2: Set and verify API key
 
 ```bash
 export NIXTLA_TIMEGPT_API_KEY=your_api_key_here
+python -c "from nixtla import NixtlaClient; NixtlaClient().validate_api_key()"
 ```
 
 ### Step 3: Run Anomaly Detection
@@ -67,26 +64,6 @@ The script generates three output files:
 1. **anomalies.csv** - Detailed anomaly records
 2. **anomalies_plot.png** - Visual highlighting of anomalies
 3. **anomaly_summary.txt** - Summary counts by type
-
-## Output
-
-- **anomalies.csv**: Contains detected anomalies with timestamps, values, and anomaly types (outlier, level_shift, trend_break)
-- **anomalies_plot.png**: Time series visualization with anomalies highlighted in red
-- **anomaly_summary.txt**: Human-readable summary of detection results
-
-## Error Handling
-
-1. **Error**: `NIXTLA_TIMEGPT_API_KEY not set`
-   **Solution**: Run `export NIXTLA_TIMEGPT_API_KEY=your_key`
-
-2. **Error**: `CSV file missing required columns`
-   **Solution**: Ensure CSV has `unique_id`, `ds`, and `y` columns
-
-3. **Error**: `No anomalies detected`
-   **Solution**: This is valid output - data may have no anomalies
-
-4. **Error**: `Connection error to TimeGPT API`
-   **Solution**: Check network connection and API key validity
 
 ## Examples
 
