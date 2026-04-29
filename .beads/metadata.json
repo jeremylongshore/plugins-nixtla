@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_database": "nixtla",
+  "project_id": "271ea3ef-f431-455d-aca3-90cfa17cb69e"
+}
