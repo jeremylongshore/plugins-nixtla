@@ -2,16 +2,20 @@
 name: nixtla-baseline-review
 description: Analyze Nixtla baseline forecasting results (sMAPE/MASE on M4 or other
   benchmark datasets). Use when the user asks about baseline performance, model comparisons,
-  or metric interpretation for Nixtla time-series experiments. Trigger with "baseline review",
-  "interpret sMAPE/MASE", or "compare AutoETS vs AutoTheta".
+  or metric interpretation for Nixtla time-series experiments. Trigger with "baseline
+  review", "interpret sMAPE/MASE", or "compare AutoETS vs AutoTheta".
 allowed-tools: Read,Grep,Bash(ls:*)
 version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, forecasting, benchmarking, time-series, statsforecast]
+tags:
+- nixtla
+- forecasting
+- benchmarking
+- time-series
+- statsforecast
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Baseline Review Skill
 
 ## Overview

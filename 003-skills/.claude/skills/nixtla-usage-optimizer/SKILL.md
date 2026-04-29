@@ -1,14 +1,19 @@
 ---
 name: nixtla-usage-optimizer
-description: "Analyze Nixtla usage and optimize cost-effective forecast routing strategies. Use when auditing API usage or reducing costs. Trigger with 'optimize nixtla costs' or 'audit API usage'."
-allowed-tools: "Read,Glob,Grep"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze Nixtla usage and optimize cost-effective forecast routing strategies.
+  Use when auditing API usage or reducing costs. Trigger with 'optimize nixtla costs'
+  or 'audit API usage'.
+allowed-tools: Read,Glob,Grep
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, cost-optimization]
+tags:
+- nixtla
+- time-series
+- forecasting
+- cost-optimization
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Usage Optimizer
 
 Audit Nixtla library usage and recommend cost-effective routing strategies across TimeGPT and baseline models.

@@ -1,14 +1,20 @@
 ---
 name: nixtla-timegpt-finetune-lab
-description: "Configure TimeGPT fine-tuning on custom datasets with Nixtla SDK. Use when training domain-specific forecast models. Trigger with 'fine-tune TimeGPT' or 'train custom model'."
-allowed-tools: "Read,Write,Glob,Grep,Edit"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Configure TimeGPT fine-tuning on custom datasets with Nixtla SDK. Use
+  when training domain-specific forecast models. Trigger with 'fine-tune TimeGPT'
+  or 'train custom model'.
+allowed-tools: Read,Write,Glob,Grep,Edit
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, fine-tuning, timegpt]
+tags:
+- nixtla
+- time-series
+- forecasting
+- fine-tuning
+- timegpt
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla TimeGPT Fine-Tuning Lab
 
 Guide production-ready TimeGPT fine-tuning workflows from data preparation through model comparison.

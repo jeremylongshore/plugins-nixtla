@@ -1,14 +1,22 @@
 ---
 name: nixtla-model-selector
-description: "Automatically selects the best forecasting model between StatsForecast and TimeGPT based on time series data characteristics. Use when unsure which model performs best for a dataset. Trigger with 'auto-select model', 'choose best model', 'model selection'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Automatically selects the best forecasting model between StatsForecast
+  and TimeGPT based on time series data characteristics. Use when unsure which model
+  performs best for a dataset. Trigger with 'auto-select model', 'choose best model',
+  'model selection'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, model-selection, statsforecast, timegpt]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- model-selection
+- statsforecast
+- timegpt
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Model Selector
 
 Automatically selects and executes the optimal forecasting model for time series data.

@@ -1,14 +1,20 @@
 ---
 name: nixtla-exogenous-integrator
-description: "Incorporates external variables (holidays, weather, events) into TimeGPT forecasts to improve accuracy. Use when forecasts require external data, holidays impact sales, or weather affects demand. Trigger with 'include holidays', 'add weather data', 'integrate events'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Incorporates external variables (holidays, weather, events) into TimeGPT
+  forecasts to improve accuracy. Use when forecasts require external data, holidays
+  impact sales, or weather affects demand. Trigger with 'include holidays', 'add weather
+  data', 'integrate events'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, exogenous-variables]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- exogenous-variables
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Exogenous Integrator
 
 Augments TimeGPT forecasts with exogenous variables for increased accuracy.

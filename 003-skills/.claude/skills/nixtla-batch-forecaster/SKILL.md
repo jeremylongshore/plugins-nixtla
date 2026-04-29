@@ -1,14 +1,18 @@
 ---
 name: nixtla-batch-forecaster
-description: "Forecast multiple time series in parallel using TimeGPT. Use when processing 10-100+ contracts efficiently. Trigger with 'batch forecast' or 'parallel forecasting'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Forecast multiple time series in parallel using TimeGPT. Use when processing
+  10-100+ contracts efficiently. Trigger with 'batch forecast' or 'parallel forecasting'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, batch-processing]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- batch-processing
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Batch Forecaster
 
 Process multiple time series forecasts in parallel with optimized throughput.

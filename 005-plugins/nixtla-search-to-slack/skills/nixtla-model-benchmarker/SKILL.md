@@ -1,14 +1,21 @@
 ---
 name: nixtla-model-benchmarker
-description: "Generate benchmarking pipelines to compare forecasting models and summarize accuracy/speed trade-offs. Use when evaluating TimeGPT vs StatsForecast/MLForecast/NeuralForecast on a dataset. Trigger with \"benchmark models\", \"compare TimeGPT vs StatsForecast\", or \"model selection\"."
+description: Generate benchmarking pipelines to compare forecasting models and summarize
+  accuracy/speed trade-offs. Use when evaluating TimeGPT vs StatsForecast/MLForecast/NeuralForecast
+  on a dataset. Trigger with "benchmark models", "compare TimeGPT vs StatsForecast",
+  or "model selection".
 allowed-tools: Write,Read,Bash(python:*),Glob
 version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, benchmarking, forecasting, model-selection, time-series]
+tags:
+- nixtla
+- benchmarking
+- forecasting
+- model-selection
+- time-series
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Model Benchmarker
 
 ## Overview

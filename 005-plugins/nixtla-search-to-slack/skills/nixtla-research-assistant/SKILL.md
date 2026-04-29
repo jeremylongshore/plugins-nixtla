@@ -1,15 +1,22 @@
 ---
 name: nixtla-research-assistant
-description: "Research and summarize Nixtla ecosystem updates and time-series forecasting content from the web and GitHub. Use when gathering release notes, recent changes, or best-practice references. Trigger with \"Nixtla updates\", \"what's new with TimeGPT\", or \"find time-series papers\"."
+description: Research and summarize Nixtla ecosystem updates and time-series forecasting
+  content from the web and GitHub. Use when gathering release notes, recent changes,
+  or best-practice references. Trigger with "Nixtla updates", "what's new with TimeGPT",
+  or "find time-series papers".
 allowed-tools: WebFetch,WebSearch,Bash(python:*),Read,Write,Glob
 version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, research, time-series, timegpt, web-search]
-argument-hint: "<topic or query>"
+tags:
+- nixtla
+- research
+- time-series
+- timegpt
+- web-search
+argument-hint: <topic or query>
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Research Assistant
 
 ## Overview

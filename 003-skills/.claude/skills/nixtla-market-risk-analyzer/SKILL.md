@@ -1,14 +1,22 @@
 ---
 name: nixtla-market-risk-analyzer
-description: "Analyze market risk with VaR, volatility, and position sizing using forecast data. Use when assessing investment risk, calculating portfolio metrics, or determining position sizes. Trigger with 'analyze market risk', 'calculate VaR', or 'position sizing'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze market risk with VaR, volatility, and position sizing using forecast
+  data. Use when assessing investment risk, calculating portfolio metrics, or determining
+  position sizes. Trigger with 'analyze market risk', 'calculate VaR', or 'position
+  sizing'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, risk-analysis, VaR, portfolio, position-sizing]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- risk-analysis
+- VaR
+- portfolio
+- position-sizing
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Market Risk Analyzer
 
 Calculates key market risk metrics and recommends optimal position sizes using historical data analysis.

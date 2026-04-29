@@ -1,14 +1,21 @@
 ---
 name: nixtla-plugin-scaffolder
-description: "Generate production-ready plugin structures from PRD documents with enterprise-compliant files. Use when scaffolding new plugins, converting PRDs to plugin skeletons, or initializing plugin projects. Trigger with 'scaffold plugin', 'create plugin from PRD', or 'initialize plugin structure'."
-allowed-tools: "Write,Glob,Read,Bash(mkdir:*)"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate production-ready plugin structures from PRD documents with enterprise-compliant
+  files. Use when scaffolding new plugins, converting PRDs to plugin skeletons, or
+  initializing plugin projects. Trigger with 'scaffold plugin', 'create plugin from
+  PRD', or 'initialize plugin structure'.
+allowed-tools: Write,Glob,Read,Bash(mkdir:*)
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, plugin-development, scaffolding, code-generation, PRD]
+tags:
+- nixtla
+- plugin-development
+- scaffolding
+- code-generation
+- PRD
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Plugin Scaffolder
 
 Rapidly scaffold production-ready Claude Code plugin structures from PRD documents, generating all required files with enterprise compliance standards.

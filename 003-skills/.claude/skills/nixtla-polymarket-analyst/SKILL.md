@@ -1,14 +1,21 @@
 ---
 name: nixtla-polymarket-analyst
-description: "Analyze and forecast Polymarket contracts using TimeGPT with confidence intervals. Use when predicting contract prices or evaluating prediction market trends. Trigger with 'Polymarket analysis', 'forecast prediction market', or 'analyze contract'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze and forecast Polymarket contracts using TimeGPT with confidence
+  intervals. Use when predicting contract prices or evaluating prediction market trends.
+  Trigger with 'Polymarket analysis', 'forecast prediction market', or 'analyze contract'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, polymarket, prediction-markets, trading]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebFetch"
+tags:
+- nixtla
+- time-series
+- forecasting
+- polymarket
+- prediction-markets
+- trading
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep,WebFetch
+compatibility: Designed for Claude Code
 ---
-
 # Polymarket Analyst
 
 Analyzes and forecasts Polymarket prediction market contract prices using historical data and TimeGPT forecasting models.

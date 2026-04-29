@@ -1,14 +1,20 @@
 ---
 name: nixtla-skills-bootstrap
-description: "Generate and configure Nixtla Skills using the CLI for forecasting workflows. Use when installing or updating skills. Trigger with 'install nixtla skills' or 'update nixtla'."
-allowed-tools: "Read,Glob,Grep"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate and configure Nixtla Skills using the CLI for forecasting workflows.
+  Use when installing or updating skills. Trigger with 'install nixtla skills' or
+  'update nixtla'.
+allowed-tools: Read,Glob,Grep
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, skills-management, installation, cli]
+tags:
+- nixtla
+- time-series
+- skills-management
+- installation
+- cli
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Skills Bootstrap
 
 Install or update Nixtla Skills in the current project using the nixtla-skills CLI.

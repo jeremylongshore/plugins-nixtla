@@ -1,14 +1,20 @@
 ---
 name: nixtla-schema-mapper
-description: "Transform data sources to Nixtla schema (unique_id, ds, y) with column inference. Use when preparing data for forecasting. Trigger with 'map to Nixtla schema' or 'transform data'."
-allowed-tools: "Read,Write,Glob,Grep,Edit"
-version: "1.1.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Transform data sources to Nixtla schema (unique_id, ds, y) with column
+  inference. Use when preparing data for forecasting. Trigger with 'map to Nixtla
+  schema' or 'transform data'.
+allowed-tools: Read,Write,Glob,Grep,Edit
+version: 1.1.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, data-transformation, schema, etl]
+tags:
+- nixtla
+- time-series
+- data-transformation
+- schema
+- etl
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Schema Mapper
 
 Transform data sources to Nixtla-compatible schema (`unique_id`, `ds`, `y`).

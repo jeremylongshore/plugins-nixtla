@@ -1,14 +1,23 @@
 ---
 name: nixtla-test-generator
-description: "Generate comprehensive pytest test suites from PRD functional requirements with fixtures, parameterization, and coverage tracking. Use when creating tests for new plugins, validating PRD requirements, or scaffolding test infrastructure. Trigger with 'generate tests from PRD', 'create test suite', or 'scaffold pytest tests'."
-allowed-tools: "Write,Read,Glob,Bash(python:*),Bash(pytest:*)"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate comprehensive pytest test suites from PRD functional requirements
+  with fixtures, parameterization, and coverage tracking. Use when creating tests
+  for new plugins, validating PRD requirements, or scaffolding test infrastructure.
+  Trigger with 'generate tests from PRD', 'create test suite', or 'scaffold pytest
+  tests'.
+allowed-tools: Write,Read,Glob,Bash(python:*),Bash(pytest:*)
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, testing, pytest, code-generation, PRD, test-automation]
+tags:
+- nixtla
+- testing
+- pytest
+- code-generation
+- PRD
+- test-automation
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Test Generator
 
 Generate production-ready pytest test suites from PRD (Product Requirements Document) functional requirements, ensuring comprehensive test coverage for Nixtla plugins.

@@ -1,14 +1,20 @@
 ---
 name: nixtla-experiment-architect
-description: "Generate production-ready forecasting experiments with StatsForecast and TimeGPT. Use when setting up model benchmarking or cross-validation. Trigger with 'scaffold experiment' or 'compare models'."
-allowed-tools: "Read,Write,Glob,Grep,Edit"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate production-ready forecasting experiments with StatsForecast
+  and TimeGPT. Use when setting up model benchmarking or cross-validation. Trigger
+  with 'scaffold experiment' or 'compare models'.
+allowed-tools: Read,Write,Glob,Grep,Edit
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, experiment-design, cross-validation]
+tags:
+- nixtla
+- time-series
+- forecasting
+- experiment-design
+- cross-validation
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Experiment Architect
 
 Design and scaffold complete forecasting experiments using Nixtla's libraries.

@@ -1,14 +1,20 @@
 ---
 name: nixtla-contract-schema-mapper
-description: "Transform prediction market data to Nixtla format (unique_id, ds, y). Use when preparing datasets for forecasting. Trigger with 'convert to Nixtla format' or 'schema mapping'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Transform prediction market data to Nixtla format (unique_id, ds, y).
+  Use when preparing datasets for forecasting. Trigger with 'convert to Nixtla format'
+  or 'schema mapping'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, data-transformation, schema-mapping]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- data-transformation
+- schema-mapping
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Contract Schema Mapper
 
 Transforms prediction market data into Nixtla-compatible format (unique_id, ds, y).

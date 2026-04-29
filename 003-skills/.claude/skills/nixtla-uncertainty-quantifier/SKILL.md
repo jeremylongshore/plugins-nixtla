@@ -1,14 +1,21 @@
 ---
 name: nixtla-uncertainty-quantifier
-description: "Analyze forecast uncertainty using conformal prediction. Use when risk assessment, scenario planning, or prediction interval generation is required. Trigger with 'quantify uncertainty', 'prediction intervals', or 'confidence bands'."
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze forecast uncertainty using conformal prediction. Use when risk
+  assessment, scenario planning, or prediction interval generation is required. Trigger
+  with 'quantify uncertainty', 'prediction intervals', or 'confidence bands'.
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, uncertainty, conformal-prediction, risk-assessment]
+tags:
+- nixtla
+- time-series
+- forecasting
+- uncertainty
+- conformal-prediction
+- risk-assessment
+compatibility: Designed for Claude Code
 ---
-
 # Uncertainty Quantifier
 
 Generates prediction intervals and confidence bands for time series forecasts using conformal prediction.

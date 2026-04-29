@@ -1,14 +1,20 @@
 ---
 name: nixtla-event-impact-modeler
-description: "Analyze causal impact of events on time series forecasts using TimeGPT. Use when quantifying promotion or disaster effects. Trigger with 'event impact analysis' or 'causal analysis'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze causal impact of events on time series forecasts using TimeGPT.
+  Use when quantifying promotion or disaster effects. Trigger with 'event impact analysis'
+  or 'causal analysis'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, causal-impact, event-analysis]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebSearch"
+tags:
+- nixtla
+- time-series
+- forecasting
+- causal-impact
+- event-analysis
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep,WebSearch
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Event Impact Modeler
 
 Quantifies the causal impact of exogenous events on contract prices using TimeGPT forecasting and CausalImpact analysis.

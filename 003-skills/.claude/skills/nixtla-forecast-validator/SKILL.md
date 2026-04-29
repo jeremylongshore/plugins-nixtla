@@ -1,14 +1,20 @@
 ---
 name: nixtla-forecast-validator
-description: "Validate forecast quality by comparing MASE and sMAPE against benchmarks. Use when detecting model degradation. Trigger with 'validate forecast' or 'check forecast quality'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Validate forecast quality by comparing MASE and sMAPE against benchmarks.
+  Use when detecting model degradation. Trigger with 'validate forecast' or 'check
+  forecast quality'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, validation, model-monitoring]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- validation
+- model-monitoring
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Forecast Validator
 
 Validates time series forecast quality metrics and detects performance degradation using statistical measures. Compares current forecast accuracy against historical benchmarks to identify significant deviations in MASE and sMAPE metrics.

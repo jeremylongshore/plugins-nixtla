@@ -1,14 +1,21 @@
 ---
 name: nixtla-cross-validator
-description: "Performs rigorous time series cross-validation using expanding and sliding windows. Use when needing to evaluate the performance of time series models on unseen data. Trigger with cross validate time series, evaluate forecasting model, time series backtesting."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Performs rigorous time series cross-validation using expanding and sliding
+  windows. Use when needing to evaluate the performance of time series models on unseen
+  data. Trigger with cross validate time series, evaluate forecasting model, time
+  series backtesting.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, cross-validation, model-evaluation]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- cross-validation
+- model-evaluation
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Cross-Validator Skill
 
 Evaluates time series model performance using cross-validation.

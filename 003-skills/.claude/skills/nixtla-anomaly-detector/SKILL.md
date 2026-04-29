@@ -1,14 +1,20 @@
 ---
 name: nixtla-anomaly-detector
-description: Detects anomalies in time series data using TimeGPT. Identifies outliers, level shifts, and trend breaks without model training. Use when identifying anomalies, outliers, or unusual patterns in time series. Trigger with "detect anomalies", "find outliers", "anomaly detection".
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Detects anomalies in time series data using TimeGPT. Identifies outliers,
+  level shifts, and trend breaks without model training. Use when identifying anomalies,
+  outliers, or unusual patterns in time series. Trigger with "detect anomalies", "find
+  outliers", "anomaly detection".
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, anomaly-detection]
+tags:
+- nixtla
+- time-series
+- forecasting
+- anomaly-detection
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Anomaly Detector
 
 Automatically detect and flag anomalies in time series data using TimeGPT.

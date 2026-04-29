@@ -1,14 +1,22 @@
 ---
 name: nixtla-mcp-server-builder
-description: "Generate production-ready MCP server implementations from PRD tool specifications with schema validation, error handling, and testing infrastructure. Use when building MCP servers for Nixtla plugins, implementing tool handlers, or scaffolding server infrastructure. Trigger with 'build MCP server', 'generate MCP implementation', or 'scaffold MCP tools'."
-allowed-tools: "Write,Read,Glob,Bash(python:*),Bash(mkdir:*)"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate production-ready MCP server implementations from PRD tool specifications
+  with schema validation, error handling, and testing infrastructure. Use when building
+  MCP servers for Nixtla plugins, implementing tool handlers, or scaffolding server
+  infrastructure. Trigger with 'build MCP server', 'generate MCP implementation',
+  or 'scaffold MCP tools'.
+allowed-tools: Write,Read,Glob,Bash(python:*),Bash(mkdir:*)
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, MCP, server-development, code-generation, plugin-development]
+tags:
+- nixtla
+- MCP
+- server-development
+- code-generation
+- plugin-development
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla MCP Server Builder
 
 Generate complete, production-ready MCP (Model Context Protocol) server implementations from PRD tool specifications, enabling rapid development of Claude Code plugin backends.

@@ -1,14 +1,21 @@
 ---
 name: nixtla-prd-to-code
-description: "Transform PRD documents into actionable implementation tasks with TodoWrite integration. Use when planning development work, converting requirements to tasks, or creating implementation roadmaps. Trigger with 'PRD to tasks', 'plan implementation from PRD', or 'create task list'."
-allowed-tools: "Read,Write,Glob,TodoWrite"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Transform PRD documents into actionable implementation tasks with TodoWrite
+  integration. Use when planning development work, converting requirements to tasks,
+  or creating implementation roadmaps. Trigger with 'PRD to tasks', 'plan implementation
+  from PRD', or 'create task list'.
+allowed-tools: Read,Write,Glob,TodoWrite
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, plugin-development, PRD, task-planning, project-management]
+tags:
+- nixtla
+- plugin-development
+- PRD
+- task-planning
+- project-management
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla PRD to Code
 
 Transform Product Requirements Documents into comprehensive implementation task lists with automatic TodoWrite integration for seamless development planning.

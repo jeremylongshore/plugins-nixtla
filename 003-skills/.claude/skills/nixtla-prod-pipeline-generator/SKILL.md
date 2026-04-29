@@ -1,14 +1,21 @@
 ---
 name: nixtla-prod-pipeline-generator
-description: "Transform forecasting experiments into Airflow/Prefect pipelines with monitoring. Use when deploying forecasts to production. Trigger with 'generate pipeline' or 'create Airflow DAG'."
-allowed-tools: "Read,Write,Glob,Grep,Edit"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Transform forecasting experiments into Airflow/Prefect pipelines with
+  monitoring. Use when deploying forecasts to production. Trigger with 'generate pipeline'
+  or 'create Airflow DAG'.
+allowed-tools: Read,Write,Glob,Grep,Edit
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, production, pipelines, airflow]
+tags:
+- nixtla
+- time-series
+- forecasting
+- production
+- pipelines
+- airflow
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Production Pipeline Generator
 
 Transform validated forecasting experiments into production-ready inference pipelines with proper orchestration, monitoring, and error handling.

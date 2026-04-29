@@ -1,14 +1,22 @@
 ---
 name: nixtla-liquidity-forecaster
-description: "Forecasts orderbook depth and spreads to optimize trade execution timing. Use when needing to estimate market liquidity for large orders or predicting bid-ask spread evolution. Trigger with 'forecast liquidity', 'predict orderbook', 'estimate depth'."
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep,WebFetch"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Forecasts orderbook depth and spreads to optimize trade execution timing.
+  Use when needing to estimate market liquidity for large orders or predicting bid-ask
+  spread evolution. Trigger with 'forecast liquidity', 'predict orderbook', 'estimate
+  depth'.
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep,WebFetch
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, liquidity, polymarket, orderbook]
+tags:
+- nixtla
+- time-series
+- forecasting
+- liquidity
+- polymarket
+- orderbook
+compatibility: Designed for Claude Code
 ---
-
 # Liquidity Forecaster
 
 Predicts future orderbook depth and bid-ask spreads using historical market data and TimeGPT.

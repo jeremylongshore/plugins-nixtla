@@ -1,14 +1,20 @@
 ---
 name: nixtla-correlation-mapper
-description: "Analyze multi-contract correlations for forecast-based hedge recommendations. Use when managing correlated assets. Trigger with 'analyze correlations' or 'suggest hedge'."
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze multi-contract correlations for forecast-based hedge recommendations.
+  Use when managing correlated assets. Trigger with 'analyze correlations' or 'suggest
+  hedge'.
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, correlation, hedging]
-allowed-tools: "Read,Write,Bash(python:*),Glob,Grep"
+tags:
+- nixtla
+- time-series
+- forecasting
+- correlation
+- hedging
+allowed-tools: Read,Write,Bash(python:*),Glob,Grep
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Correlation Mapper
 
 Identifies correlations between multiple contracts and generates hedging strategies for portfolio risk management.

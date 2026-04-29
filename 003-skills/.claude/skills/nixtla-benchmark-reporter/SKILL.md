@@ -1,14 +1,22 @@
 ---
 name: nixtla-benchmark-reporter
-description: Generate comprehensive markdown benchmark reports from forecast accuracy metrics with model comparisons, statistical analysis, and regression detection. Use when analyzing baseline performance, comparing forecast models, or validating model quality. Trigger with 'generate benchmark report', 'analyze forecast metrics', or 'create performance summary'.
-allowed-tools: "Read,Write,Glob,Bash(python:*)"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate comprehensive markdown benchmark reports from forecast accuracy
+  metrics with model comparisons, statistical analysis, and regression detection.
+  Use when analyzing baseline performance, comparing forecast models, or validating
+  model quality. Trigger with 'generate benchmark report', 'analyze forecast metrics',
+  or 'create performance summary'.
+allowed-tools: Read,Write,Glob,Bash(python:*)
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, benchmarking, metrics]
+tags:
+- nixtla
+- time-series
+- forecasting
+- benchmarking
+- metrics
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Benchmark Reporter
 
 ## Purpose

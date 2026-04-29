@@ -1,14 +1,21 @@
 ---
 name: nixtla-demo-generator
-description: "Generate production-ready Jupyter notebooks showcasing Nixtla forecasting workflows for statsforecast, mlforecast, and TimeGPT. Use when creating demos, building examples, or showcasing forecasting capabilities. Trigger with 'generate demo notebook', 'create Jupyter demo', or 'build forecasting example'."
-allowed-tools: "Write,Read,Glob,Bash(python:*)"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Generate production-ready Jupyter notebooks showcasing Nixtla forecasting
+  workflows for statsforecast, mlforecast, and TimeGPT. Use when creating demos, building
+  examples, or showcasing forecasting capabilities. Trigger with 'generate demo notebook',
+  'create Jupyter demo', or 'build forecasting example'.
+allowed-tools: Write,Read,Glob,Bash(python:*)
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, forecasting, jupyter, demo]
+tags:
+- nixtla
+- time-series
+- forecasting
+- jupyter
+- demo
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Demo Generator
 
 Generate interactive, production-ready Jupyter notebooks that showcase Nixtla forecasting workflows with complete data pipelines, model training, evaluation, and visualization.

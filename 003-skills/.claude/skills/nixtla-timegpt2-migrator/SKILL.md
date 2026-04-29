@@ -1,14 +1,21 @@
 ---
 name: nixtla-timegpt2-migrator
-description: "Analyze and transform code for TimeGPT-1 to TimeGPT-2 migration. Use when upgrading TimeGPT version, migrating client libraries, or updating API calls. Trigger with 'migrate to TimeGPT-2', 'upgrade TimeGPT', or 'TimeGPT migration'."
-allowed-tools: "Read,Write,Edit,Glob,Grep"
-version: "1.0.0"
-author: "Jeremy Longshore <jeremy@intentsolutions.io>"
+description: Analyze and transform code for TimeGPT-1 to TimeGPT-2 migration. Use
+  when upgrading TimeGPT version, migrating client libraries, or updating API calls.
+  Trigger with 'migrate to TimeGPT-2', 'upgrade TimeGPT', or 'TimeGPT migration'.
+allowed-tools: Read,Write,Edit,Glob,Grep
+version: 1.0.0
+author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, time-series, migration, timegpt, upgrade, refactoring]
+tags:
+- nixtla
+- time-series
+- migration
+- timegpt
+- upgrade
+- refactoring
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla TimeGPT-2 Migrator
 
 Automates the migration process from TimeGPT-1 to TimeGPT-2, identifying compatibility issues and generating updated code.

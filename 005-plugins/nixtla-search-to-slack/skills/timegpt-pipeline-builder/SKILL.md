@@ -1,14 +1,21 @@
 ---
 name: timegpt-pipeline-builder
-description: "Generate production-ready TimeGPT forecasting pipeline code from requirements. Use when scaffolding a pipeline with validation, logging, visualization, and repeatable runs. Trigger with \"create TimeGPT pipeline\", \"build TimeGPT integration\", or \"generate forecast code\"."
+description: Generate production-ready TimeGPT forecasting pipeline code from requirements.
+  Use when scaffolding a pipeline with validation, logging, visualization, and repeatable
+  runs. Trigger with "create TimeGPT pipeline", "build TimeGPT integration", or "generate
+  forecast code".
 allowed-tools: Write,Read,Bash(python:*),Glob,Grep
 version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, timegpt, pipeline, code-generation, forecasting]
+tags:
+- nixtla
+- timegpt
+- pipeline
+- code-generation
+- forecasting
+compatibility: Designed for Claude Code
 ---
-
 # TimeGPT Pipeline Builder
 
 ## Overview

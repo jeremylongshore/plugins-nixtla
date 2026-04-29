@@ -13,10 +13,14 @@ allowed-tools: Read,Glob,Grep
 version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-compatible-with: claude-code
-tags: [nixtla, timegpt, forecasting, explainability, reporting]
+tags:
+- nixtla
+- timegpt
+- forecasting
+- explainability
+- reporting
+compatibility: Designed for Claude Code
 ---
-
 # Nixtla Explain Analyst
 
 ## Overview
