@@ -44,9 +44,11 @@ This directory contains documentation for both **implemented** and **planned** C
 
 ---
 
-## Implemented Plugins (13)
+## Implemented Plugins (13 + 1 separate)
 
-All implemented plugins have working code in `/005-plugins/` with full documentation.
+All implemented plugins have working code in `/005-plugins/` with full documentation. A 14th plugin, **changelog-automation**, exists in `005-plugins/` and has its own documentation at `000a-planned-plugins/changelog-automation/`. It is tracked separately because its PRD reports 0% complete despite a partial implementation on disk — that drift is reconciled by beads epic `C0` (`nixtla-xha`).
+
+For the canonical disk-state inventory of all 14 plugins with status labels (WORKING/PARTIAL/SCAFFOLD), see `005-plugins/README.md`.
 
 ### Original Core (3)
 | Plugin | Status | Description |

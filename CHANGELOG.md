@@ -7,7 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Features
+## [1.9.0] - 2026-04-29
+
+### Release Highlights
+**Public-readiness audit + SDK migration baseline.** Cuts the v1.9.0 release with corrected plugin inventory, fixed marketplace.json source paths, and a baseline audit of every plugin against the breaking Nixtla SDK v0.7.3 changes (Feb 2026). Foundation epic F2 (`nixtla-788`) closed.
+
+### Documentation
+- **`005-plugins/README.md` rewritten** from a stub ("Empty - Awaiting Implementation") into a real plugin index covering all 14 plugins with WORKING / PARTIAL / SCAFFOLD status labels and beads-epic cross-references.
+- **`000-docs/122-AA-AUDT-sdk-migration-baseline.md`** — read-only audit of every plugin's Nixtla SDK surface against the v0.7.3 breaking changes. Per-plugin remediation tasks land as F1 children. Finding: no deprecated symbol calls in any plugin; the only regression hot-path is `nixtla>=0.5.0` pins (7 plugins) needing bumps to `>=0.7.3`. The dark-horse risk is implicit gap-filling — only live execution catches it.
+- **TimeGPT-2 awareness:** TimeGPT-2 family (Mini/Standard/Pro, Oct 2025) and TimeGPT-2.1 multivariate (Dec 2025) are in private preview. No plugin currently targets them. F2 only acknowledges; deep integration is out of scope until the API stabilizes publicly.
+
+### Fixes
+- **`.claude-plugin/marketplace.json`** — source paths corrected from `plugins/<name>` to `005-plugins/<name>` (matches actual disk layout; previous paths would have failed `claude plugin install` from the marketplace).
+- **`nixtla-baseline-lab` version in marketplace** — synced to `1.5.0` (was `1.4.1`, drifted from the plugin manifest).
+
+### Operational
+- 13 beads epics created tracking the v1.9.0+ build plan: F1 (SDK migration), F2 (this release), 6 greenfield revenue plugins (A1–A6), 3 SCAFFOLD remediations (B1–B3), 1 doc-gap meta (C0), and the pre-public-launch health audit (D1). Dependency graph: F1+F2 ready, A/B/C0 gated on F1+F2, D1 gated on all of those.
+
+### Known gaps (intentionally deferred)
+- Plugin-level version drift across `marketplace.json`, `000-docs/000a-planned-plugins/README.md`, and per-plugin `plugin.json` (only the 3 marketplace entries fixed in this release; full per-plugin sync deferred to D1 health audit).
+- Marketplace listing expansion to all 14 plugins (each per-plugin epic's gate-13 adds its plugin once it has live-execution proof; F2 deliberately keeps the marketplace listing tight at WORKING-only).
+
+### Additional features (carried over from [Unreleased] in v1.8.1 → v1.9.0 window)
+
 - **Test Harness Lab Documentation** (2,507 lines):
   - Created comprehensive 5-phase reference documentation for multi-phase validated workflow pattern
   - `02-phase-2.md` (436 lines): Field utilization analysis procedure
