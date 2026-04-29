@@ -3524,8 +3524,7 @@ def populate_compliance_db(
                 pass
         return str(p)
 
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS skill_compliance (
+    c.execute("""CREATE TABLE IF NOT EXISTS skill_compliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         skill_path TEXT UNIQUE,
         total_fields INTEGER,
@@ -3553,11 +3552,9 @@ def populate_compliance_db(
         reference_file_count INTEGER DEFAULT 0,
         has_config_dir INTEGER DEFAULT 0,
         gold_standard_pct INTEGER DEFAULT 0
-    )"""
-    )
+    )""")
 
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS agent_compliance (
+    c.execute("""CREATE TABLE IF NOT EXISTS agent_compliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         agent_path TEXT UNIQUE,
         total_fields INTEGER,
@@ -3571,11 +3568,9 @@ def populate_compliance_db(
         validated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         validator_version TEXT,
         run_id INTEGER
-    )"""
-    )
+    )""")
 
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS plugin_compliance (
+    c.execute("""CREATE TABLE IF NOT EXISTS plugin_compliance (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         plugin_path TEXT UNIQUE,
         plugin_json_valid INTEGER,
@@ -3593,8 +3588,7 @@ def populate_compliance_db(
         validated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         validator_version TEXT,
         run_id INTEGER
-    )"""
-    )
+    )""")
 
     # Helpful index for run-scoped queries.
     c.execute("CREATE INDEX IF NOT EXISTS idx_skill_compliance_run_id ON skill_compliance(run_id)")

@@ -248,8 +248,7 @@ def format_html(
         badge = r.get("badge")
         color = badge_colors.get(badge, "#666")
         label = badge.capitalize() if badge else "Unrated"
-        rows.append(
-            f"""
+        rows.append(f"""
         <tr>
             <td>{i+1}</td>
             <td>{r['skill_name']}</td>
@@ -257,8 +256,7 @@ def format_html(
             <td><span style="background:{color};padding:2px 8px;border-radius:4px;
                 font-weight:bold;color:#111">{label}</span></td>
             <td>{r.get('deterministic_score', '-')}</td>
-        </tr>"""
-        )
+        </tr>""")
 
     ci = summary.get("ci_95", (0, 0))
 

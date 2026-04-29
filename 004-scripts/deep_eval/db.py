@@ -206,8 +206,7 @@ def populate_deep_eval_db(
 
 def _create_tables(cursor):
     """Create deep_eval tables if they don't exist."""
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS deep_eval_runs (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS deep_eval_runs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         run_timestamp TEXT NOT NULL,
         skill_count INTEGER,
@@ -217,11 +216,9 @@ def _create_tables(cursor):
         llm_available INTEGER DEFAULT 0,
         config_json TEXT,
         validator_version TEXT
-    )"""
-    )
+    )""")
 
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS deep_eval_results (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS deep_eval_results (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         run_id INTEGER NOT NULL,
         skill_path TEXT NOT NULL,
@@ -237,11 +234,9 @@ def _create_tables(cursor):
         evaluated_at TEXT,
         FOREIGN KEY (run_id) REFERENCES deep_eval_runs(id),
         UNIQUE(run_id, skill_path)
-    )"""
-    )
+    )""")
 
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS deep_eval_dimensions (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS deep_eval_dimensions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         run_id INTEGER NOT NULL,
         result_id INTEGER,
@@ -253,11 +248,9 @@ def _create_tables(cursor):
         details_json TEXT,
         FOREIGN KEY (run_id) REFERENCES deep_eval_runs(id),
         FOREIGN KEY (result_id) REFERENCES deep_eval_results(id)
-    )"""
-    )
+    )""")
 
-    cursor.execute(
-        """CREATE TABLE IF NOT EXISTS deep_eval_rankings (
+    cursor.execute("""CREATE TABLE IF NOT EXISTS deep_eval_rankings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         run_id INTEGER NOT NULL,
         skill_path TEXT NOT NULL,
@@ -269,23 +262,14 @@ def _create_tables(cursor):
         draws INTEGER DEFAULT 0,
         composite_score REAL,
         FOREIGN KEY (run_id) REFERENCES deep_eval_runs(id)
-    )"""
-    )
+    )""")
 
     # Indexes for common queries
-    cursor.execute(
-        """CREATE INDEX IF NOT EXISTS idx_deep_eval_results_run
-        ON deep_eval_results(run_id)"""
-    )
-    cursor.execute(
-        """CREATE INDEX IF NOT EXISTS idx_deep_eval_results_path
-        ON deep_eval_results(skill_path)"""
-    )
-    cursor.execute(
-        """CREATE INDEX IF NOT EXISTS idx_deep_eval_dims_run
-        ON deep_eval_dimensions(run_id)"""
-    )
-    cursor.execute(
-        """CREATE INDEX IF NOT EXISTS idx_deep_eval_rankings_run
-        ON deep_eval_rankings(run_id, category)"""
-    )
+    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_deep_eval_results_run
+        ON deep_eval_results(run_id)""")
+    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_deep_eval_results_path
+        ON deep_eval_results(skill_path)""")
+    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_deep_eval_dims_run
+        ON deep_eval_dimensions(run_id)""")
+    cursor.execute("""CREATE INDEX IF NOT EXISTS idx_deep_eval_rankings_run
+        ON deep_eval_rankings(run_id, category)""")
