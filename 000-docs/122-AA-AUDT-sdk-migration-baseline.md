@@ -25,31 +25,39 @@ Read-only baseline audit of every plugin under `005-plugins/` for usage of the d
 
 ## Findings (14 plugin dirs)
 
-| Plugin | TimeGPT SDK? | Pinned `nixtla` | Deprecated symbols | Effort |
+> **Errata 2026-04-29 (post-publication correction).** The first cut of this table conflated which plugins actually pin the Nixtla SDK. Filesystem ground truth (verified by `grep -rn "nixtla" 005-plugins/*/requirements.txt 005-plugins/*/scripts/requirements.txt`):
+>
+> - 7 plugins pin `nixtla>=0.5.0`: airflow-operator, baseline-lab, bigquery-forecaster, cost-optimizer, defi-sentinel, migration-assistant, vs-statsforecast-benchmark
+> - 5 plugins have no nixtla pin: forecast-explainer, roi-calculator, search-to-slack, snowflake-adapter, changelog-automation
+> - 2 plugins are SCAFFOLD with no requirements file: anomaly-streaming-monitor, dbt-package
+> - 1 root-level pin in `requirements.txt` was also `>=0.5.0`
+>
+> All 7 plugin pins + the root pin were bumped to `>=0.7.3` in commit `479575f` (closes child task `nixtla-3d8`). The table below reflects the corrected state.
+
+| Plugin | TimeGPT SDK? | Pinned `nixtla` (pre/post bump) | Deprecated symbols | Effort |
 |---|---|---|---|---|
-| nixtla-anomaly-streaming-monitor | yes | `>=0.5.0` | none — pin only | moderate (verify `.detect_anomalies()` against v0.7.3) |
-| nixtla-airflow-operator | yes | `>=0.5.0` | none — pin only | moderate (operator pattern needs v0.7.3 API check) |
-| nixtla-bigquery-forecaster | yes | `>=0.5.0` | none — pin only | moderate (BQ→forecast→BQ flow needs verification) |
-| nixtla-snowflake-adapter | yes | `>=0.5.0` | none — pin only | moderate (Snowflake↔Nixtla SDK v0.7.3 path is new — see Nixtla blog Feb 2026) |
-| nixtla-defi-sentinel | yes | `>=0.5.0` | none — pin only | trivial (pin bump) |
-| nixtla-forecast-explainer | yes | `>=0.5.0` | none — pin only | trivial |
-| nixtla-cost-optimizer | yes | `>=0.5.0` | none — pin only | trivial |
-| nixtla-roi-calculator | doc/pricing only | unpinned | none | trivial (no runtime dep) |
-| nixtla-migration-assistant | doc/template only | unpinned | none | trivial |
-| nixtla-vs-statsforecast-benchmark | doc/benchmark only | unpinned | none | trivial |
-| changelog-automation | no | n/a | n/a | exempt (non-Nixtla) |
-| nixtla-anomaly-streaming-monitor (SCAFFOLD) | no | n/a | n/a | covered under epic B1 (`nixtla-v6n`) |
-| nixtla-dbt-package (SCAFFOLD) | no | n/a | n/a | covered under epic B2 (`nixtla-o6p`) |
-| nixtla-search-to-slack (SCAFFOLD) | no | n/a | n/a | covered under epic B3 (`nixtla-9vz`) |
-| nixtla-baseline-lab | n/a (statsforecast only) | n/a | exempt | exempt — no TimeGPT SDK |
+| nixtla-airflow-operator | yes | `>=0.5.0` → `>=0.7.3` | none — pin only | moderate (operator pattern needs v0.7.3 API check) |
+| nixtla-baseline-lab | yes (optional, for TimeGPT comparison) | `>=0.5.0` → `>=0.7.3` | none — pin only | trivial (statsforecast is the primary surface) |
+| nixtla-bigquery-forecaster | yes | `>=0.5.0` → `>=0.7.3` | none — pin only | moderate (BQ→forecast→BQ flow needs verification) |
+| nixtla-cost-optimizer | yes | `>=0.5.0` → `>=0.7.3` | none — pin only | trivial |
+| nixtla-defi-sentinel | yes | `>=0.5.0` → `>=0.7.3` | none — pin only | trivial (pin bump) |
+| nixtla-migration-assistant | yes | `>=0.5.0` → `>=0.7.3` | none — pin only | trivial |
+| nixtla-vs-statsforecast-benchmark | yes | `>=0.5.0` → `>=0.7.3` | none — pin only | moderate (benchmark must reflect v0.7.3 perf) |
+| nixtla-forecast-explainer | no (uses statsmodels) | unpinned | none | exempt — no Nixtla SDK |
+| nixtla-roi-calculator | no (calculator only) | unpinned | none | exempt — no Nixtla SDK |
+| nixtla-snowflake-adapter | no (uses snowflake-connector-python only) | unpinned | none | exempt — but see note: Nixtla SDK v0.7.3 added native Snowflake support, may want to re-evaluate |
+| nixtla-search-to-slack (SCAFFOLD) | no | unpinned | none | covered under epic B3 (`nixtla-9vz`) |
+| nixtla-anomaly-streaming-monitor (SCAFFOLD) | n/a (no requirements yet) | n/a | n/a | covered under epic B1 (`nixtla-v6n`) |
+| nixtla-dbt-package (SCAFFOLD) | n/a (no requirements yet) | n/a | n/a | covered under epic B2 (`nixtla-o6p`) |
+| changelog-automation | no | n/a | n/a | exempt (non-Nixtla; tracked under epic C0 `nixtla-xha`) |
 
 ## Executive Summary
 
 1. **No deprecated symbol calls found** in any plugin. The `validate_token()`/`token=`/`environment=`/`TIMEGPT_TOKEN` surface is entirely absent across the codebase. This is the easy half of v0.7.3 — those plugins were either young enough to ship after the SDK matured or never used those particular APIs.
 
-2. **Version pin is the only regression hot-path.** 7 plugins pin `nixtla>=0.5.0`, which silently lets pip install pre-v0.7.3 releases. Bumping to `nixtla>=0.7.3` is the minimum action required.
+2. **Version pin is the only regression hot-path — and it has been remediated.** 7 plugin requirements files plus the root `requirements.txt` (8 locations total) pinned `nixtla>=0.5.0`, which silently let pip install pre-v0.7.3 releases. All bumped to `nixtla>=0.7.3` in commit `479575f` (closes child task `nixtla-3d8`).
 
-3. **Effort is concentrated in API verification, not code rewrite.** No plugin needs symbol-level migration. The work is: bump pins, then live-execute against v0.7.3 to confirm nothing depends on implicit gap-filling or other behavioral changes.
+3. **Effort is concentrated in API verification, not code rewrite.** No plugin needs symbol-level migration. The remaining F1 work is: live-execute each plugin against v0.7.3 in a fresh codespace to confirm nothing depends on implicit gap-filling or other behavioral changes (story #11 per plugin epic).
 
 4. **`fill_gaps()` is the dark-horse risk.** Pre-v0.7.3, the SDK auto-filled gaps in time series; post-v0.7.3, callers must invoke `fill_gaps()` explicitly. Static analysis can't catch this — only live execution against irregular data will. Story #11 (codespace live-execution) per epic catches this; static unit tests will not.
 
