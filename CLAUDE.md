@@ -8,9 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | Attribute | Value |
 |-----------|-------|
-| **Version** | 1.8.1 (source: `VERSION`) |
+| **Version** | 1.9.0 (source: `VERSION`) |
 | **Status** | Experimental showcase |
-| **Stack** | Python 3.9+, statsforecast, TimeGPT API, pytest, black, isort |
+| **Stack** | Python 3.10+ (Nixtla SDK >=0.7.3 dropped 3.9), statsforecast, TimeGPT API, pytest, black, isort |
 | **Skills** | 30 (in `003-skills/.claude/skills/`) |
 | **Plugins** | 13 (in `005-plugins/`) - 3 working |
 

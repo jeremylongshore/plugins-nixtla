@@ -17,9 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`000-docs/122-AA-AUDT-sdk-migration-baseline.md`** — read-only audit of every plugin's Nixtla SDK surface against the v0.7.3 breaking changes. Per-plugin remediation tasks land as F1 children. Finding: no deprecated symbol calls in any plugin; the only regression hot-path is `nixtla>=0.5.0` pins (7 plugins) needing bumps to `>=0.7.3`. The dark-horse risk is implicit gap-filling — only live execution catches it.
 - **TimeGPT-2 awareness:** TimeGPT-2 family (Mini/Standard/Pro, Oct 2025) and TimeGPT-2.1 multivariate (Dec 2025) are in private preview. No plugin currently targets them. F2 only acknowledges; deep integration is out of scope until the API stabilizes publicly.
 
+### Breaking Changes
+- **Python 3.10+ required.** Dropped Python 3.9 from the supported matrix. Reason: Nixtla SDK v0.7.3 (the F1 migration floor) requires `python>=3.10`. `pyproject.toml` `requires-python` updated, CI matrix Linux/3.9 entry removed, mypy `python_version` bumped to 3.10. Users on 3.9 must upgrade or pin `nixtla<0.7.3` (not recommended — keeps you on the deprecated SDK surface).
+
 ### Fixes
 - **`.claude-plugin/marketplace.json`** — source paths corrected from `plugins/<name>` to `005-plugins/<name>` (matches actual disk layout; previous paths would have failed `claude plugin install` from the marketplace).
 - **`nixtla-baseline-lab` version in marketplace** — synced to `1.5.0` (was `1.4.1`, drifted from the plugin manifest).
+- **`nixtla>=0.5.0` → `nixtla>=0.7.3`** across 8 locations (7 plugin requirements files + root `requirements.txt` + 1 documented pin in baseline-lab README). Surfaces install-time failures rather than letting plugins silently keep running on the deprecated SDK surface. (F1 child task `nixtla-3d8`.)
+- **`pyproject.toml`** root nixtla dep also bumped from `>=0.5.0` to `>=0.7.3`.
+- **`.github/workflows/plugin-validator.yml`** — fixed jq escape bug in "Detect Plugins to Validate" (backslash-escaped quotes inside bash single-quotes were passed literally to jq, which doesn't accept them). Each of the 14 plugins now validates as a separate matrix entry on every PR. (F2 child task `nixtla-7ch`.)
 
 ### Operational
 - 13 beads epics created tracking the v1.9.0+ build plan: F1 (SDK migration), F2 (this release), 6 greenfield revenue plugins (A1–A6), 3 SCAFFOLD remediations (B1–B3), 1 doc-gap meta (C0), and the pre-public-launch health audit (D1). Dependency graph: F1+F2 ready, A/B/C0 gated on F1+F2, D1 gated on all of those.
