@@ -144,7 +144,7 @@ datasetsforecast>=0.0.8
 pandas>=2.0.0
 numpy>=1.24.0
 matplotlib>=3.7.0
-nixtla>=0.5.0  # Optional, for TimeGPT comparison
+nixtla>=0.7.3  # Optional, for TimeGPT comparison (v0.7.3 = NixtlaClient/api_key= rename floor)
 ```
 
 ---
