@@ -67,7 +67,7 @@ Read-only baseline audit of every plugin under `005-plugins/` for usage of the d
 
 For each non-exempt plugin in the table, F1 spawns one child task:
 
-```
+```text
 Title: <plugin>: bump nixtla>=0.7.3 + verify against v0.7.3 SDK
 Type: task
 Parent: nixtla-48n

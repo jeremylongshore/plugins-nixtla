@@ -47,9 +47,11 @@ Manifest only or manifest + tests only. Build to WORKING tracked in beads epics 
 
 ## SDK compatibility
 
-All TimeGPT-using plugins should target **Nixtla SDK v0.7.3+** (Feb 2026 breaking changes: `NixtlaClient` class, `api_key=`, `NIXTLA_API_KEY` env, explicit `fill_gaps()`). See `000-docs/122-AA-AUDT-sdk-migration-baseline.md` for the audit and per-plugin remediation plan (beads epic `F1` / `nixtla-48n`).
+All TimeGPT-using plugins should target **Nixtla SDK v0.7.3+** (Feb 2026 breaking changes: `NixtlaClient` class, `api_key=`, canonical env var `NIXTLA_API_KEY`, explicit `fill_gaps()`). See `000-docs/122-AA-AUDT-sdk-migration-baseline.md` for the audit and per-plugin remediation plan (beads epic `F1` / `nixtla-48n`).
 
-`nixtla-baseline-lab` is exempt — it uses `statsforecast` only, no TimeGPT SDK.
+> **Env var status (as of v1.9.0).** The canonical post-v0.7.3 environment variable is `NIXTLA_API_KEY`. Repo plugins currently use a mix of `NIXTLA_TIMEGPT_API_KEY` (Intent Solutions legacy variant) and `TIMEGPT_API_KEY` (legacy upstream Nixtla variant). Standardizing on `NIXTLA_API_KEY` is part of each plugin's F1 codespace live-execution gate — do not propagate the legacy variants in new code.
+
+`nixtla-baseline-lab` keeps `nixtla` as an *optional* dep for the TimeGPT comparison path; the primary surface (statsforecast) does not need the SDK.
 
 ## Planned plugins (not yet on disk)
 

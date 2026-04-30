@@ -1166,7 +1166,10 @@ Older versions and their changelogs can be found in the [releases page](https://
 **Maintained by**: Jeremy Longshore (jeremy@intentsolutions.io)
 **Repository**: [claude-code-plugins-nixtla](https://github.com/intent-solutions-io/plugins-nixtla)
 
-[Unreleased]: https://github.com/intent-solutions-io/plugins-nixtla/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/intent-solutions-io/plugins-nixtla/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/intent-solutions-io/plugins-nixtla/releases/tag/v1.9.0
+[1.8.1]: https://github.com/intent-solutions-io/plugins-nixtla/releases/tag/v1.8.1
+[1.8.0]: https://github.com/intent-solutions-io/plugins-nixtla/releases/tag/v1.8.0
 [0.8.0]: https://github.com/intent-solutions-io/plugins-nixtla/releases/tag/v0.8.0
 [0.7.0]: https://github.com/intent-solutions-io/plugins-nixtla/releases/tag/v0.7.0
 [0.6.0]: https://github.com/intent-solutions-io/plugins-nixtla/releases/tag/v0.6.0

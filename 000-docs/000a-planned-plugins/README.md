@@ -37,10 +37,10 @@ This directory contains documentation for both **implemented** and **planned** C
 
 | Category | Count | Status |
 |----------|-------|--------|
-| **Implemented Plugins** | 13 | Live in `005-plugins/` |
+| **Implemented Plugins (PRD-tracked)** | 13 | Live in `005-plugins/`; the 14th (`changelog-automation`) is tracked separately under epic C0 — see note below |
 | **Planned Plugins** | 6 | PRDs complete, awaiting build |
 | **Templates** | 1 | Reusable blueprints |
-| **Total** | 20 | - |
+| **Total** | 20 | (13 PRD-tracked + 1 separately-tracked + 6 planned) |
 
 ---
 
