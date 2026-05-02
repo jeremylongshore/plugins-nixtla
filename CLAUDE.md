@@ -8,9 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | Attribute | Value |
 |-----------|-------|
-| **Version** | 1.8.1 (source: `VERSION`) |
+| **Version** | 1.9.0 (source: `VERSION`) |
 | **Status** | Experimental showcase |
-| **Stack** | Python 3.9+, statsforecast, TimeGPT API, pytest, black, isort |
+| **Stack** | Python 3.10+ (Nixtla SDK >=0.7.3 dropped 3.9), statsforecast, TimeGPT API, pytest, black, isort |
 | **Skills** | 30 (in `003-skills/.claude/skills/`) |
 | **Plugins** | 13 (in `005-plugins/`) - 3 working |
 
@@ -306,3 +306,15 @@ Release process:
 4. Tag: `git tag -a v1.X.Y -m "Release v1.X.Y"`
 5. Push: `git push origin v1.X.Y`
 
+
+## Testing baseline (2026-05-01 — Intent Solutions Testing SOP)
+
+This repo participates in the **Intent Solutions Testing SOP** per `~/.claude/CLAUDE.md` § "Intent Solutions Testing SOP" and the VPS-as-the-home program (`OPS-5nm`, Priority 6).
+
+**Installed**: `@intentsolutions/audit-harness v0.1.0` vendored at `.audit-harness/` with wrapper at `scripts/audit-harness`.
+
+**Commands**: `scripts/audit-harness {verify, init, list, escape-scan --staged}`.
+
+**Next step**: run `/audit-tests` to produce `TEST_AUDIT.md`. See `000-docs/677-OD-SOPS-audit-harness-baseline-2026-05-01.md`.
+
+**Upgrade**: `AUDIT_HARNESS_VERSION=vX.Y.Z curl -sSL https://raw.githubusercontent.com/jeremylongshore/audit-harness/main/install.sh | bash`. Or run `/sync-testing-harness` from any session.

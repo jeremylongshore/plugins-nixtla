@@ -1,7 +1,7 @@
 # Nixtla Open-Source Models
 statsforecast>=1.7.0
 datasetsforecast>=1.0.0  # Required by baseline-lab integration
-nixtla>=0.5.0  # For TimeGPT (optional)
+nixtla>=0.7.3  # For TimeGPT (optional); v0.7.3 is the SDK rename floor (NixtlaClient/api_key=)
 
 # Google Cloud
 google-cloud-bigquery>=3.10.0

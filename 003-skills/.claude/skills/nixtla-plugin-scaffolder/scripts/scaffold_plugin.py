@@ -323,8 +323,7 @@ python skills/{self.plugin_name}/scripts/{self.plugin_name.replace('-', '_')}_mc
         for tool in mcp_tools:
             func_name = tool["name"]
             func_desc = tool["description"]
-            tool_functions.append(
-                f'''
+            tool_functions.append(f'''
 @server.call_tool()
 async def {func_name}(arguments: dict) -> list[types.TextContent]:
     """
@@ -341,8 +340,7 @@ async def {func_name}(arguments: dict) -> list[types.TextContent]:
         type="text",
         text=f"{func_name} executed with args: {{arguments}}"
     )]
-'''
-            )
+''')
 
         mcp_content = f'''#!/usr/bin/env python3
 """

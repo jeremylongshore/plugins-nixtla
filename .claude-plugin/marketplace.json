@@ -7,8 +7,8 @@
   "plugins": [
     {
       "name": "nixtla-baseline-lab",
-      "version": "1.4.1",
-      "source": "github:intent-solutions-io/plugins-nixtla/plugins/nixtla-baseline-lab",
+      "version": "1.5.0",
+      "source": "github:intent-solutions-io/plugins-nixtla/005-plugins/nixtla-baseline-lab",
       "description": "Run Nixtla-style baseline forecasting models on public benchmark datasets from inside Claude Code conversations.",
       "author": {
         "name": "Jeremy Longshore",
@@ -20,7 +20,7 @@
     {
       "name": "nixtla-bigquery-forecaster",
       "version": "0.1.0",
-      "source": "github:intent-solutions-io/plugins-nixtla/plugins/nixtla-bigquery-forecaster",
+      "source": "github:intent-solutions-io/plugins-nixtla/005-plugins/nixtla-bigquery-forecaster",
       "description": "Run Nixtla statsforecast models on BigQuery time series data. Pull from BigQuery, forecast with AutoETS/AutoTheta, write results back.",
       "author": {
         "name": "Jeremy Longshore",
@@ -32,7 +32,7 @@
     {
       "name": "nixtla-search-to-slack",
       "version": "0.2.0",
-      "source": "github:intent-solutions-io/plugins-nixtla/plugins/nixtla-search-to-slack",
+      "source": "github:intent-solutions-io/plugins-nixtla/005-plugins/nixtla-search-to-slack",
       "description": "Automated content discovery and curation for Nixtla and time-series forecasting practitioners. Searches web and GitHub, generates AI summaries, and publishes formatted digests to Slack.",
       "author": {
         "name": "Jeremy Longshore",

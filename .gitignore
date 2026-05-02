@@ -153,3 +153,8 @@ reports/
 *-nixtla-contractor*.md
 *-exploitation*.md
 *law-firm*.csv
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key

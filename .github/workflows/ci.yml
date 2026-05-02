@@ -173,10 +173,9 @@ jobs:
       fail-fast: false
       matrix:
         # Reduced matrix: Linux gets all versions, others get 3.11 only
+        # Python 3.9 dropped in v1.9.0 — Nixtla SDK >=0.7.3 requires py>=3.10
         include:
-          # Linux - test all Python versions (1x multiplier)
-          - os: ubuntu-latest
-            python-version: '3.9'
+          # Linux - test all supported Python versions (1x multiplier)
           - os: ubuntu-latest
             python-version: '3.10'
           - os: ubuntu-latest
