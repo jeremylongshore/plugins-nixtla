@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Strategic direction — v2.0 plan landed
+
+A strategic vision document was filed at [`000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md`](000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md) that establishes the four-tier structure for v2.0:
+
+- **Tier 1 — The Trinity** (v2.0 ship target): `nixtla-baseline-lab`, `nixtla-bigquery-forecaster`, `nixtla-search-to-slack`. Hardened to a 10-gate elite criterion (per-plugin CI, pytest ≥80% coverage, security review, screencasts, deploy guides).
+- **Tier 2 — Revenue plays** (v3.0): `nixtla-sales-demo-builder` → `nixtla-forecast-workflow-templates` → `nixtla-forecast-audit-report`. Each ships as a minor release on the v2.x line.
+- **Tier 3 — Y2 flagship**: `nixtla-embedded-forecast-widget`. Deferred until Tier 2 has paying customer signal.
+- **Tier 4 — Experimental / archived**: 11 plugin directories (`nixtla-roi-calculator`, `nixtla-migration-assistant`, `nixtla-snowflake-adapter`, `nixtla-airflow-operator`, `nixtla-cost-optimizer`, `nixtla-defi-sentinel`, `nixtla-forecast-explainer`, `nixtla-vs-statsforecast-benchmark`, `nixtla-dbt-package`, `nixtla-anomaly-streaming-monitor`, `changelog-automation`) and 2 removed-from-roadmap plans (`nixtla-support-deflector`, `nixtla-docs-qa-generator`). All demarcated as experimental, excluded from the public marketplace.
+
+### Beads re-decomposition
+
+- Closed 6 epics that no longer serve the strategy: `nixtla-o6p` (dbt-package, deferred), `nixtla-v6n` (anomaly-streaming-monitor, archived), `nixtla-xha` (C0 doc-gap, superseded by VISN doc), `nixtla-scv` (embedded-widget, Y2 deferred), `nixtla-qtl` (support-deflector, removed from roadmap), `nixtla-l25` (docs-qa-generator, removed from roadmap), `nixtla-9vz` (search-to-slack, reclassified into Trinity).
+- Created `nixtla-2oj` (Epic: v2.0 release — The Trinity hardened to globally-elite quality, P0) with 5 children: V2-T1 (`nixtla-8fb` baseline-lab harden), V2-T2 (`nixtla-a59` bigquery-forecaster harden), V2-T3 (`nixtla-zha` search-to-slack verify), V2-T4 (`nixtla-sii` release cut), V2-T5 (`nixtla-q8j` Trinity codespace smoke audit).
+- Created `nixtla-t23` (Epic: experimental tier demarcation, P1) — single sweep adding banners + isolating Tier 4 plugins from public surface.
+- Re-wired Tier 2 epics to be blocked by v2.0 epic.
+
+### Repo transferred
+
+`intent-solutions-io/plugins-nixtla` → `jeremylongshore/plugins-nixtla` (2026-05-02). All `intent-solutions-io` URLs in the README and `.claude-plugin/marketplace.json` updated to the new owner. Old URLs redirect via GitHub.
+
+### Documentation
+
+- New: [`000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md`](000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md) — the keystone "why" document for the v2.0 cut. Every future scope decision is reconciled against this.
+- Rewritten: [`README.md`](README.md) — reflects the new flagship-tier narrative, fixes post-transfer URLs, syncs version (1.9.0) and counts (3 flagship + 11 experimental + 30 skills).
+- Fixed: [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) owner URL and source URLs (now point to `jeremylongshore/plugins-nixtla`; the previous URLs would 404).
+
 ## [1.9.0] - 2026-04-29
 
 ### Release Highlights

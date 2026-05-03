@@ -1,187 +1,46 @@
 # Nixtla Plugin Showcase
 
-Claude Code plugins and AI skills for time-series forecasting with Nixtla's statsforecast and TimeGPT.
+Production-grade Claude Code plugins and AI skills for time-series forecasting with Nixtla — `statsforecast`, `mlforecast`, `neuralforecast`, and TimeGPT.
 
-**Version**: 1.7.0 | **Status**: Experimental | **Plugins**: 3 | **Skills**: 8
+**Version**: 1.9.0 · **Status**: Public showcase · **Flagship plugins**: 3 · **Skills**: 30 · **Experimental tier**: 11 plugins
+
+> **What this is.** A curated reference implementation showing what production-grade time-series forecasting looks like inside Claude Code. Three flagship plugins demonstrate the patterns; thirty skills carry the forecasting expertise; an experimental tier shows where the work goes next. See [`000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md`](000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md) for the strategy and the four-tier structure.
 
 ---
 
-## TL;DR (30 Seconds)
+## TL;DR (30 seconds)
 
 | Question | Answer |
 |----------|--------|
-| **What** | Claude Code plugins + AI skills for time-series forecasting |
-| **Who** | Business showcase for Nixtla CEO |
-| **Status** | Experimental (not production) |
-| **Stack** | Python 3.10+, statsforecast, TimeGPT API |
-| **Entry Point** | `005-plugins/nixtla-baseline-lab/` |
+| **What** | Three flagship Claude Code plugins + 30 forecasting skills |
+| **Why** | Showcase Nixtla's stack inside the AI-augmented developer workflow |
+| **Who** | Time-series practitioners, data engineers, Nixtla customers and prospects |
+| **Stack** | Python 3.10+, statsforecast, mlforecast, neuralforecast, TimeGPT API |
+| **Try first** | [`005-plugins/nixtla-baseline-lab/`](005-plugins/nixtla-baseline-lab/) — runs offline in 90 seconds, no API key |
 
 ---
 
-## Health Check (Run First)
+## The flagship — three plugins, ready to install
+
+```
+.claude-plugin/marketplace.json  ← the curated set
+```
+
+| Plugin | What it does | API key | Status |
+|--------|--------------|--------|--------|
+| [`nixtla-baseline-lab`](005-plugins/nixtla-baseline-lab/) | Run statsforecast baselines on M4 (or your CSV) inside a Claude conversation | None | Working |
+| [`nixtla-bigquery-forecaster`](005-plugins/nixtla-bigquery-forecaster/) | Pull from BigQuery, forecast with AutoETS / AutoTheta, write results back, all from chat | GCP creds | Working |
+| [`nixtla-search-to-slack`](005-plugins/nixtla-search-to-slack/) | Discover and curate forecasting content from web + GitHub, post AI-summarized digests to Slack | Slack + (SerpAPI or Claude WebSearch) | Working |
+
+> The flagship is hardened to the v2.0 acceptance gate: install loads cleanly on a fresh clone, per-plugin CI gates merge, ≥80% test coverage, security-reviewed, screencast linked, deploy guide for self-hosting. See the strategic vision doc for the full ten-gate criterion.
+
+### Quickstart — Baseline Lab
+
+Five-minute install with zero API keys:
 
 ```bash
-# 1. Python version OK?
-python3 --version  # Need 3.10+
-
-# 2. Clone and install
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
-cd plugins-nixtla
-pip install -e . && pip install -r requirements-dev.txt
-
-# 3. Tests pass?
-pytest -v --tb=short
-
-# 4. Baseline lab smoke test (90 sec, offline, no API key needed)
-cd 005-plugins/nixtla-baseline-lab
-./scripts/setup_nixtla_env.sh --venv
-source .venv-nixtla-baseline/bin/activate
-python tests/run_baseline_m4_smoke.py
-```
-
-All pass? You're ready. Something failed? See [Troubleshooting](#troubleshooting).
-
----
-
-## Directory Map
-
-```
-nixtla/
-├── 000-docs/                    # ALL documentation (Doc-Filing v3.0)
-│   ├── 001a-planned-skills/     #   Generated skill specs (prediction markets)
-│   ├── 004a-dev-planning-templates/  #   Development templates
-│   └── archive/                 #   Historical docs
-│
-├── 003-skills/                  # Claude Skills (AI behavior mods)
-│   └── .claude/skills/          #   8 production skills
-│
-├── 005-plugins/                 # WORKING PLUGINS (start here)
-│   ├── nixtla-baseline-lab/     #   Main showcase - M4 benchmarks
-│   ├── nixtla-bigquery-forecaster/   BigQuery integration
-│   └── nixtla-search-to-slack/  #   Slack notifications
-│
-├── packages/                    # Installable packages
-│   └── nixtla-claude-skills-installer/  # CLI: nixtla-skills
-│
-├── scripts/                     # Repo-level automation
-├── tests/                       # Integration tests
-├── .github/workflows/           # CI/CD pipelines (7 workflows)
-│
-├── CLAUDE.md                    # AI assistant instructions
-├── README.md                    # You are here
-├── CHANGELOG.md                 # Release history
-└── VERSION                      # Current version: 1.7.0
-```
-
-### Entry Points by Role
-
-| Role | Start Here |
-|------|------------|
-| **Developer** | [005-plugins/nixtla-baseline-lab/](005-plugins/nixtla-baseline-lab/) |
-| **Plugin Author** | [000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md](000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md) |
-| **Skill Author** | [000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md](000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md) |
-
----
-
-## Environment Variables
-
-| Variable | Required | Purpose | Where Used |
-|----------|----------|---------|------------|
-| `NIXTLA_TIMEGPT_API_KEY` | For TimeGPT only | Nixtla API access | TimeGPT skills/plugins |
-| `PROJECT_ID` | For GCP | Google Cloud project | BigQuery forecaster |
-| `LOCATION` | For GCP | GCP region (default: us-central1) | BigQuery forecaster |
-
-**Quick Setup**:
-
-```bash
-# Minimal (baseline lab - no API key needed)
-# statsforecast runs fully offline
-
-# Full setup (TimeGPT features)
-export NIXTLA_TIMEGPT_API_KEY='your-key-here'
-
-# GCP features
-export PROJECT_ID='your-gcp-project'
-export LOCATION='us-central1'
-```
-
----
-
-## Quick Commands
-
-### Install & Setup
-
-```bash
-# Clone
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
-cd plugins-nixtla
-
-# Install (editable + dev deps)
-pip install -e .
-pip install -r requirements-dev.txt
-```
-
-### Run Tests
-
-```bash
-pytest -v                          # All tests
-pytest 005-plugins/ -v             # Plugin tests only
-pytest --cov=005-plugins -v        # With coverage
-python tests/run_baseline_m4_smoke.py  # Baseline lab smoke test
-```
-
-### Lint & Format
-
-```bash
-black --check .                    # Check formatting
-black .                            # Fix formatting
-isort --check-only .               # Check imports
-isort .                            # Fix imports
-flake8 .                           # Lint check
-```
-
-### Skills Installer
-
-```bash
-pip install -e packages/nixtla-claude-skills-installer
-cd /path/to/your/project
-nixtla-skills init                 # Install all skills
-nixtla-skills update               # Update to latest
-nixtla-skills --version            # Check version
-```
-
----
-
-## CI/CD Reference
-
-| Workflow | File | Trigger | Purpose |
-|----------|------|---------|---------|
-| **Main CI** | `ci.yml` | PR, push | Lint, format, test |
-| **Baseline Lab** | `nixtla-baseline-lab-ci.yml` | PR, push | Plugin tests |
-| **Skills Installer** | `skills-installer-ci.yml` | PR, push | Installer tests |
-| **BigQuery Deploy** | `deploy-bigquery-forecaster.yml` | Manual | Cloud Functions |
-| **Plugin Validator** | `plugin-validator.yml` | PR | Schema validation |
-| **Gemini PR Review** | `gemini-pr-review.yml` | PR | AI code review |
-| **Gemini Daily Audit** | `gemini-daily-audit.yml` | Schedule | Daily audit |
-
-**Location**: `.github/workflows/`
-
-**Required to Merge**: `ci.yml` must pass
-
----
-
-## Plugins
-
-| Plugin | Purpose | Status | API Key |
-|--------|---------|--------|---------|
-| `nixtla-baseline-lab` | Run statsforecast baselines on M4 data | Working | No |
-| `nixtla-bigquery-forecaster` | Forecast BigQuery data via Cloud Functions | Working | Yes |
-| `nixtla-search-to-slack` | Search web/GitHub, post to Slack | MVP | Yes |
-
-### Quick Start (Baseline Lab)
-
-```bash
-cd 005-plugins/nixtla-baseline-lab
+git clone https://github.com/jeremylongshore/plugins-nixtla.git
+cd plugins-nixtla/005-plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
 pip install -r scripts/requirements.txt
@@ -190,76 +49,226 @@ pip install -r scripts/requirements.txt
 /nixtla-baseline-m4 demo_preset=m4_daily_small
 ```
 
-Runs in ~90 seconds, fully offline, zero API costs.
+Runs in ~90 seconds, fully offline, zero API cost. First-time download fetches ~30 MB of M4 data.
+
+### What's in the marketplace
+
+```bash
+# Install any of the Trinity directly via the marketplace manifest
+claude plugin install github:jeremylongshore/plugins-nixtla/005-plugins/nixtla-baseline-lab
+claude plugin install github:jeremylongshore/plugins-nixtla/005-plugins/nixtla-bigquery-forecaster
+claude plugin install github:jeremylongshore/plugins-nixtla/005-plugins/nixtla-search-to-slack
+```
+
+---
+
+## The skills — 30 production skills
+
+Skills are Claude behavior modifications (`SKILL.md` + scripts/templates) that auto-activate on relevant context. The repo ships 30 of them across two domains:
+
+| Domain | Count | Examples |
+|---|---|---|
+| **Forecasting / time-series** | 19 | `nixtla-anomaly-detector`, `nixtla-batch-forecaster`, `nixtla-correlation-mapper`, `nixtla-cross-validator`, `nixtla-event-impact-modeler`, `nixtla-exogenous-integrator`, `nixtla-forecast-validator`, `nixtla-model-selector`, `nixtla-timegpt-finetune-lab`, `nixtla-uncertainty-quantifier` |
+| **Engineering / infra** | 11 | `nixtla-mcp-server-builder`, `nixtla-plugin-scaffolder`, `nixtla-prd-to-code`, `nixtla-test-generator`, `nixtla-universal-validator`, `nixtla-prod-pipeline-generator` |
+
+```bash
+# Install all 30 into your own project
+pip install -e 006-packages/nixtla-claude-skills-installer
+cd /path/to/your/project
+nixtla-skills init
+```
+
+Spec for the skill format we use: [`000-docs/000a-skills-schema/SKILLS-STANDARD-COMPLETE.md`](000-docs/000a-skills-schema/SKILLS-STANDARD-COMPLETE.md).
+
+---
+
+## Experimental tier — 11 plugins, not for public install
+
+The repo also contains 11 in-progress plugin directories at various stages of maturity. **They are not in the marketplace and are not recommended for production use.** They live here as transparency about ongoing work and as a starting point for community contributors.
+
+The full list and disposition (deferred / archived / removed-from-roadmap) is in [`130-AA-VISN`](000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md) §"Tier 4". The short version: each plugin's README will carry an experimental banner; none are listed in `.claude-plugin/marketplace.json`.
+
+---
+
+## Roadmap — where this goes next
+
+Three plugins in the v3.0 expansion, each with a complete PRD already written:
+
+| Next-up plugin | Effort | Drives |
+|---|---|---|
+| `nixtla-sales-demo-builder` | 3 wk | Industry-specific TimeGPT demo notebooks generated in minutes |
+| `nixtla-forecast-workflow-templates` | 6 wk | Drop-in production workflows (demand planning, revenue, capacity); $50–100K ARR opportunity |
+| `nixtla-forecast-audit-report` | 8 wk | Compliance-grade audit reports (SOX, FDA, Basel III); unlocks regulated verticals |
+
+PRDs live in `000-docs/000a-planned-plugins/external-revenue/`. Each lands as its own minor release on the v2.x line.
+
+---
+
+## Health check (run first)
+
+```bash
+# 1. Python version
+python3 --version              # need 3.10+ (Nixtla SDK >=0.7.3 requires it)
+
+# 2. Clone + install
+git clone https://github.com/jeremylongshore/plugins-nixtla.git
+cd plugins-nixtla
+pip install -e . && pip install -r requirements-dev.txt
+
+# 3. Tests pass?
+pytest -v --tb=short -m "not integration"
+
+# 4. Skills validate?
+python 004-scripts/validate_skills_v2.py
+```
+
+All four green? Ready to work. Any failures? See [Troubleshooting](#troubleshooting).
+
+---
+
+## Repository map
+
+```
+plugins-nixtla/
+├── 000-docs/                         # All documentation, NNN-CC-CODE-slug.md filing
+│   ├── 130-AA-VISN-...               # ← strategic vision (start here)
+│   ├── 122-AA-AUDT-...               # SDK migration baseline audit
+│   ├── 000a-skills-schema/           # Master skills standard
+│   └── 000a-planned-plugins/         # PRDs for v3.0 expansion plugins
+├── 003-skills/.claude/skills/        # 30 production skills
+├── 005-plugins/                      # Plugin implementations
+│   ├── nixtla-baseline-lab/          #   FLAGSHIP — M4 baselines, offline-capable
+│   ├── nixtla-bigquery-forecaster/   #   FLAGSHIP — GCP / BigQuery
+│   ├── nixtla-search-to-slack/       #   FLAGSHIP — content curation → Slack
+│   └── ...                           #   11 experimental plugins (banner in each)
+├── 006-packages/                     # Installable packages
+│   └── nixtla-claude-skills-installer/   # CLI: `nixtla-skills init`
+├── 004-scripts/                      # Validators, generators
+├── tests/                            # Repo-level pytest suite
+├── .github/workflows/                # CI/CD
+├── .claude-plugin/marketplace.json   # The flagship 3-plugin marketplace
+├── CHANGELOG.md                      # Release history
+└── VERSION                           # 1.9.0
+```
+
+---
+
+## Environment
+
+| Variable | When you need it | What it's for |
+|---|---|---|
+| `NIXTLA_TIMEGPT_API_KEY` | TimeGPT-based skills/plugins only | Nixtla TimeGPT API access |
+| `PROJECT_ID` | `nixtla-bigquery-forecaster` only | Your GCP project |
+| `LOCATION` | `nixtla-bigquery-forecaster` only | GCP region (default: `us-central1`) |
+| `SLACK_BOT_TOKEN`, `SERPAPI_KEY` | `nixtla-search-to-slack` only | See plugin's setup guide |
+
+Baseline lab needs no keys. Just `statsforecast` and ~30 MB of M4 data.
+
+---
+
+## Quick commands
+
+```bash
+# Tests
+pytest -v                                # all
+pytest -m "not integration"              # skip network/GCP/API tests
+pytest --cov=005-plugins -v              # with coverage
+
+# Validation
+python 004-scripts/validate_skills_v2.py --fail-on-warn
+bash 004-scripts/validate-all-plugins.sh .
+
+# Format
+black --check . && isort --check-only . && flake8 .
+black . && isort .                       # fix
+
+# Skills installer (in another project)
+pip install -e 006-packages/nixtla-claude-skills-installer
+nixtla-skills init                       # install all skills
+nixtla-skills update                     # update to latest
+```
+
+---
+
+## CI/CD
+
+| Workflow | Trigger | Required to merge? |
+|---|---|---|
+| `ci.yml` | every push + PR | Yes (lint, format, test) |
+| `skills-validation.yml` | PR | Yes (skills schema strict) |
+| `plugin-validator.yml` | PR | No (per-plugin schema check) |
+| `nixtla-baseline-lab-ci.yml` | PR touching the lab | No |
+| `gemini-pr-review.yml` | PR | No (AI review) |
+
+Workflows live in [`.github/workflows/`](.github/workflows/).
 
 ---
 
 ## Documentation
 
-| Document | Audience | Link |
-|----------|----------|------|
-| Plugin Implementation | Developers | [6767-f-OD-GUIDE-enterprise-plugin-implementation.md](000-docs/6767-f-OD-GUIDE-enterprise-plugin-implementation.md) |
-| Skill Frontmatter Schema | Skill Authors | [6767-m-DR-STND-claude-skills-frontmatter-schema.md](000-docs/6767-m-DR-STND-claude-skills-frontmatter-schema.md) |
-| Skill Authoring Guide | Skill Authors | [6767-n-DR-GUID-claude-skills-authoring-guide.md](000-docs/6767-n-DR-GUID-claude-skills-authoring-guide.md) |
-| Skill Output Controls | Developers | [099-AA-GUIDE-skill-output-controls.md](000-docs/099-AA-GUIDE-skill-output-controls.md) |
+| Document | Audience |
+|---|---|
+| [Strategic Vision v2.0](000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md) | Anyone deciding what to build next |
+| [Skills Standard](000-docs/000a-skills-schema/SKILLS-STANDARD-COMPLETE.md) | Skill authors |
+| [SDK Migration Baseline](000-docs/122-AA-AUDT-sdk-migration-baseline.md) | Anyone touching plugin requirements files |
+| [Planned-Plugins Index](000-docs/000a-planned-plugins/README.md) | Roadmap readers |
+| Per-plugin READMEs | Plugin users |
 
-**Doc-Filing System**: `NNN-CC-ABCD-description.md`
-- `PP` = Planning, `AT` = Architecture, `AA` = Audits, `OD` = Overview, `DR` = Reference
+Doc filing format: `NNN-CC-CODE-description.md` — see [`002-command-bible/DOCUMENT-FILING-STANDARD-v3.0.md`](https://github.com/jeremylongshore/...) (lives outside this repo, in the personal command-bible).
 
 ---
 
 ## Troubleshooting
 
 | Problem | Solution |
-|---------|----------|
-| `ModuleNotFoundError: statsforecast` | `pip install -r scripts/requirements.txt` |
+|---|---|
+| `ModuleNotFoundError: statsforecast` | `cd 005-plugins/<plugin> && pip install -r scripts/requirements.txt` |
 | `ModuleNotFoundError` (general) | `pip install -e . && pip install -r requirements-dev.txt` |
-| Tests fail with import error | `export PYTHONPATH=$PWD` |
-| Permission denied on script | `chmod +x scripts/*.sh` |
+| Tests fail with import error | `export PYTHONPATH=$PWD` (or activate the venv) |
+| `Could not find a version that satisfies the requirement nixtla>=0.7.3` | Python 3.10+ required (Nixtla 0.7.3 dropped 3.9). `python3 --version` to verify. |
+| Smoke test timeout | First baseline-lab run downloads ~30 MB of M4 data; ~30–60 s the first time, instant after |
 | Plugin not found after install | Restart Claude Code |
-| Smoke test timeout | First run downloads M4 data (~30MB) |
-| `NIXTLA_TIMEGPT_API_KEY not set` | Only needed for TimeGPT features, not baseline lab |
-| Python version error | Need Python 3.10+ (`python3 --version`) |
+| `NIXTLA_TIMEGPT_API_KEY not set` | Only TimeGPT skills need it. Baseline lab is offline. |
 
-**Still stuck?** Open an issue or email jeremy@intentsolutions.io
+Still stuck? Open an issue at https://github.com/jeremylongshore/plugins-nixtla/issues, or email jeremy@intentsolutions.io.
 
 ---
 
 ## Contributing
 
-1. Fork the repo
-2. Create feature branch: `git checkout -b feature/my-feature`
-3. Make changes, add tests
-4. Run `pytest` and `black .` locally
+1. Fork `https://github.com/jeremylongshore/plugins-nixtla`
+2. Branch: `git checkout -b feat/<short-description>`
+3. Make changes; add or update tests
+4. `pytest && black . && isort .` locally
 5. Open PR against `main`
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Two non-negotiables for any plugin contribution:
+
+- **Tier discipline.** New plugin ideas default to Tier 4 (experimental). Promotion to a higher tier requires reconciliation against the [strategic vision](000-docs/130-AA-VISN-strategic-vision-v2-flagship-curation.md).
+- **Test the change.** Repo-level CI must pass; if you touch a flagship plugin, that plugin's CI must pass too.
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for full details.
 
 ---
 
-## Contact
+## Sponsorship & contact
 
-**Jeremy Longshore** | jeremy@intentsolutions.io
+This work is open-source under MIT, supported by:
 
-Questions? Open an issue or email.
+- [GitHub Sponsors → @jeremylongshore](https://github.com/sponsors/jeremylongshore)
+- [Buy Me a Coffee → @jeremylongshore](https://www.buymeacoffee.com/jeremylongshore)
+
+Commercial engagements (custom plugins, integrations, advisory): [jeremy@intentsolutions.io](mailto:jeremy@intentsolutions.io)
 
 ---
 
-## Prototypes & Research
+## Prototypes & research
 
-### ERCOT Grid Forecasting
+Beyond the flagship plugins, the repo carries two research artifacts kept for transparency about ongoing exploration:
 
-**Location**: [`002-workspaces/energy-grid-prototype/`](002-workspaces/energy-grid-prototype/)
+### ERCOT grid forecasting
 
-48-hour electricity load forecasting for the Texas (ERCOT) grid with interactive map visualization.
-
-| Component | Description |
-|-----------|-------------|
-| `ercot_grid_forecast.py` | Statsforecast + TimeGPT forecasting |
-| `ercot_map_viz.py` | Interactive Texas grid map (folium) |
-| `ERCOT_Grid_Forecast_Demo.ipynb` | Complete Jupyter demo |
-
-**Results**: SeasonalNaive wins at **4.28% MAPE** on 48h holdout.
+48-hour electricity load forecasting for the Texas (ERCOT) grid with interactive map visualization. Result: SeasonalNaive wins at **4.28% MAPE** on the 48 h holdout.
 
 ```bash
 cd 002-workspaces/energy-grid-prototype
@@ -268,10 +277,14 @@ pip install -r requirements.txt
 python ercot_grid_forecast.py
 ```
 
-**Research**: See [121-AA-REPT-energy-grid-forecasting-opportunity-research.md](000-docs/121-AA-REPT-energy-grid-forecasting-opportunity-research.md)
+Research write-up: [`000-docs/121-AA-REPT-energy-grid-forecasting-opportunity-research.md`](000-docs/121-AA-REPT-energy-grid-forecasting-opportunity-research.md).
+
+### Test harness lab
+
+5-phase validated workflow pattern for evaluating release readiness — used internally as the precursor to the `nixtla-release-validation` skill. Reference docs in [`002-workspaces/test-harness-lab/`](002-workspaces/test-harness-lab/).
 
 ---
 
 ## License
 
-MIT
+[MIT](LICENSE) — copyright Jeremy Longshore.
