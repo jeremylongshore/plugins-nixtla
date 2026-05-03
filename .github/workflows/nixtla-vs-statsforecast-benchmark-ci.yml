@@ -1,0 +1,95 @@
+name: Nixtla vs StatsForecast Benchmark CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '005-plugins/nixtla-vs-statsforecast-benchmark/**'
+      - '.github/workflows/nixtla-vs-statsforecast-benchmark-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '005-plugins/nixtla-vs-statsforecast-benchmark/**'
+      - '.github/workflows/nixtla-vs-statsforecast-benchmark-ci.yml'
+
+jobs:
+  test:
+    name: Test + Coverage
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 005-plugins/nixtla-vs-statsforecast-benchmark
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: '005-plugins/nixtla-vs-statsforecast-benchmark/scripts/requirements.txt'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Import sanity check
+        run: |
+          python -c "import sys; sys.path.insert(0, 'scripts'); import benchmark_mcp; print('IMPORTS OK')"
+
+      - name: Run pytest with coverage
+        run: |
+          PYTHONPATH=scripts pytest tests/ \
+            --cov=benchmark_mcp \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-fail-under=60 \
+            -v
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nixtla-vs-statsforecast-benchmark-coverage
+          path: 005-plugins/nixtla-vs-statsforecast-benchmark/coverage.xml
+          retention-days: 14
+
+  validator-gate:
+    name: Plugin Validator v7.0 (marketplace tier)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: plugins-nixtla
+
+      - name: Checkout claude-code-plugins (canonical validator source)
+        uses: actions/checkout@v4
+        with:
+          repository: jeremylongshore/claude-code-plugins
+          path: claude-code-plugins
+          ref: main
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install validator dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jsonschema
+
+      - name: Validate nixtla-vs-statsforecast-benchmark (marketplace tier)
+        run: |
+          python claude-code-plugins/scripts/validate-skills-schema.py \
+            --marketplace \
+            plugins-nixtla/005-plugins/nixtla-vs-statsforecast-benchmark/ \
+          || (echo "::error::Plugin Validator v7.0 (marketplace tier) failed for nixtla-vs-statsforecast-benchmark." && exit 1)

@@ -1,8 +1,24 @@
 {
   "name": "nixtla-vs-statsforecast-benchmark",
-  "description": "Head-to-head comparison of TimeGPT vs StatsForecast on user data. Benchmark accuracy, speed, and cost with automated reports.",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Head-to-head benchmark of TimeGPT vs open-source StatsForecast on user data. Real model fits (AutoETS, AutoTheta, SeasonalNaive + optional NixtlaClient), real metrics (sMAPE, MASE, MAE, RMSE), wall-time comparison, rule-based recommendations.",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "statsforecast",
+    "benchmark",
+    "comparison",
+    "smape",
+    "mase",
+    "forecasting"
+  ],
+  "commands": "./commands"
 }
