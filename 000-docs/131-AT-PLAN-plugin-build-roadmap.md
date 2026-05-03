@@ -17,6 +17,24 @@ This plan is read-only research until approved. **No beads are created from this
 
 ---
 
+## Canonical validators (source of truth)
+
+Every plugin epic's acceptance gate references these. Local `004-scripts/validate_skills_v2.py` is **not authoritative** — it's a vendored copy that drifts. The canonical validators live in the `claude-code-plugins` repo.
+
+| Validator | Path | What it checks |
+|---|---|---|
+| **Claude Code Plugin Validator v7.0** (schema 3.3.1) | `~/000-projects/claude-code-plugins/scripts/validate-skills-schema.py` | SKILL.md frontmatter against the IS enterprise 8-field set (`name, description, allowed-tools, version, author, license, compatibility, tags`); two tiers (`standard` mirrors Anthropic spec, `marketplace` enforces IS strict); `--deep` adds 10-dimension analysis with badges + Elo. |
+| **SkillMD validator (slash command)** | `/validate-skillmd` | Same engine wrapped as a Claude Code skill. Default = standard tier; `--marketplace` flag = strict tier; `--deep` = full evaluation. |
+| **Bulk remediator** | `~/000-projects/claude-code-plugins/scripts/batch-remediate.py` | Applies migrations (e.g., deprecated `compatible-with` CSV → free-text `compatibility`) when the validator surfaces them. |
+| **Schema spec** | `~/000-projects/claude-code-plugins/000-docs/6767-b-SPEC-DR-STND-claude-skills-standard.md` | The master spec the validator enforces. |
+| **Schema changelog** | `~/000-projects/claude-code-plugins/000-docs/SCHEMA_CHANGELOG.md` | Non-negotiables and version history. **Read before touching the validator.** |
+
+Every plugin epic must have a child bead that runs these against every SKILL.md the plugin ships, plus marketplace tier on the plugin's manifest entries. **Validator gates are not optional.**
+
+For each plugin's `plugin.json` manifest itself (separate from skills), the same validator runs in marketplace tier — it understands plugin-level metadata too.
+
+---
+
 ## Standard child-bead templates
 
 Two templates depending on starting state.
@@ -28,10 +46,16 @@ Two templates depending on starting state.
 2. <plugin>: implement stub: <tool name> #2
    ... (one bead per stubbed tool)
 N. <plugin>: pytest unit tests, coverage ≥ 80%
-N+1. <plugin>: per-plugin CI workflow (paths + pytest + black gate)
+N+1. <plugin>: per-plugin CI workflow (paths + pytest + black + validator gate)
 N+2. <plugin>: README quickstart + usage examples + troubleshooting
 N+3. <plugin>: claude plugin install smoke verification
-N+4. <plugin>: version bump + plugin.json sync (and marketplace entry if applicable)
+N+4. <plugin>: VALIDATOR GATE — run claude-code-plugins v7.0 validator (marketplace tier)
+                against every SKILL.md the plugin ships AND against plugin.json
+                manifest. Must pass with zero errors. Run via:
+                `python ~/000-projects/claude-code-plugins/scripts/validate-skills-schema.py
+                --tier marketplace --target 005-plugins/<plugin>/`
+                or via the `/validate-skillmd --marketplace` slash command per skill.
+N+5. <plugin>: version bump + plugin.json sync (and marketplace entry if applicable)
 ```
 
 Effort: typically 1–3 days per epic depending on stub count.
@@ -40,7 +64,10 @@ Effort: typically 1–3 days per epic depending on stub count.
 
 ```
 1. <plugin>: read PRD + write build spec into bead description
-2. <plugin>: scaffold plugin.json, .mcp.json, directory structure
+2. <plugin>: scaffold plugin.json, .mcp.json, directory structure (using
+             the IS enterprise 8-field set so the validator passes from
+             day one — name, description, allowed-tools, version, author,
+             license, compatibility, tags)
 3. <plugin>: MCP server skeleton with declared tool registration
 4. <plugin>: implement core tool: <name> #1
 5. <plugin>: implement core tool: <name> #2
@@ -48,10 +75,12 @@ Effort: typically 1–3 days per epic depending on stub count.
 M. <plugin>: auxiliary helpers (templates, dataset bundles, integrations)
 M+1. <plugin>: pytest unit tests
 M+2. <plugin>: pytest integration tests (where external infra exists)
-M+3. <plugin>: per-plugin CI workflow
+M+3. <plugin>: per-plugin CI workflow with validator gate baked in
 M+4. <plugin>: README + setup guide + quickstart
 M+5. <plugin>: claude plugin install smoke verification
-M+6. <plugin>: v1.0 release artifact (tag + GitHub release notes)
+M+6. <plugin>: VALIDATOR GATE — claude-code-plugins v7.0 marketplace tier on
+               every SKILL.md + plugin.json. Zero errors required.
+M+7. <plugin>: v1.0 release artifact (tag + GitHub release notes)
 ```
 
 Effort: matches the PRD's estimate (3–12 weeks per plugin).
@@ -60,10 +89,12 @@ Effort: matches the PRD's estimate (3–12 weeks per plugin).
 
 ```
 1. <plugin>: pytest migration (if homegrown smoke runner exists)
-2. <plugin>: per-plugin CI gate
+2. <plugin>: per-plugin CI gate (with validator step)
 3. <plugin>: README freshening
 4. <plugin>: smoke verification
-5. <plugin>: version bump to 1.0
+5. <plugin>: VALIDATOR GATE — claude-code-plugins v7.0 marketplace tier
+              passes on every SKILL.md + plugin.json
+6. <plugin>: version bump to 1.0
 ```
 
 Effort: 1–2 days per epic.
@@ -74,6 +105,9 @@ Effort: 1–2 days per epic.
 1. <plugin>: PROOF OF CONCEPT banner in README + module docstring
 2. <plugin>: stub returns include explicit PoC disclaimer
 3. <plugin>: origin / motivation section in README
+4. <plugin>: VALIDATOR GATE — claude-code-plugins v7.0 marketplace tier
+              still passes on the plugin manifest + any SKILL.md (PoC plugins
+              must still meet the schema even if their tools return PoC text)
 ```
 
 Effort: half-day per epic.
@@ -300,12 +334,15 @@ Two epics. Template D.
 
 **Current**: 10 files, all 6 MCP tools return mocks, no Kafka/Kinesis consumer code. Pure scaffold.
 
-**Child beads**:
-1. PROOF OF CONCEPT banner in README. Production-gap matrix.
-2. Module docstring + each stub return labeled with `[PoC]` disclaimer.
-3. `plugin.json` description updated.
+**Disposition** (principal-decided 2026-05-03): **keep as PoC with honest labeling**, same treatment as `nixtla-defi-sentinel`. Do not drop.
 
-**Effort**: half-day. **Open question for principal**: keep as PoC, or drop entirely? (10 files, no use, no committed customer.)
+**Child beads**:
+1. PROOF OF CONCEPT banner in README. Production-gap matrix (what's mocked vs what would need to land — Kafka/Kinesis consumers, alert delivery to PagerDuty/Slack/Email, real anomaly detection on streamed data).
+2. Module docstring + each of the 6 stub returns labeled with explicit `[PoC]` disclaimer + `_disclaimer` field in dict shapes (don't change response schemas — keep the API surface developable-against).
+3. `plugin.json` description updated to reflect PoC status.
+4. Origin section in README — what the plugin demonstrates and why it exists.
+
+**Effort**: half-day. Do NOT implement live integrations.
 
 ---
 
