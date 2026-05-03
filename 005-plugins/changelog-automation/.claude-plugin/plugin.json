@@ -1,30 +1,15 @@
 {
   "name": "changelog-automation",
-  "version": "0.1.0",
-  "description": "Automate changelog generation with AI-powered synthesis, multi-source data fetching, and quality validation",
+  "version": "1.0.0",
+  "description": "Real changelog automation. Fetches data from GitHub (gh CLI), git log, and optional Slack (slack-sdk + NIXTLA_SLACK_TOKEN). Validates frontmatter against jsonschema. Loads + validates .changelog-config.json.",
   "author": {
     "name": "Jeremy Longshore",
     "email": "jeremy@intentsolutions.io",
-    "url": "https://github.com/intent-solutions-io"
+    "url": "https://github.com/jeremylongshore"
   },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
   "license": "MIT",
-  "category": "automation",
-  "tags": ["changelog", "release-notes", "automation", "documentation", "github", "slack"],
-  "commands": [
-    "changelog-weekly",
-    "changelog-custom",
-    "changelog-validate"
-  ],
-  "skills": [
-    "changelog-orchestrator"
-  ],
-  "mcp_servers": [
-    "changelog-mcp"
-  ],
-  "requires": {
-    "python": ">=3.10",
-    "claude_code": ">=0.9.0"
-  },
-  "repository": "https://github.com/nixtla/nixtla",
-  "documentation": "000-docs/000a-planned-plugins/changelog-automation/"
+  "keywords": ["changelog", "release-notes", "automation", "documentation", "github", "slack", "git"],
+  "commands": "./commands"
 }
