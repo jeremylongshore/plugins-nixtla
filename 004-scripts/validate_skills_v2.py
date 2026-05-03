@@ -61,7 +61,7 @@ ENTERPRISE_REQUIRED = {"allowed-tools", "version", "author", "license"}
 REQUIRED_FIELDS = ANTHROPIC_REQUIRED | ENTERPRISE_REQUIRED
 
 # Optional fields per Anthropic spec
-OPTIONAL_FIELDS = {"model", "disable-model-invocation", "mode", "tags", "metadata"}
+OPTIONAL_FIELDS = {"model", "disable-model-invocation", "mode", "tags", "metadata", "compatibility"}
 
 # Deprecated fields (warn but don't error)
 DEPRECATED_FIELDS = {"when_to_use"}
