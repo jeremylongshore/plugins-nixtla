@@ -1,8 +1,23 @@
 {
   "name": "nixtla-forecast-explainer",
-  "description": "Post-hoc explainability for TimeGPT forecasts. Generate plain-English explanations with STL decomposition and driver analysis.",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Post-hoc explainability for TimeGPT forecasts. STL decomposition (statsmodels), Pearson correlation driver analysis with lag scanning (scipy), executive narrative generation, and markdown report composition.",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "explainability",
+    "stl",
+    "decomposition",
+    "drivers",
+    "forecasting"
+  ],
+  "commands": "./commands"
 }
