@@ -5,13 +5,13 @@ on:
     branches:
       - main
     paths:
-      - 'plugins/nixtla-baseline-lab/**'
+      - '005-plugins/nixtla-baseline-lab/**'
       - '.github/workflows/nixtla-baseline-lab-ci.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'plugins/nixtla-baseline-lab/**'
+      - '005-plugins/nixtla-baseline-lab/**'
       - '.github/workflows/nixtla-baseline-lab-ci.yml'
 
 jobs:
@@ -28,10 +28,10 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
-          cache-dependency-path: 'plugins/nixtla-baseline-lab/scripts/requirements.txt'
+          cache-dependency-path: '005-plugins/nixtla-baseline-lab/scripts/requirements.txt'
 
       - name: Install Nixtla OSS dependencies
-        working-directory: plugins/nixtla-baseline-lab
+        working-directory: 005-plugins/nixtla-baseline-lab
         run: |
           echo "Installing Nixtla OSS dependencies..."
           python -m pip install --upgrade pip
@@ -40,13 +40,13 @@ jobs:
           pip list | grep -E "(statsforecast|datasetsforecast|pandas|numpy|matplotlib|nixtla)"
 
       - name: Run MCP server test
-        working-directory: plugins/nixtla-baseline-lab
+        working-directory: 005-plugins/nixtla-baseline-lab
         run: |
           echo "Running MCP server in test mode..."
           python scripts/nixtla_baseline_mcp.py test
 
       - name: Run golden task validation
-        working-directory: plugins/nixtla-baseline-lab
+        working-directory: 005-plugins/nixtla-baseline-lab
         run: |
           echo "Running golden task smoke test..."
           python tests/run_baseline_m4_smoke.py
@@ -57,5 +57,5 @@ jobs:
         with:
           name: nixtla-baseline-test-results
           path: |
-            plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
+            005-plugins/nixtla-baseline-lab/nixtla_baseline_m4_test/
           retention-days: 7

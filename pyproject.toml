@@ -79,16 +79,20 @@ packages = ["plugins", "tests"]
 
 [tool.black]
 line-length = 100
-target-version = ['py39', 'py310', 'py311', 'py312']
+target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 exclude = '''
 /(
     \.git
   | \.venv
   | \.venv-.*
+  | venv
   | build
   | dist
   | __pycache__
+  | \.audit-harness
+  | 009-temp-data
+  | 010-archive
 )/
 '''
 
@@ -101,6 +105,7 @@ force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
 known_third_party = ["nixtla", "statsforecast", "utilsforecast", "pandas", "numpy"]
+skip_glob = [".audit-harness/*", "009-temp-data/*", "010-archive/*"]
 
 [tool.mypy]
 python_version = "3.10"

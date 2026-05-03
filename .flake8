@@ -5,9 +5,13 @@ exclude =
     .git,
     .venv,
     .venv-*,
+    venv,
     build,
     dist,
-    __pycache__
+    __pycache__,
+    .audit-harness,
+    009-temp-data,
+    010-archive
 
 # Template files have intentional undefined names (placeholders for users)
 per-file-ignores =
