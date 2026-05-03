@@ -1,8 +1,24 @@
 {
   "name": "nixtla-migration-assistant",
-  "description": "Automated migration from Prophet/statsmodels to Nixtla. Analyze code, transform data, and compare accuracy side-by-side.",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Real migration assistant for moving from Prophet, statsmodels, or sklearn forecasting to Nixtla TimeGPT or StatsForecast. AST-based code analysis, pandas-based data transformation to canonical (unique_id, ds, y) schema, code generation across 5 source/target combinations, real side-by-side accuracy comparison, and phased migration plans.",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "migration",
+    "prophet",
+    "statsmodels",
+    "sklearn",
+    "statsforecast",
+    "forecasting"
+  ],
+  "commands": "./commands"
 }
