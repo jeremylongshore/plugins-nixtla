@@ -1,8 +1,22 @@
 {
   "name": "nixtla-airflow-operator",
-  "description": "Apache Airflow operator for TimeGPT forecasting DAGs. Generate production-ready forecasting pipelines with monitoring.",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Real Apache Airflow tooling for TimeGPT forecasting pipelines. Generate production-ready DAGs (BigQuery / Snowflake / Postgres / S3 sources), AST + DagBag-based DAG validation with credential lint, real Airflow Connection JSON for 5 source types, and pytest test modules that load the DAG via DagBag.",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "airflow",
+    "dag",
+    "orchestration",
+    "forecasting"
+  ],
+  "commands": "./commands"
 }

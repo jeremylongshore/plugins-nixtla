@@ -1,21 +1,28 @@
 #!/usr/bin/env python3
 """MCP Server for Nixtla Airflow Operator.
 
-Exposes 4 tools:
-- generate_dag: Generate Airflow DAG Python file
-- validate_dag: Validate DAG syntax and connections
-- configure_connection: Set up data source connection
-- generate_tests: Create DAG test file
+Real implementations for:
+  - generate_dag: produce a runnable Airflow DAG file targeting a chosen source.
+  - validate_dag: AST + (optional) DagBag validation with lint warnings.
+  - configure_connection: real Airflow Connection JSON for nixtla / bigquery /
+    snowflake / postgres / s3, plus the `airflow connections add` CLI command.
+  - generate_tests: produce a real pytest module that loads the DAG via DagBag
+    and asserts structure (task IDs, dependency graph).
 """
 
+from __future__ import annotations
+
+import ast
 import json
-from typing import Any
+import re
+from typing import Any, Optional
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 from mcp.types import TextContent, Tool
 
 app = Server("nixtla-airflow-operator")
+
 
 DAG_TEMPLATE = '''"""
 Nixtla TimeGPT Forecasting DAG
@@ -99,6 +106,404 @@ with DAG(
 '''
 
 
+# ---------------------------------------------------------------------------
+# Tool: validate_dag
+# ---------------------------------------------------------------------------
+
+
+def _ast_extract_task_ids(tree: ast.Module) -> list[str]:
+    """Walk the AST and pull out task_id keyword args from Operator() calls."""
+    task_ids: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            for kw in node.keywords:
+                if kw.arg == "task_id" and isinstance(kw.value, ast.Constant):
+                    if isinstance(kw.value.value, str):
+                        task_ids.append(kw.value.value)
+    return task_ids
+
+
+def _ast_extract_dag_id(tree: ast.Module) -> Optional[str]:
+    """Find the DAG id from a `DAG(<id>, ...)` or `with DAG(<id>, ...)` construct."""
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func = node.func
+            name = None
+            if isinstance(func, ast.Name):
+                name = func.id
+            elif isinstance(func, ast.Attribute):
+                name = func.attr
+            if name == "DAG" and node.args:
+                first = node.args[0]
+                if isinstance(first, ast.Constant) and isinstance(first.value, str):
+                    return first.value
+    return None
+
+
+def _lint_warnings(source: str) -> list[dict[str, Any]]:
+    """Return repo-policy lint warnings (deprecated patterns, hardcoded creds)."""
+    warnings: list[dict[str, Any]] = []
+
+    # Hardcoded credentials.
+    cred_patterns = [
+        (r'(password|api_key|secret|token)\s*=\s*["\'][^"\']{4,}["\']', "hardcoded credential"),
+        (r"AKIA[0-9A-Z]{16}", "AWS access key id"),
+    ]
+    for line_no, line in enumerate(source.splitlines(), start=1):
+        # Skip lines containing template variables (e.g., var.value.api_key).
+        if "var.value" in line or "Variable.get" in line:
+            continue
+        for pat, label in cred_patterns:
+            if re.search(pat, line, re.IGNORECASE):
+                warnings.append(
+                    {
+                        "severity": "warning",
+                        "message": f"possible {label} on line {line_no}",
+                        "line": line_no,
+                    }
+                )
+                break
+
+    # Missing schedule.
+    if "schedule_interval" not in source and "schedule=" not in source:
+        warnings.append(
+            {
+                "severity": "warning",
+                "message": "DAG has no schedule_interval / schedule keyword",
+                "line": None,
+            }
+        )
+
+    # Missing default_args.
+    if "default_args" not in source:
+        warnings.append(
+            {
+                "severity": "warning",
+                "message": "DAG missing default_args (no retries / email config)",
+                "line": None,
+            }
+        )
+
+    return warnings
+
+
+def validate_dag(dag_path: Optional[str] = None, source: Optional[str] = None) -> dict[str, Any]:
+    """Validate a DAG file (or source string) for syntax + structure + lint."""
+    if source is None:
+        if dag_path is None:
+            return {
+                "valid": False,
+                "errors": [
+                    {
+                        "severity": "error",
+                        "message": "must provide dag_path or source",
+                        "line": None,
+                    }
+                ],
+                "task_count": 0,
+                "dag_id": None,
+            }
+        try:
+            with open(dag_path, "r", encoding="utf-8") as f:
+                source = f.read()
+        except FileNotFoundError:
+            return {
+                "valid": False,
+                "errors": [
+                    {"severity": "error", "message": f"file not found: {dag_path}", "line": None}
+                ],
+                "task_count": 0,
+                "dag_id": None,
+            }
+
+    errors: list[dict[str, Any]] = []
+
+    # Syntax check.
+    try:
+        compile(source, dag_path or "<string>", "exec")
+    except SyntaxError as exc:
+        errors.append(
+            {
+                "severity": "error",
+                "message": f"syntax error: {exc.msg}",
+                "line": exc.lineno,
+            }
+        )
+
+    # AST inspection.
+    task_ids: list[str] = []
+    dag_id: Optional[str] = None
+    if not errors:
+        tree = ast.parse(source)
+        task_ids = _ast_extract_task_ids(tree)
+        dag_id = _ast_extract_dag_id(tree)
+
+        # Duplicate task IDs.
+        seen: set[str] = set()
+        for tid in task_ids:
+            if tid in seen:
+                errors.append(
+                    {
+                        "severity": "error",
+                        "message": f"duplicate task_id: {tid}",
+                        "line": None,
+                    }
+                )
+            seen.add(tid)
+
+    # Optional DagBag load.
+    dagbag_loaded = False
+    try:
+        from airflow.models.dagbag import DagBag  # type: ignore[import-untyped]
+
+        if dag_path is not None:
+            db = DagBag(dag_folder=dag_path, include_examples=False)
+            if db.import_errors:
+                for path, msg in db.import_errors.items():
+                    errors.append(
+                        {
+                            "severity": "error",
+                            "message": f"DagBag import error on {path}: {msg}",
+                            "line": None,
+                        }
+                    )
+            else:
+                dagbag_loaded = True
+    except ImportError:
+        # Airflow not installed; AST validation is the fallback.
+        pass
+
+    warnings = _lint_warnings(source)
+
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors,
+        "warnings": warnings,
+        "task_count": len(task_ids),
+        "task_ids": task_ids,
+        "dag_id": dag_id,
+        "dagbag_loaded": dagbag_loaded,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Tool: configure_connection
+# ---------------------------------------------------------------------------
+
+
+def configure_connection(
+    source: str, connection_id: str, config: Optional[dict[str, Any]] = None
+) -> dict[str, Any]:
+    """Generate a real Airflow Connection JSON + the CLI command to register it."""
+    config = config or {}
+    src = source.lower().strip()
+
+    if src == "nixtla":
+        required = ["api_key"]
+        missing = [k for k in required if k not in config]
+        if missing:
+            return {
+                "status": "error",
+                "message": f"required fields missing for nixtla: {missing}",
+            }
+        conn = {
+            "conn_type": "http",
+            "host": config.get("host", "https://api.nixtla.io"),
+            "password": config["api_key"],
+            "extra": json.dumps({"endpoint": "/timegpt-1"}),
+        }
+
+    elif src == "bigquery":
+        required = ["project_id"]
+        missing = [k for k in required if k not in config]
+        if missing:
+            return {
+                "status": "error",
+                "message": f"required fields missing for bigquery: {missing}",
+            }
+        extra = {"project": config["project_id"]}
+        if "key_path" in config:
+            extra["key_path"] = config["key_path"]
+        conn = {"conn_type": "google_cloud_platform", "extra": json.dumps(extra)}
+
+    elif src == "snowflake":
+        required = ["account", "user", "password", "warehouse", "database", "schema"]
+        missing = [k for k in required if k not in config]
+        if missing:
+            return {
+                "status": "error",
+                "message": f"required fields missing for snowflake: {missing}",
+            }
+        conn = {
+            "conn_type": "snowflake",
+            "host": f"{config['account']}.snowflakecomputing.com",
+            "login": config["user"],
+            "password": config["password"],
+            "schema": config["schema"],
+            "extra": json.dumps(
+                {
+                    "account": config["account"],
+                    "warehouse": config["warehouse"],
+                    "database": config["database"],
+                }
+            ),
+        }
+
+    elif src == "postgres":
+        required = ["host", "port", "user", "password", "database"]
+        missing = [k for k in required if k not in config]
+        if missing:
+            return {
+                "status": "error",
+                "message": f"required fields missing for postgres: {missing}",
+            }
+        conn = {
+            "conn_type": "postgres",
+            "host": config["host"],
+            "port": int(config["port"]),
+            "login": config["user"],
+            "password": config["password"],
+            "schema": config["database"],
+        }
+
+    elif src == "s3":
+        required = ["aws_access_key_id", "aws_secret_access_key"]
+        missing = [k for k in required if k not in config]
+        if missing:
+            return {
+                "status": "error",
+                "message": f"required fields missing for s3: {missing}",
+            }
+        conn = {
+            "conn_type": "aws",
+            "login": config["aws_access_key_id"],
+            "password": config["aws_secret_access_key"],
+            "extra": json.dumps({"region_name": config.get("region_name", "us-east-1")}),
+        }
+
+    else:
+        return {
+            "status": "error",
+            "message": f"unsupported source: {source}. Supported: nixtla, bigquery, snowflake, postgres, s3",
+        }
+
+    cli_command = (
+        f"airflow connections add {connection_id} " f"--conn-json '{json.dumps(conn, default=str)}'"
+    )
+
+    return {
+        "status": "success",
+        "connection_id": connection_id,
+        "source": src,
+        "connection": conn,
+        "cli_command": cli_command,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Tool: generate_tests
+# ---------------------------------------------------------------------------
+
+
+TEST_MODULE_TEMPLATE = '''"""
+Tests for the {dag_id} DAG.
+Generated by nixtla-airflow-operator.
+
+Run from your Airflow project root:
+    pytest dags/tests/{test_filename} -v
+"""
+
+import pytest
+
+try:
+    from airflow.models.dagbag import DagBag
+except ImportError:
+    pytest.skip("airflow not installed; skipping DAG tests", allow_module_level=True)
+
+
+DAG_ID = "{dag_id}"
+EXPECTED_TASK_IDS = {task_ids!r}
+
+
+@pytest.fixture(scope="module")
+def dagbag():
+    return DagBag(dag_folder="dags/", include_examples=False)
+
+
+def test_dag_loads_without_errors(dagbag):
+    assert dagbag.import_errors == {{}}, f"DAG import errors: {{dagbag.import_errors}}"
+
+
+def test_dag_present(dagbag):
+    assert DAG_ID in dagbag.dags, f"DAG {{DAG_ID}} not found in dagbag"
+
+
+def test_dag_has_expected_tasks(dagbag):
+    dag = dagbag.dags[DAG_ID]
+    actual = set(t.task_id for t in dag.tasks)
+    expected = set(EXPECTED_TASK_IDS)
+    assert actual == expected, f"task mismatch: actual={{actual}} expected={{expected}}"
+
+
+def test_dag_no_orphan_tasks(dagbag):
+    """Every task except the source must have an upstream task."""
+    dag = dagbag.dags[DAG_ID]
+    for task in dag.tasks:
+        if task.upstream_list or task.downstream_list:
+            continue
+        if len(dag.tasks) > 1:
+            pytest.fail(f"orphan task: {{task.task_id}} has no upstream/downstream")
+'''
+
+
+def generate_tests(
+    dag_name: str, source: Optional[str] = None, dag_path: Optional[str] = None
+) -> dict[str, Any]:
+    """Generate a real pytest module that exercises the DAG via DagBag."""
+    task_ids: list[str] = []
+
+    # Try to discover task IDs from the source / file.
+    if source is None and dag_path is not None:
+        try:
+            with open(dag_path, "r", encoding="utf-8") as f:
+                source = f.read()
+        except FileNotFoundError:
+            source = None
+
+    if source:
+        try:
+            tree = ast.parse(source)
+            task_ids = _ast_extract_task_ids(tree)
+        except SyntaxError:
+            task_ids = []
+
+    if not task_ids:
+        # Fallback to the canonical 3-task DAG generated by generate_dag.
+        task_ids = ["extract_data", "run_forecast", "load_results"]
+
+    test_filename = f"test_{dag_name}.py"
+    test_module = TEST_MODULE_TEMPLATE.format(
+        dag_id=dag_name, task_ids=task_ids, test_filename=test_filename
+    )
+
+    return {
+        "status": "success",
+        "test_module": test_module,
+        "test_filename": test_filename,
+        "dag_id": dag_name,
+        "expected_task_ids": task_ids,
+        "instructions": (
+            f"Place this in your Airflow project's dags/tests/ directory and run: "
+            f"pytest dags/tests/{test_filename} -v"
+        ),
+    }
+
+
+# ---------------------------------------------------------------------------
+# MCP server surface
+# ---------------------------------------------------------------------------
+
+
 @app.list_tools()
 async def list_tools() -> list[Tool]:
     return [
@@ -123,28 +528,41 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="validate_dag",
-            description="Validate DAG syntax and connections",
+            description="Validate DAG syntax + AST structure + DagBag (when airflow installed) + lint",
             inputSchema={
                 "type": "object",
-                "properties": {"dag_path": {"type": "string"}},
-                "required": ["dag_path"],
+                "properties": {
+                    "dag_path": {"type": "string"},
+                    "source": {"type": "string"},
+                },
             },
         ),
         Tool(
             name="configure_connection",
-            description="Generate Airflow connection configuration",
+            description=(
+                "Generate Airflow Connection JSON for nixtla / bigquery / snowflake "
+                "/ postgres / s3, plus the airflow connections add CLI command"
+            ),
             inputSchema={
                 "type": "object",
-                "properties": {"source": {"type": "string"}, "connection_id": {"type": "string"}},
+                "properties": {
+                    "source": {"type": "string"},
+                    "connection_id": {"type": "string"},
+                    "config": {"type": "object"},
+                },
                 "required": ["source", "connection_id"],
             },
         ),
         Tool(
             name="generate_tests",
-            description="Generate DAG test file",
+            description="Generate pytest module that loads the DAG via DagBag + asserts structure",
             inputSchema={
                 "type": "object",
-                "properties": {"dag_name": {"type": "string"}},
+                "properties": {
+                    "dag_name": {"type": "string"},
+                    "source": {"type": "string"},
+                    "dag_path": {"type": "string"},
+                },
                 "required": ["dag_name"],
             },
         ),
@@ -165,13 +583,24 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         return [TextContent(type="text", text=dag_code)]
 
     elif name == "validate_dag":
-        return [TextContent(type="text", text="DAG validation: PASSED")]
+        result = validate_dag(dag_path=arguments.get("dag_path"), source=arguments.get("source"))
+        return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
     elif name == "configure_connection":
-        return [TextContent(type="text", text="Connection configuration generated")]
+        result = configure_connection(
+            source=str(arguments["source"]),
+            connection_id=str(arguments["connection_id"]),
+            config=arguments.get("config", {}),
+        )
+        return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
     elif name == "generate_tests":
-        return [TextContent(type="text", text="Test file generated")]
+        result = generate_tests(
+            dag_name=str(arguments["dag_name"]),
+            source=arguments.get("source"),
+            dag_path=arguments.get("dag_path"),
+        )
+        return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
     return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
