@@ -2,9 +2,17 @@
 name: changelog-orchestrator
 description: Orchestrate 6-phase changelog generation workflow with AI synthesis, multi-source data fetching (GitHub/Slack/Git), quality validation, and automated PR creation. Use when automating release notes, weekly changelogs, or documentation updates. Trigger with "generate changelog", "weekly changelog", or "automate release notes".
 allowed-tools: Read,Write,Bash(python:*)
-version: 0.1.0
+version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+compatibility: Designed for Claude Code; requires gh CLI for GitHub source and slack-sdk + NIXTLA_SLACK_TOKEN for optional Slack source
+tags:
+  - changelog
+  - release-notes
+  - automation
+  - github
+  - slack
+  - documentation
 ---
 
 # Changelog Orchestrator
