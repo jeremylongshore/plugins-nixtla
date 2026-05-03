@@ -1,8 +1,23 @@
 {
   "name": "nixtla-roi-calculator",
-  "description": "Enterprise ROI calculator for TimeGPT value estimation. Calculate build vs buy costs, generate executive reports, and export to Salesforce.",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Calculate 3-year ROI of moving forecasting to Nixtla TimeGPT, generate a real PDF report, compare scenarios with sensitivity analysis, and post the result to Salesforce as an Opportunity (live or dry-run).",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "roi",
+    "tco",
+    "salesforce",
+    "enterprise",
+    "forecasting"
+  ],
+  "commands": "./commands"
 }
