@@ -13,6 +13,15 @@ allowed-tools: Read,Glob,Grep
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+compatibility: Designed for Claude Code; requires statsmodels + scipy at plugin runtime
+tags:
+  - nixtla
+  - timegpt
+  - explainability
+  - stl
+  - decomposition
+  - drivers
+  - forecasting
 ---
 
 # Nixtla Explain Analyst
