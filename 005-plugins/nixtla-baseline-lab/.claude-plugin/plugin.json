@@ -1,8 +1,7 @@
 {
   "name": "nixtla-baseline-lab",
   "version": "1.5.0",
-  "displayName": "Nixtla Baseline Lab",
-  "description": "Run Nixtla-style baseline forecasting models on public benchmark datasets from inside Claude Code conversations.",
+  "description": "Run Nixtla-style baseline forecasting models (AutoETS, AutoTheta, SeasonalNaive) on M4 / custom CSV datasets from inside Claude Code. Pure statsforecast — no API keys.",
   "author": {
     "name": "Jeremy Longshore",
     "email": "jeremy@intentsolutions.io",
@@ -13,11 +12,14 @@
   "license": "MIT",
   "keywords": [
     "nixtla",
+    "statsforecast",
     "time-series",
     "forecasting",
     "baseline",
-    "statsforecast",
-    "m4"
+    "m4",
+    "autoets",
+    "autotheta",
+    "seasonalnaive"
   ],
   "commands": "./commands",
   "agents": "./agents",

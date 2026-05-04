@@ -8,6 +8,15 @@ allowed-tools: Read,Grep,Bash(ls:*)
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+tags:
+  - forecasting
+  - time-series
+  - baseline
+  - statsforecast
+  - benchmarks
+  - sMAPE
+  - MASE
+compatibility: Claude Code 1.0+; Python 3.10+; reads outputs from the nixtla-baseline-m4 workflow (statsforecast 1.7+).
 ---
 
 # Nixtla Baseline Review Skill
