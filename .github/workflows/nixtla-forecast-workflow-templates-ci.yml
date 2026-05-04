@@ -1,0 +1,74 @@
+name: Nixtla Forecast Workflow Templates CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '005-plugins/nixtla-forecast-workflow-templates/**'
+      - '.github/workflows/nixtla-forecast-workflow-templates-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '005-plugins/nixtla-forecast-workflow-templates/**'
+      - '.github/workflows/nixtla-forecast-workflow-templates-ci.yml'
+
+jobs:
+  unit-tests:
+    name: WIP Labeling Tests (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 005-plugins/nixtla-forecast-workflow-templates
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest mcp
+
+      - name: Run pytest
+        run: pytest tests/ -v -o addopts="" -p no:cacheprovider
+
+  validator-gate:
+    name: Plugin Validator v7.0 (marketplace tier)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        with:
+          path: plugins-nixtla
+
+      - name: Checkout claude-code-plugins
+        uses: actions/checkout@v4
+        with:
+          repository: jeremylongshore/claude-code-plugins
+          path: claude-code-plugins
+          ref: main
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install validator deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jsonschema
+
+      - name: Validate (marketplace tier)
+        run: |
+          python claude-code-plugins/scripts/validate-skills-schema.py \
+            --marketplace \
+            plugins-nixtla/005-plugins/nixtla-forecast-workflow-templates/ \
+          || (echo "::error::Validator failed for nixtla-forecast-workflow-templates." && exit 1)
