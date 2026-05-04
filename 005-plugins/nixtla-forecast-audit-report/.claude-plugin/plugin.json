@@ -1,0 +1,24 @@
+{
+  "name": "nixtla-forecast-audit-report",
+  "version": "0.1.0-wip",
+  "description": "[WORK IN PROGRESS] Generate an audit-grade report from a TimeGPT forecast for compliance + governance review. Not production-ready \u2014 every tool response includes a `_disclaimer` field. Tracked for v1.0 build (Epic 4.3).",
+  "author": {
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "audit",
+    "compliance",
+    "model-risk",
+    "governance",
+    "reporting",
+    "work-in-progress"
+  ],
+  "commands": "./commands"
+}

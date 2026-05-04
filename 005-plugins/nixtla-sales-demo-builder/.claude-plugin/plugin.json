@@ -1,0 +1,24 @@
+{
+  "name": "nixtla-sales-demo-builder",
+  "version": "0.1.0-wip",
+  "description": "[WORK IN PROGRESS] Generate enterprise-ready Nixtla TimeGPT sales demos from a customer's data shape. Not production-ready \u2014 every tool response includes a `_disclaimer` field. Tracked for v1.0 build (Epic 4.1).",
+  "author": {
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "sales",
+    "demo",
+    "synthetic-data",
+    "forecasting",
+    "enterprise",
+    "work-in-progress"
+  ],
+  "commands": "./commands"
+}
