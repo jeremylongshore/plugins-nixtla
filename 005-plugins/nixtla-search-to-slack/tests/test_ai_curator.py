@@ -1,198 +1,180 @@
-"""
-Unit tests for AI curator.
+"""Pytest tests for the AICurator.
+
+Important: this curator is a stub by design — when the plugin runs inside
+Claude Code, Claude itself does the LLM-grade curation in the conversation.
+The AICurator class only provides keyword-based relevance scoring,
+truncation, and key-point extraction. Tests below verify that real surface.
+
+(The earlier version of this file mocked openai/anthropic SDK module
+attributes; the implementation never imported either, so those tests
+collected but failed at patch time. Replaced wholesale per bead nixtla-8nk.)
 """
 
-import json
-from unittest.mock import MagicMock, Mock, patch
+from __future__ import annotations
 
 import pytest
 from nixtla_search_to_slack.ai_curator import AICurator, CuratedContent
+from nixtla_search_to_slack.content_aggregator import Content
 
 
-class TestAICurator:
-    """Test AI curation functionality."""
+def _make_content(title: str = "TimeGPT v2.1 multivariate", description: str = "") -> Content:
+    """Helper for creating Content fixtures."""
+    return Content(
+        title=title,
+        url="https://example.com/article",
+        description=description,
+        source="web",
+        timestamp="2026-05-04T00:00:00Z",
+        metadata={},
+    )
 
-    @patch("nixtla_search_to_slack.ai_curator.openai")
-    def test_curate_with_openai(self, mock_openai, mock_env_config, sample_content):
-        """Test curation using OpenAI."""
-        # Mock OpenAI response
-        mock_response = Mock()
-        mock_response.choices = [Mock()]
-        mock_response.choices[0].message.content = json.dumps(
-            {
-                "summary": "Test summary",
-                "key_points": ["Point 1", "Point 2"],
-                "why_it_matters": "Important for time series",
-                "relevance_score": 85,
-            }
+
+@pytest.fixture
+def curator():
+    return AICurator()
+
+
+# ---------------------------------------------------------------------------
+# Initialization
+# ---------------------------------------------------------------------------
+
+
+class TestAICuratorInit:
+    def test_init_without_env_config(self):
+        c = AICurator()
+        assert c.env_config == {}
+
+    def test_init_with_env_config(self):
+        cfg = {"FOO": "bar"}
+        c = AICurator(env_config=cfg)
+        assert c.env_config == cfg
+
+
+# ---------------------------------------------------------------------------
+# curate() — top-level contract
+# ---------------------------------------------------------------------------
+
+
+class TestCurate:
+    def test_returns_curated_content_list(self, curator):
+        items = [_make_content("TimeGPT release notes", "Nixtla released new model.")]
+        result = curator.curate(items)
+        assert isinstance(result, list)
+        assert len(result) == 1
+        assert isinstance(result[0], CuratedContent)
+
+    def test_preserves_input_count(self, curator):
+        items = [_make_content("a"), _make_content("b"), _make_content("c")]
+        assert len(curator.curate(items)) == 3
+
+    def test_empty_input(self, curator):
+        assert curator.curate([]) == []
+
+
+# ---------------------------------------------------------------------------
+# _calculate_relevance — keyword-based scoring with asymmetric inputs
+# ---------------------------------------------------------------------------
+
+
+class TestRelevanceScoring:
+    def test_no_keywords_returns_base_score(self, curator):
+        c = _make_content("Cooking recipes", "How to bake bread.")
+        assert curator._calculate_relevance(c) == 30
+
+    def test_nixtla_keyword_boosts_score(self, curator):
+        # 'nixtla' is a keyword (+10) AND triggers the +20 boost.
+        c = _make_content("Nixtla update", "")
+        # base 30 + 10 (1 keyword: nixtla) + 20 (nixtla boost) = 60
+        assert curator._calculate_relevance(c) == 60
+
+    def test_timegpt_boost_separate_from_nixtla(self, curator):
+        c = _make_content("TimeGPT release", "")
+        # base 30 + 10 (timegpt keyword) + 15 (timegpt boost) = 55
+        assert curator._calculate_relevance(c) == 55
+
+    def test_score_capped_at_100(self, curator):
+        desc = "TimeGPT statsforecast mlforecast neuralforecast nixtla time-series forecasting prediction arima lstm prophet autoets autotheta seasonal"
+        c = _make_content("Nixtla TimeGPT", desc)
+        assert curator._calculate_relevance(c) == 100
+
+    def test_text_match_is_case_insensitive(self, curator):
+        c = _make_content("NIXTLA NEWS", "TIMEGPT v2 RELEASED")
+        # base 30 + 10 (nixtla) + 10 (timegpt) + 20 + 15 = 85
+        assert curator._calculate_relevance(c) == 85
+
+
+# ---------------------------------------------------------------------------
+# _extract_key_points
+# ---------------------------------------------------------------------------
+
+
+class TestExtractKeyPoints:
+    def test_empty_description_returns_placeholder(self, curator):
+        assert curator._extract_key_points("") == ["See source for details"]
+
+    def test_none_description_returns_placeholder(self, curator):
+        assert curator._extract_key_points(None) == ["See source for details"]
+
+    def test_very_short_sentences_filtered_out(self, curator):
+        desc = "Short. Tiny. Hi."
+        assert curator._extract_key_points(desc) == ["See source for details"]
+
+    def test_extracts_up_to_three_points(self, curator):
+        desc = (
+            "TimeGPT introduces multivariate forecasting in v2.1. "
+            "It outperforms baselines on the M5 benchmark by 15%. "
+            "The Python SDK now supports async/await for batch calls. "
+            "A fourth sentence here will be skipped because the cap is three."
         )
-        mock_openai.ChatCompletion.create.return_value = mock_response
+        points = curator._extract_key_points(desc)
+        assert len(points) == 3
+        assert all(len(p) > 20 for p in points)
 
-        curator = AICurator(mock_env_config)
-        curator.llm_provider = "openai"
-        curator.llm_client = mock_openai
 
-        results = curator.curate(sample_content[:1])
+# ---------------------------------------------------------------------------
+# _generate_why_it_matters — score-banded output
+# ---------------------------------------------------------------------------
 
-        assert len(results) == 1
-        assert isinstance(results[0], CuratedContent)
-        assert results[0].summary == "Test summary"
-        assert len(results[0].key_points) == 2
-        assert results[0].relevance_score == 85
 
-    @patch("nixtla_search_to_slack.ai_curator.anthropic")
-    def test_curate_with_anthropic(self, mock_anthropic, mock_env_config, sample_content):
-        """Test curation using Anthropic."""
-        # Mock Anthropic response
-        mock_client = Mock()
-        mock_response = Mock()
-        mock_response.content = [
-            Mock(
-                text=json.dumps(
-                    {
-                        "summary": "Anthropic summary",
-                        "key_points": ["Key 1", "Key 2", "Key 3"],
-                        "why_it_matters": "Critical for Nixtla users",
-                        "relevance_score": 92,
-                    }
-                )
-            )
-        ]
-        mock_client.messages.create.return_value = mock_response
-        mock_anthropic.Anthropic.return_value = mock_client
+class TestWhyItMatters:
+    @pytest.mark.parametrize(
+        "score, expected_phrase",
+        [
+            (95, "Directly relevant to Nixtla"),
+            (80, "Directly relevant to Nixtla"),
+            (75, "Relevant to time-series forecasting practitioners"),
+            (60, "Relevant to time-series forecasting practitioners"),
+            (50, "May be of interest to data scientists"),
+            (40, "May be of interest to data scientists"),
+            (35, "General interest for the forecasting community"),
+            (0, "General interest for the forecasting community"),
+        ],
+    )
+    def test_band_boundaries(self, curator, score, expected_phrase):
+        c = _make_content()
+        assert expected_phrase in curator._generate_why_it_matters(c, score)
 
-        env_config = mock_env_config.copy()
-        env_config["ANTHROPIC_API_KEY"] = "sk-ant-test"
-        del env_config["OPENAI_API_KEY"]
 
-        curator = AICurator(env_config)
-        curator.llm_provider = "anthropic"
-        curator.llm_client = mock_client
+# ---------------------------------------------------------------------------
+# _process_content — the integrating method
+# ---------------------------------------------------------------------------
 
-        results = curator.curate(sample_content[:1])
 
-        assert len(results) == 1
-        assert results[0].summary == "Anthropic summary"
-        assert len(results[0].key_points) == 3
-        assert results[0].relevance_score == 92
+class TestProcessContent:
+    def test_summary_truncates_long_descriptions(self, curator):
+        desc = "x" * 500
+        c = _make_content(description=desc)
+        result = curator._process_content(c)
+        # Summary capped at 300 chars per impl.
+        assert len(result.summary) == 300
 
-    def test_missing_llm_provider(self):
-        """Test error when no LLM provider is configured."""
-        with pytest.raises(ValueError, match="No LLM provider configured"):
-            AICurator({})
+    def test_summary_falls_back_to_title_when_no_description(self, curator):
+        c = _make_content(title="Just a title", description="")
+        result = curator._process_content(c)
+        assert result.summary == "Just a title"
 
-    @patch("nixtla_search_to_slack.ai_curator.openai")
-    def test_fallback_on_llm_error(self, mock_openai, mock_env_config, sample_content):
-        """Test fallback when LLM fails."""
-        # Mock OpenAI to raise an error
-        mock_openai.ChatCompletion.create.side_effect = Exception("API Error")
-
-        curator = AICurator(mock_env_config)
-        curator.llm_provider = "openai"
-        curator.llm_client = mock_openai
-
-        results = curator.curate(sample_content[:1])
-
-        # Should return fallback content
-        assert len(results) == 1
-        assert results[0].summary == sample_content[0].description[:200]
-        assert (
-            "Information available at the source" in results[0].key_points[0]
-            or len(results[0].key_points) > 0
-        )
-
-    @patch("nixtla_search_to_slack.ai_curator.openai")
-    def test_invalid_json_response(self, mock_openai, mock_env_config, sample_content):
-        """Test fallback when LLM returns invalid JSON."""
-        # Mock OpenAI with invalid JSON
-        mock_response = Mock()
-        mock_response.choices = [Mock()]
-        mock_response.choices[0].message.content = "This is not valid JSON"
-        mock_openai.ChatCompletion.create.return_value = mock_response
-
-        curator = AICurator(mock_env_config)
-        curator.llm_provider = "openai"
-        curator.llm_client = mock_openai
-
-        results = curator.curate(sample_content[:1])
-
-        # Should return fallback content
-        assert len(results) == 1
-        assert len(results[0].summary) > 0
-
-    @patch("nixtla_search_to_slack.ai_curator.openai")
-    def test_relevance_score_bounds(self, mock_openai, mock_env_config, sample_content):
-        """Test that relevance scores are bounded 0-100."""
-        # Mock with out-of-bounds relevance score
-        mock_response = Mock()
-        mock_response.choices = [Mock()]
-        mock_response.choices[0].message.content = json.dumps(
-            {
-                "summary": "Summary",
-                "key_points": ["Point"],
-                "why_it_matters": "Matters",
-                "relevance_score": 150,  # Out of bounds
-            }
-        )
-        mock_openai.ChatCompletion.create.return_value = mock_response
-
-        curator = AICurator(mock_env_config)
-        curator.llm_provider = "openai"
-        curator.llm_client = mock_openai
-
-        results = curator.curate(sample_content[:1])
-
-        # Score should be clamped to 100
-        assert results[0].relevance_score == 100
-
-    @patch("nixtla_search_to_slack.ai_curator.openai")
-    def test_key_points_limit(self, mock_openai, mock_env_config, sample_content):
-        """Test that key points are limited to 3."""
-        # Mock with too many key points
-        mock_response = Mock()
-        mock_response.choices = [Mock()]
-        mock_response.choices[0].message.content = json.dumps(
-            {
-                "summary": "Summary",
-                "key_points": ["P1", "P2", "P3", "P4", "P5"],  # Too many
-                "why_it_matters": "Matters",
-                "relevance_score": 80,
-            }
-        )
-        mock_openai.ChatCompletion.create.return_value = mock_response
-
-        curator = AICurator(mock_env_config)
-        curator.llm_provider = "openai"
-        curator.llm_client = mock_openai
-
-        results = curator.curate(sample_content[:1])
-
-        # Should limit to 3 points
-        assert len(results[0].key_points) == 3
-
-    def test_create_fallback_with_keywords(self, mock_env_config, sample_content):
-        """Test fallback creation with keyword-based relevance."""
-        curator = AICurator(mock_env_config)
-
-        # Create content with Nixtla keywords
-        content = sample_content[0]
-        content.title = "TimeGPT and StatsForecast Integration"
-        content.description = (
-            "New features for MLForecast and NeuralForecast time series forecasting"
-        )
-
-        fallback = curator._create_fallback(content)
-
-        # Should have higher relevance due to keywords
-        assert fallback.relevance_score > 50
-        assert len(fallback.summary) > 0
-
-    def test_build_prompt(self, mock_env_config, sample_content):
-        """Test prompt building."""
-        curator = AICurator(mock_env_config)
-        prompt = curator._build_prompt(sample_content[0])
-
-        assert "TimeGPT" in prompt
-        assert sample_content[0].title in prompt
-        assert sample_content[0].url in prompt
-        assert "relevance_score" in prompt
+    def test_relevance_score_is_int_in_range(self, curator):
+        c = _make_content("Nixtla TimeGPT", "Forecasting with statsforecast")
+        result = curator._process_content(c)
+        assert isinstance(result.relevance_score, int)
+        assert 0 <= result.relevance_score <= 100
