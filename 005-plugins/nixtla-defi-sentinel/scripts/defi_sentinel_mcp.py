@@ -1,8 +1,26 @@
 #!/usr/bin/env python3
 """MCP Server for Nixtla DeFi Sentinel.
 
-DeFi protocol monitoring with TimeGPT anomaly detection.
+⚠️  PROOF OF CONCEPT — not for production use.
+
+This module is an exploratory PoC built in response to a real DeFi exploit
+to demonstrate how Nixtla's anomaly-detection primitives could be applied
+to surface protocol-risk signals (TVL drops, APY spikes, volume anomalies).
+
+All MCP tools currently return ILLUSTRATIVE FIXTURES, not live data. Every
+response includes a `_disclaimer` field making this explicit, and the
+fixtures use 2024 timestamps so they're obviously not live.
+
+Production deployment requires:
+  - Live data integration (DeFiLlama API, The Graph, on-chain RPC)
+  - NixtlaClient.detect_anomalies() wired to streamed protocol metrics
+  - Real alert delivery (PagerDuty / Telegram / Discord / Slack webhooks)
+  - Authenticated configuration, secret management, rate limiting
+
+See README §"What's real vs PoC" for the full production-gap analysis.
 """
+
+from __future__ import annotations
 
 import json
 from typing import Any
@@ -14,7 +32,13 @@ from mcp.types import TextContent, Tool
 app = Server("nixtla-defi-sentinel")
 
 
-# DeFi protocols supported
+POC_DISCLAIMER = (
+    "PoC: this output is an illustrative fixture, not live protocol data. "
+    "See README §'What's real vs PoC' for the production-gap analysis."
+)
+
+
+# DeFi protocols supported (illustrative list — real integration would query DeFiLlama)
 SUPPORTED_PROTOCOLS = [
     "aave",
     "compound",
@@ -36,7 +60,7 @@ async def list_tools() -> list[Tool]:
     return [
         Tool(
             name="monitor_protocol",
-            description="Start monitoring a DeFi protocol",
+            description="[PoC] Demonstrate the protocol-monitoring API surface",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -56,7 +80,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="get_protocol_status",
-            description="Get current status of monitored protocol",
+            description="[PoC] Demonstrate protocol-status response shape",
             inputSchema={
                 "type": "object",
                 "properties": {"protocol": {"type": "string"}},
@@ -65,7 +89,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="configure_alerts",
-            description="Configure alerting for protocol",
+            description="[PoC] Demonstrate alert-configuration API surface",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -78,7 +102,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="run_anomaly_scan",
-            description="Run anomaly detection scan on protocol",
+            description="[PoC] Demonstrate anomaly-scan response shape",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -90,7 +114,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="generate_risk_report",
-            description="Generate protocol risk assessment report",
+            description="[PoC] Demonstrate risk-report response shape",
             inputSchema={
                 "type": "object",
                 "properties": {
@@ -102,7 +126,7 @@ async def list_tools() -> list[Tool]:
         ),
         Tool(
             name="compare_protocols",
-            description="Compare multiple protocols on risk metrics",
+            description="[PoC] Demonstrate protocol-comparison response shape",
             inputSchema={
                 "type": "object",
                 "properties": {"protocols": {"type": "array", "items": {"type": "string"}}},
@@ -118,30 +142,33 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
         protocol = arguments.get("protocol", "aave")
         metrics = arguments.get("metrics", ["tvl", "apy"])
         result = {
+            "_disclaimer": POC_DISCLAIMER,
             "status": "monitoring_started",
             "protocol": protocol,
             "metrics": metrics,
             "threshold": arguments.get("threshold", 0.95),
-            "data_source": "DeFiLlama API",
-            "update_frequency": "5 minutes",
+            "data_source": "DeFiLlama API (PoC fixture, not actually polled)",
+            "update_frequency": "5 minutes (would be the production cadence)",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
     elif name == "get_protocol_status":
         protocol = arguments.get("protocol", "aave")
         result = {
+            "_disclaimer": POC_DISCLAIMER,
             "protocol": protocol,
             "status": "healthy",
             "current_tvl": "$12.5B",
             "tvl_change_24h": "+2.3%",
             "avg_apy": "4.2%",
             "anomalies_detected_24h": 0,
-            "last_updated": "2024-01-15T10:30:00Z",
+            "last_updated": "2024-01-15T10:30:00Z (fixture timestamp, not live)",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
     elif name == "configure_alerts":
         result = {
+            "_disclaimer": POC_DISCLAIMER,
             "status": "configured",
             "protocol": arguments.get("protocol"),
             "channel": arguments.get("channel"),
@@ -152,6 +179,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     elif name == "run_anomaly_scan":
         protocol = arguments.get("protocol", "aave")
         result = {
+            "_disclaimer": POC_DISCLAIMER,
             "protocol": protocol,
             "scan_period": f"{arguments.get('lookback_days', 30)} days",
             "anomalies_found": [
@@ -159,7 +187,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                     "date": "2024-01-10",
                     "metric": "tvl",
                     "severity": "medium",
-                    "description": "TVL dropped 8% in 2 hours",
+                    "description": "TVL dropped 8% in 2 hours (PoC fixture)",
                     "confidence": 0.92,
                 }
             ],
@@ -171,6 +199,7 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     elif name == "generate_risk_report":
         protocol = arguments.get("protocol", "aave")
         result = {
+            "_disclaimer": POC_DISCLAIMER,
             "protocol": protocol,
             "report_date": "2024-01-15",
             "overall_risk": "LOW",
@@ -180,13 +209,13 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                 {"factor": "Market risk", "score": 4, "max": 10},
             ],
             "tvl_forecast_7d": {"point": "$12.8B", "lower": "$11.9B", "upper": "$13.7B"},
-            "recommendation": "STABLE - Continue monitoring",
+            "recommendation": "STABLE - Continue monitoring (PoC narrative)",
         }
         return [TextContent(type="text", text=json.dumps(result, indent=2))]
 
     elif name == "compare_protocols":
-        protocols = arguments.get("protocols", ["aave", "compound"])
         result = {
+            "_disclaimer": POC_DISCLAIMER,
             "comparison": [
                 {"protocol": "aave", "tvl": "$12.5B", "risk_score": 2.3, "apy": "4.2%"},
                 {"protocol": "compound", "tvl": "$8.2B", "risk_score": 2.8, "apy": "3.8%"},

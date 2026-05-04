@@ -1,8 +1,22 @@
 {
   "name": "nixtla-defi-sentinel",
-  "description": "DeFi protocol monitoring with TimeGPT anomaly detection. Track TVL, yields, and liquidity with real-time alerts.",
-  "version": "0.1.0",
+  "version": "1.0.0-poc",
+  "description": "[PROOF OF CONCEPT] Anomaly-detection API surface for DeFi protocol monitoring (TVL/APY/volume). Built as exploration after a real DeFi exploit. All tools return illustrative fixtures — not live protocol data. Production requires DeFiLlama integration + Nixtla detect_anomalies() + alert webhook delivery (~6-8 wks).",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "defi",
+    "anomaly-detection",
+    "proof-of-concept",
+    "monitoring"
+  ],
+  "commands": "./commands"
 }
