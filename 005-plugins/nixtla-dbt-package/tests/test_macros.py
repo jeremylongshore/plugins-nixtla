@@ -188,6 +188,6 @@ class TestReadmePocMatrix:
     def test_readme_documents_poc_warehouses(self, readme_text):
         # Snowflake and Databricks must be flagged as PoC explicitly so
         # downstream users don't assume parity with BigQuery.
-        assert re.search(r"Snowflake.*PoC|PoC.*Snowflake", readme_text, re.IGNORECASE), (
-            "README must label Snowflake as PoC"
-        )
+        assert re.search(
+            r"Snowflake.*PoC|PoC.*Snowflake", readme_text, re.IGNORECASE
+        ), "README must label Snowflake as PoC"
