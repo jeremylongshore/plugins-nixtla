@@ -6,8 +6,8 @@ This is an MVP implementation and example, not a production service.
 Not endorsed or operated by Nixtla.
 """
 
-__version__ = "0.1.0"
-__author__ = "Intent Solutions io"
+__version__ = "1.0.0"
+__author__ = "Jeremy Longshore"
 
 from .main import run_digest
 

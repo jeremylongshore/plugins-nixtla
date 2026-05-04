@@ -5,6 +5,15 @@ allowed-tools: Write,Read,Bash(python:*),Glob,Grep
 version: 1.0.1
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+tags:
+  - timegpt
+  - nixtla
+  - pipeline
+  - code-generation
+  - forecasting
+  - time-series
+  - production
+compatibility: Claude Code 1.0+; Python 3.10+; nixtla SDK 0.7+ (NixtlaClient); pandas 2.0+; matplotlib 3.7+ (optional, for plots).
 ---
 
 # TimeGPT Pipeline Builder

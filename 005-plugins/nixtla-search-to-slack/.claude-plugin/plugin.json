@@ -1,14 +1,14 @@
 {
   "name": "nixtla-search-to-slack",
-  "version": "0.2.0",
-  "description": "Automated content discovery and curation for Nixtla and time-series forecasting practitioners. Searches web and GitHub, generates AI summaries, and publishes formatted digests to Slack.",
+  "version": "1.0.0",
+  "description": "Automated content discovery for Nixtla / time-series practitioners. Searches the web + GitHub for forecasting content, generates AI summaries, and publishes formatted digests to Slack on a schedule.",
   "author": {
     "name": "Jeremy Longshore",
     "email": "jeremy@intentsolutions.io",
-    "url": "https://github.com/intent-solutions-io"
+    "url": "https://github.com/jeremylongshore"
   },
-  "homepage": "https://github.com/intent-solutions-io/plugins-nixtla",
-  "repository": "https://github.com/intent-solutions-io/plugins-nixtla",
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
   "license": "MIT",
   "keywords": [
     "nixtla",

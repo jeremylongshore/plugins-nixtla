@@ -58,8 +58,8 @@ nixtla-search-to-slack/
 | description | Automated content discovery and curation... | Required |
 | version | 0.2.0 | Required |
 | author.name | Jeremy Longshore | Required |
-| homepage | https://github.com/intent-solutions-io/plugins-nixtla | Optional |
-| repository | https://github.com/intent-solutions-io/plugins-nixtla | Optional |
+| homepage | https://github.com/jeremylongshore/plugins-nixtla | Optional |
+| repository | https://github.com/jeremylongshore/plugins-nixtla | Optional |
 | license | MIT | Optional |
 
 ---
