@@ -333,9 +333,16 @@ class GitHubSearchAdapter:
         return results
 
     def _calculate_date_filter(self, time_range: str) -> str:
-        """Calculate GitHub date filter from time range."""
+        """Calculate GitHub date filter from time range.
+
+        Returns an empty string for malformed input (e.g., "invalid" or
+        "abc d") so callers don't have to guard against ValueError.
+        """
         if time_range.endswith("d"):
-            days = int(time_range[:-1])
+            try:
+                days = int(time_range[:-1])
+            except ValueError:
+                return ""
             date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
             return f"created:>={date}"
         return ""

@@ -17,60 +17,32 @@ sys.path.insert(0, str(_PLUGIN_ROOT / "src"))
 
 
 # ---------------------------------------------------------------------------
-# Skip-list for tests that were written speculatively against APIs that don't
-# match the current implementation.
-#
-# These tests reference module attributes (openai client, anthropic client,
-# specific URL-tracking-param normalization, certain orchestrator branches)
-# that the current src/ does not expose. They were never executed in CI before
-# v1.0 and fail at collection / patch time.
-#
-# Tracked for rewrite — see follow-up bead. Once the test author rewrites
-# them against the real surface, remove the corresponding entries here.
+# Skip-list for tests that target a refactored search-adapter surface
+# (the WebSearchAdapter was rewritten to use a provider-strategy pattern;
+# the old adapter accepted api_key+config+provider_config positionally).
+# Rewriting these against the new provider pattern is a separate item.
 # ---------------------------------------------------------------------------
 
 _KNOWN_BROKEN_TESTS = {
-    # ai_curator: tests assume openai/anthropic Python SDKs are imported as
-    # module-level attributes; the real ai_curator does not import either.
-    "test_ai_curator.py::TestAICurator::test_curate_with_openai",
-    "test_ai_curator.py::TestAICurator::test_curate_with_anthropic",
-    "test_ai_curator.py::TestAICurator::test_missing_llm_provider",
-    "test_ai_curator.py::TestAICurator::test_fallback_on_llm_error",
-    "test_ai_curator.py::TestAICurator::test_invalid_json_response",
-    "test_ai_curator.py::TestAICurator::test_relevance_score_bounds",
-    "test_ai_curator.py::TestAICurator::test_key_points_limit",
-    "test_ai_curator.py::TestAICurator::test_create_fallback_with_keywords",
-    "test_ai_curator.py::TestAICurator::test_build_prompt",
-    # content_aggregator: these two assume URL-normalization removes UTM /
-    # tracking params + treats different domains as duplicates by title.
-    # Current dedup keeps tracking params and dedups by exact URL.
-    "test_content_aggregator.py::TestContentAggregator::test_deduplicate_url_with_tracking_params",
-    "test_content_aggregator.py::TestContentAggregator::test_keep_similar_titles_different_domains",
-    # search_orchestrator: tests reference adapter internals (parse_time_range,
-    # exclude-domain query construction, calculate_date_filter) that don't
-    # exist on the current adapters.
+    # search_orchestrator: targets the pre-refactor WebSearchAdapter
+    # constructor (api_key=, provider_config=) and assumes a
+    # _parse_time_range() helper that no longer exists.
     "test_search_orchestrator.py::TestSearchOrchestrator::test_search_multiple_sources",
     "test_search_orchestrator.py::TestWebSearchAdapter::test_web_search_success",
     "test_search_orchestrator.py::TestWebSearchAdapter::test_web_search_excludes_domains",
     "test_search_orchestrator.py::TestWebSearchAdapter::test_parse_time_range",
-    "test_search_orchestrator.py::TestGitHubSearchAdapter::test_calculate_date_filter",
-    # slack_publisher: error-path test expects exception class the current
-    # publisher doesn't raise.
-    "test_slack_publisher.py::TestSlackPublisher::test_publish_slack_error",
 }
 
 
 def pytest_collection_modifyitems(config, items):
     skip_marker = pytest.mark.skip(
         reason=(
-            "Speculative test against an API the current src/ does not expose; "
-            "tracked for rewrite — see follow-up bead. Do not use this test as "
-            "evidence of behavior; the impl may differ."
+            "Speculative test against the pre-refactor WebSearchAdapter API; "
+            "needs rewrite against the provider-strategy pattern. Tracked separately."
         )
     )
     for item in items:
         rel = item.nodeid
-        # nodeid looks like 'tests/test_X.py::Class::method' — strip 'tests/'
         for broken in _KNOWN_BROKEN_TESTS:
             if rel.endswith(broken):
                 item.add_marker(skip_marker)

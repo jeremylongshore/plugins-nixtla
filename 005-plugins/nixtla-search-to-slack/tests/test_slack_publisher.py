@@ -52,16 +52,24 @@ class TestSlackPublisher:
         mock_client.chat_postMessage.assert_not_called()
 
     @patch("nixtla_search_to_slack.slack_publisher.WebClient")
-    @patch("nixtla_search_to_slack.slack_publisher.SlackApiError")
     def test_publish_slack_error(
-        self, mock_error, mock_webclient, mock_env_config, sample_curated_content
+        self, mock_webclient, mock_env_config, sample_curated_content, monkeypatch
     ):
-        """Test handling of Slack API errors."""
-        # Mock Slack error
+        """Slack API errors are caught and surfaced via PublishResult."""
+        # Override the autouse DRY_RUN=true in conftest so we exercise the
+        # real publish path (otherwise we short-circuit before the mock).
+        monkeypatch.setenv("DRY_RUN", "false")
+
+        # Use the real SlackApiError so the impl's `except SlackApiError`
+        # branch fires (rather than the generic Exception fallback, which
+        # would also work but format the message differently).
+        from slack_sdk.errors import SlackApiError
+
         mock_client = Mock()
-        error = Mock()
-        error.response = {"error": "channel_not_found"}
-        mock_client.chat_postMessage.side_effect = error
+        mock_response = {"error": "channel_not_found", "ok": False}
+        mock_client.chat_postMessage.side_effect = SlackApiError(
+            message="channel_not_found", response=mock_response
+        )
         mock_webclient.return_value = mock_client
 
         publisher = SlackPublisher(mock_env_config)
@@ -71,6 +79,7 @@ class TestSlackPublisher:
 
         assert result.success is False
         assert result.error is not None
+        assert "channel_not_found" in result.error
 
     def test_missing_slack_token(self):
         """Test error when Slack token is missing."""
