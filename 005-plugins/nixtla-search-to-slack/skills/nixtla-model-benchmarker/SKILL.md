@@ -5,6 +5,16 @@ allowed-tools: Write,Read,Bash(python:*),Glob
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+tags:
+  - benchmarking
+  - forecasting
+  - time-series
+  - timegpt
+  - statsforecast
+  - mlforecast
+  - neuralforecast
+  - model-comparison
+compatibility: Claude Code 1.0+; Python 3.10+; statsforecast 1.7+ (optional), mlforecast 0.13+ (optional), neuralforecast 1.7+ (optional), nixtla SDK 0.7+ for TimeGPT.
 ---
 
 # Nixtla Model Benchmarker

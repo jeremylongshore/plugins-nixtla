@@ -5,6 +5,16 @@ allowed-tools: WebFetch,WebSearch,Bash(python:*),Read,Write,Glob
 version: 1.0.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+tags:
+  - research
+  - content-discovery
+  - nixtla
+  - timegpt
+  - time-series
+  - github-search
+  - web-search
+  - news
+compatibility: Claude Code 1.0+; uses Claude's built-in WebFetch/WebSearch — no external API keys required for research itself.
 ---
 
 # Nixtla Research Assistant
