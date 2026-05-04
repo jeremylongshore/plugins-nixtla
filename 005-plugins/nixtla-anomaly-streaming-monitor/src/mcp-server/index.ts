@@ -1,8 +1,20 @@
 /**
  * Nixtla Anomaly Streaming Monitor - MCP Server
  *
- * Real-time streaming anomaly detection for Kafka/Kinesis with
- * PagerDuty/Slack alerting integration.
+ * ⚠️  PROOF OF CONCEPT — not for production use.
+ *
+ * This module is an exploratory PoC demonstrating an anomaly-detection API
+ * surface for streaming protocol metrics (Kafka / Kinesis / HTTP webhooks).
+ * All MCP tools currently return ILLUSTRATIVE FIXTURES, not live consumer
+ * data. Every response includes a `_disclaimer` field making this explicit.
+ *
+ * Production deployment requires:
+ *   - Real Kafka/Kinesis consumer code (kafkajs / @aws-sdk/client-kinesis)
+ *   - Event queue + Python-worker IPC for batch dispatch to NixtlaClient
+ *   - Real alert delivery (PagerDuty Events API / Slack webhooks / SMTP)
+ *   - Stream lag monitoring + circuit breakers + dead-letter queue handling
+ *
+ * See README §"What's real vs PoC" for the full production-gap analysis.
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -12,10 +24,14 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
+const POC_DISCLAIMER =
+  "PoC: this output is an illustrative fixture, not live stream data. " +
+  "See README §'What's real vs PoC' for the production-gap analysis.";
+
 const server = new Server(
   {
     name: "nixtla-anomaly-streaming-monitor",
-    version: "0.1.0",
+    version: "1.0.0-poc",
   },
   {
     capabilities: {
@@ -24,13 +40,13 @@ const server = new Server(
   }
 );
 
-// Tool definitions
+// Tool definitions (every description prefixed [PoC])
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
         name: "stream_monitor_start",
-        description: "Start monitoring a stream for anomalies",
+        description: "[PoC] Demonstrate the stream-monitor-start API surface",
         inputSchema: {
           type: "object",
           properties: {
@@ -54,7 +70,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "stream_monitor_stop",
-        description: "Stop monitoring a stream",
+        description: "[PoC] Demonstrate the stream-monitor-stop API surface",
         inputSchema: {
           type: "object",
           properties: {
@@ -68,7 +84,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "stream_health_check",
-        description: "Check consumer health status",
+        description: "[PoC] Demonstrate the consumer-health response shape",
         inputSchema: {
           type: "object",
           properties: {
@@ -81,7 +97,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "configure_alerts",
-        description: "Set up alerting rules",
+        description: "[PoC] Demonstrate the alert-configuration API surface",
         inputSchema: {
           type: "object",
           properties: {
@@ -102,7 +118,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "get_anomaly_stats",
-        description: "Get real-time anomaly statistics",
+        description: "[PoC] Demonstrate the anomaly-stats response shape",
         inputSchema: {
           type: "object",
           properties: {
@@ -113,7 +129,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "export_dashboard_config",
-        description: "Generate Grafana dashboard configuration",
+        description: "[PoC] Demonstrate the Grafana dashboard config response shape",
         inputSchema: {
           type: "object",
           properties: {
@@ -125,7 +141,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   };
 });
 
-// Tool execution
+// Tool execution — every response carries _disclaimer
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
 
@@ -137,6 +153,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             type: "text",
             text: JSON.stringify(
               {
+                _disclaimer: POC_DISCLAIMER,
                 status: "started",
                 monitor_id: `monitor_${Date.now()}`,
                 source: args?.source,
@@ -155,7 +172,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify({ status: "stopped", monitor_id: args?.monitor_id }),
+            text: JSON.stringify({
+              _disclaimer: POC_DISCLAIMER,
+              status: "stopped",
+              monitor_id: args?.monitor_id,
+            }),
           },
         ],
       };
@@ -166,6 +187,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: "text",
             text: JSON.stringify({
+              _disclaimer: POC_DISCLAIMER,
               status: "healthy",
               lag: 0,
               events_per_second: 1250,
@@ -180,7 +202,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: JSON.stringify({ status: "configured", channel: args?.channel }),
+            text: JSON.stringify({
+              _disclaimer: POC_DISCLAIMER,
+              status: "configured",
+              channel: args?.channel,
+            }),
           },
         ],
       };
@@ -191,6 +217,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: "text",
             text: JSON.stringify({
+              _disclaimer: POC_DISCLAIMER,
               timeframe: args?.timeframe || "1h",
               total_events: 4500000,
               anomalies_detected: 127,
@@ -206,7 +233,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         content: [
           {
             type: "text",
-            text: "Grafana dashboard config exported to config/grafana_dashboard.json",
+            text: JSON.stringify({
+              _disclaimer: POC_DISCLAIMER,
+              status: "exported",
+              path: "config/grafana_dashboard.json",
+              note: "Static fixture — see file in repo for the dashboard JSON shape.",
+            }),
           },
         ],
       };
@@ -221,7 +253,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Nixtla Anomaly Streaming Monitor MCP server running");
+  console.error("Nixtla Anomaly Streaming Monitor MCP server (PoC) running");
 }
 
 main().catch(console.error);

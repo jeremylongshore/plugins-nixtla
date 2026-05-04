@@ -1,8 +1,23 @@
 {
   "name": "nixtla-anomaly-streaming-monitor",
-  "description": "Real-time streaming anomaly detection for Kafka/Kinesis. Detect anomalies within 30 seconds with PagerDuty/Slack alerts.",
-  "version": "0.1.0",
+  "version": "1.0.0-poc",
+  "description": "[PROOF OF CONCEPT] Anomaly-detection API surface for streaming protocol metrics (Kafka/Kinesis/webhooks). All tools return illustrative fixtures — not live stream data. Production requires real consumers + Nixtla detect_anomalies() + alert delivery (~6-10 wks).",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "timegpt",
+    "streaming",
+    "kafka",
+    "kinesis",
+    "anomaly-detection",
+    "proof-of-concept"
+  ],
+  "commands": "./commands"
 }
