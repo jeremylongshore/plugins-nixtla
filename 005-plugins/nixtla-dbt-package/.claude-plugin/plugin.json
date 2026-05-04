@@ -6,7 +6,7 @@
     "name": "Intent Solutions"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/intent-solutions-io/plugins-nixtla",
-  "repository": "https://github.com/intent-solutions-io/plugins-nixtla",
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
   "keywords": ["dbt", "nixtla", "timegpt", "forecasting", "snowflake", "bigquery"]
 }

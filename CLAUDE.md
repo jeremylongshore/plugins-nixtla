@@ -9,10 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Attribute | Value |
 |-----------|-------|
 | **Version** | 1.9.0 (source: `VERSION`) |
-| **Status** | Experimental showcase |
+| **Status** | v1.9.0 — 12/13 plugins at v1.0 marketplace tier (or v1.0-poc with honest labeling) |
 | **Stack** | Python 3.10+ (Nixtla SDK >=0.7.3 dropped 3.9), statsforecast, TimeGPT API, pytest, black, isort |
 | **Skills** | 30 (in `003-skills/.claude/skills/`) |
-| **Plugins** | 13 (in `005-plugins/`) - 3 working |
+| **Plugins** | 13 (in `005-plugins/`) — 12 at v1.0 / v1.0-poc; `nixtla-bigquery-forecaster` + `nixtla-dbt-package` still in progress |
 
 ## Quick Start (5 Minutes)
 

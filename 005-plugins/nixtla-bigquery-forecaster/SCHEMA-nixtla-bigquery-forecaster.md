@@ -47,8 +47,8 @@ nixtla-bigquery-forecaster/
 | description | Run Nixtla statsforecast models on BigQuery... | Required |
 | version | 0.1.0 | Required |
 | author.name | Jeremy Longshore | Required |
-| homepage | https://github.com/intent-solutions-io/plugins-nixtla | Optional |
-| repository | https://github.com/intent-solutions-io/plugins-nixtla | Optional |
+| homepage | https://github.com/jeremylongshore/plugins-nixtla | Optional |
+| repository | https://github.com/jeremylongshore/plugins-nixtla | Optional |
 | license | MIT | Optional |
 
 ---

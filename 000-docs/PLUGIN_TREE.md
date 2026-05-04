@@ -220,7 +220,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+git clone https://github.com/jeremylongshore/plugins-nixtla.git
 cd plugins-nixtla
 
 # Install baseline lab
@@ -287,7 +287,7 @@ See individual plugin READMEs for contribution guidelines:
 
 ## 📚 Additional Resources
 
-- **Main Repository**: [plugins-nixtla](https://github.com/intent-solutions-io/plugins-nixtla)
+- **Main Repository**: [plugins-nixtla](https://github.com/jeremylongshore/plugins-nixtla)
 - **Skills Documentation**: [003-skills/.claude/skills/](003-skills/.claude/skills/)
 - **Plugin Documentation**: [000-docs/002a-planned-plugins/](000-docs/002a-planned-plugins/)
 
@@ -301,4 +301,4 @@ See individual plugin READMEs for contribution guidelines:
 ---
 
 **Last Updated**: 2025-12-09
-**Repository**: https://github.com/intent-solutions-io/plugins-nixtla
+**Repository**: https://github.com/jeremylongshore/plugins-nixtla

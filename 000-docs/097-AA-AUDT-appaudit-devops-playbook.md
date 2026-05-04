@@ -989,7 +989,7 @@ git push -u origin feature/my-feature
 
 - **Repository Owner**: Jeremy Longshore (Intent Solutions)
 - **Nixtla Contact**: [TBD based on collaboration]
-- **GitHub Issues**: https://github.com/intent-solutions-io/plugins-nixtla/issues
+- **GitHub Issues**: https://github.com/jeremylongshore/plugins-nixtla/issues
 
 ---
 

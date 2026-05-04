@@ -3,7 +3,7 @@
     "nixtla-dev-marketplace": {
       "source": {
         "source": "github",
-        "repo": "intent-solutions-io/plugins-nixtla"
+        "repo": "jeremylongshore/plugins-nixtla"
       }
     }
   },

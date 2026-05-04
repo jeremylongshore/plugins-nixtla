@@ -13,7 +13,7 @@ Installation Options:
 
 1. Development Mode (from repo):
    ```
-   git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+   git clone https://github.com/jeremylongshore/plugins-nixtla.git
    cd claude-code-plugins-nixtla
    pip install -e packages/nixtla-claude-skills-installer
    ```

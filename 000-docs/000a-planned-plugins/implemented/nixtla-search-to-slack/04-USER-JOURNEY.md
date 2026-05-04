@@ -10,7 +10,7 @@
 ### Step 1: Clone and Setup Environment
 
 ```bash
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+git clone https://github.com/jeremylongshore/plugins-nixtla.git
 cd plugins-nixtla/005-plugins/nixtla-search-to-slack
 
 python -m venv venv

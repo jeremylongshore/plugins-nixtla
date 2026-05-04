@@ -12,7 +12,7 @@ Set up the Nixtla dbt package for TimeGPT forecasting.
 1. Add to packages.yml:
    ```yaml
    packages:
-     - git: "https://github.com/intent-solutions-io/plugins-nixtla.git"
+     - git: "https://github.com/jeremylongshore/plugins-nixtla.git"
        subdirectory: "005-plugins/nixtla-dbt-package"
    ```
 

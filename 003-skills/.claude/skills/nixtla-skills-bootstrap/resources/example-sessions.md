@@ -68,7 +68,7 @@ All skills are now up to date.
 The installer needs to be installed first:
 
 ```
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+git clone https://github.com/jeremylongshore/plugins-nixtla.git
 cd claude-code-plugins-nixtla
 pip install -e packages/nixtla-claude-skills-installer
 ```
