@@ -37,7 +37,7 @@ jobs:
           pip install pytest
 
       - name: Run PoC labeling tests
-        run: pytest tests/ -v
+        run: pytest tests/ -v -o addopts="" -p no:cacheprovider
 
   validator-gate:
     name: Plugin Validator v7.0 (marketplace tier)
