@@ -1,8 +1,25 @@
 {
   "name": "nixtla-snowflake-adapter",
-  "description": "Claude Code wrapper for Nixtla Snowflake Native App. Generate CALL NIXTLA_FORECAST() SQL and validate installations.",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Generate CALL NIXTLA.FORECAST() / NIXTLA.DETECT_ANOMALIES() SQL for the Nixtla Snowflake Native App, validate installation, and emit Looker views — all from inside Claude Code.",
   "author": {
-    "name": "Intent Solutions"
-  }
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
+  },
+  "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
+  "repository": "https://github.com/jeremylongshore/plugins-nixtla",
+  "license": "MIT",
+  "keywords": [
+    "nixtla",
+    "snowflake",
+    "native-app",
+    "sql",
+    "forecasting",
+    "time-series",
+    "anomaly-detection",
+    "looker"
+  ],
+  "commands": "./commands",
+  "mcpServers": "./.mcp.json"
 }
