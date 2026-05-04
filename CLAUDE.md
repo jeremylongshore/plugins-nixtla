@@ -9,10 +9,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Attribute | Value |
 |-----------|-------|
 | **Version** | 1.9.0 (source: `VERSION`) |
-| **Status** | v1.9.0 — 12/13 plugins at v1.0 marketplace tier (or v1.0-poc with honest labeling) |
+| **Status** | 13 plugins at v1.0 marketplace tier (or v1.0-poc); 6 Phase 4/5 plugins scaffolded as v0.1.0-wip |
 | **Stack** | Python 3.10+ (Nixtla SDK >=0.7.3 dropped 3.9), statsforecast, TimeGPT API, pytest, black, isort |
 | **Skills** | 30 (in `003-skills/.claude/skills/`) |
-| **Plugins** | 13 (in `005-plugins/`) — 12 at v1.0 / v1.0-poc; `nixtla-bigquery-forecaster` + `nixtla-dbt-package` still in progress |
+| **Plugins** | 19 (in `005-plugins/`) — 13 at v1.0 / v1.0-poc + 6 at v0.1.0-wip with honest WIP labeling |
 
 ## Quick Start (5 Minutes)
 
@@ -138,8 +138,17 @@ nixtla-skills update    # Update to latest
    - Each has: `SKILL.md` + optional `scripts/`, `assets/templates/`
 
 2. **Plugins** (`005-plugins/*/`)
-   - Complete applications with MCP servers, tests, Python backends
-   - Working: nixtla-baseline-lab, nixtla-bigquery-forecaster, nixtla-search-to-slack
+   - Independently-shipped apps. Each plugin owns its own `plugin.json`,
+     MCP server, tests, and per-plugin GitHub Actions workflow.
+   - Granularity: one plugin per job (NOT a monolith). Pre-PoC v1.0:
+     baseline-lab, search-to-slack, snowflake-adapter, bigquery-forecaster,
+     dbt-package, plus 7 Phase 1 plugins (roi-calculator, forecast-explainer,
+     vs-statsforecast-benchmark, cost-optimizer, migration-assistant,
+     airflow-operator, changelog-automation).
+   - PoC pattern (v1.0-poc): defi-sentinel, anomaly-streaming-monitor.
+   - WIP scaffolds (v0.1.0-wip): sales-demo-builder, forecast-workflow-templates,
+     forecast-audit-report, support-deflector, docs-qa-generator,
+     embedded-forecast-widget.
 
 3. **Slash Commands** (`005-plugins/*/commands/*.md`)
    - User-invoked commands like `/nixtla-baseline-m4`
@@ -152,11 +161,46 @@ The baseline lab MCP server (`005-plugins/nixtla-baseline-lab/scripts/nixtla_bas
 - `generate_benchmark_report` - Markdown report from metrics CSV
 - `generate_github_issue_draft` - GitHub issue template
 
+Most MCP servers are Python (using the `mcp` package). One exception: streaming-monitor's MCP server is TypeScript (`@modelcontextprotocol/sdk`) because its production target is `kafkajs` / `aws-sdk`.
+
+### Honest Labeling Pattern (load-bearing)
+
+Plugin posture is encoded in three layers — version suffix, tool description prefix, response disclaimer field. Each tier has dedicated tests verifying the labeling integrity.
+
+| Tier | Version | Tool desc prefix | Response field | Example |
+|---|---|---|---|---|
+| Production v1.0 | `1.0.0` | none | none | baseline-lab, snowflake-adapter, bigquery-forecaster |
+| Proof of Concept | `1.0.0-poc` | `[PoC]` | `_disclaimer` (PoC notice) | defi-sentinel, anomaly-streaming-monitor |
+| Work In Progress | `0.1.0-wip` | `[WIP]` | `_disclaimer` (WIP notice) | sales-demo-builder, support-deflector, etc. |
+
+**Why this matters**: a future Claude / contributor / user looking at the plugin needs to know its fidelity at a glance. Renaming a `0.1.0-wip` plugin to `1.0.0` without implementing the production gap = silent regression. The labeling tests block that.
+
+**Test pattern** (each plugin's `tests/test_{poc,wip}_labeling.py`):
+- Plugin manifest version contains the suffix
+- README has the banner / Origin section / What's-real-vs-roadmap matrix
+- Every tool description starts with the prefix
+- Every `call_tool()` response contains the `_disclaimer` field
+
+### Production Hardening Patterns
+
+When taking a plugin from demo → production (Epic 2.4 `bigquery-forecaster` is the canonical reference):
+
+- **`src/sql_validation.py`**: identifier validators (`validate_identifier`, `validate_project_id`) for SQL-injection mitigation. BigQuery doesn't support parameterized identifiers; the only safe path is regex allow-list.
+- **`src/retry.py`**: `@retry_on_transient` decorator with exponential backoff + jitter. Catches `google.api_core.exceptions` `{ServiceUnavailable, TooManyRequests, InternalServerError, GatewayTimeout, DeadlineExceeded}`. Default 5 attempts, 1s→30s.
+- **Lazy `src/__init__.py`**: PEP 562 `__getattr__` so light modules (validators, retry) load without statsforecast / google-cloud-bigquery installed. Lets CI run validator/security tests without the heavy deps.
+- **`DEPLOY.md`**: per-plugin deployment guide covering GCP service accounts, Cloud Run Jobs, Secret Manager, observability, troubleshooting, cost notes.
+
+### plugin.json Canonical Fields (Anthropic spec — validator allow-list)
+
+The validator's `PLUGIN_JSON_FIELDS` accepts: `name` (required), `version`, `description`, `author` (object with `name`), `homepage`, `repository`, `license`, `keywords`, `commands`, `agents`, `skills`, `hooks`, `mcpServers`, `outputStyles`, `lspServers`. Anything else = ERROR (e.g., `displayName` is rejected; `tags` and `compatibility` belong only in SKILL.md frontmatter, not plugin.json).
+
 ## Skills Standard (Summary)
 
 **Full spec**: `000-docs/000a-skills-schema/SKILLS-STANDARD-COMPLETE.md`
+**Canonical validator**: `~/000-projects/claude-code-plugins/scripts/validate-skills-schema.py` (Plugin Validator v7.0 / schema 3.3.1)
+**Vendored copy** at `004-scripts/validate_skills_v2.py` is for in-repo CI only — the canonical validator is the source of truth.
 
-### Required Frontmatter
+### Required Frontmatter (IS 8-field marketplace tier — all required, ERROR if missing)
 
 ```yaml
 name: nixtla-<short-name>
@@ -168,6 +212,10 @@ allowed-tools: "Read,Write,Glob,Grep,Edit,Bash(python:*)"
 version: "1.0.0"
 author: "Jeremy Longshore <jeremy@intentsolutions.io>"
 license: "MIT"
+tags:
+  - forecasting
+  - time-series
+compatibility: Claude Code 1.0+; Python 3.10+; statsforecast 1.7+.
 ```
 
 ### L4 Quality Requirements (100% mandatory)
@@ -265,14 +313,24 @@ All docs in `000-docs/` use naming: `NNN-AA-CODE-descriptive-slug.md`
 
 ## CI/CD Workflows
 
-All in `.github/workflows/`:
+Every plugin has a per-plugin workflow at `.github/workflows/{name}-ci.yml`. The pattern (replicated 19×):
 
-| Workflow | Purpose | Required to Merge |
-|----------|---------|-------------------|
-| `ci.yml` | Main validation | Yes |
-| `skills-validation.yml` | Skills compliance | Yes |
-| `plugin-validator.yml` | Plugin schema | No |
-| `nixtla-baseline-lab-ci.yml` | Plugin tests | No |
+```yaml
+jobs:
+  unit-tests:    # pytest -o addopts="" (overrides repo-root coverage flags)
+  validator-gate: # clones jeremylongshore/claude-code-plugins, runs Plugin Validator v7.0 marketplace tier
+```
+
+**Why `-o addopts=""`**: the repo-root `pytest.ini` injects `--cov` flags requiring pytest-cov. Per-plugin jobs install only `pytest` to keep CI fast — the override neutralizes the inifile injection.
+
+**Cross-cutting workflows** (in `.github/workflows/`):
+
+| Workflow | Purpose |
+|---|---|
+| `ci.yml` | Main repo-wide validation (lint + repo-level tests) |
+| `skills-validation.yml` | Vendored skills validator |
+| `plugin-validator.yml` | Per-plugin matrix validation via canonical validator |
+| `gemini-daily-audit.yml` | Daily audit run |
 
 ## Troubleshooting
 
@@ -297,14 +355,24 @@ All in `.github/workflows/`:
 
 ## Version & Release
 
-**Current**: 1.8.1 (source of truth: `VERSION`)
+**Current**: 1.9.0 (source of truth: `VERSION`)
 
-Release process:
+Use `/release` (Universal Release Engineering skill) for the full ceremony — it handles version-consistency checks, CHANGELOG generation, README sync, security scan, branch-protection bypass/restore, gist update, and AAR generation.
+
+Manual release steps if `/release` is unavailable:
 1. Update `VERSION` file
 2. Update `CHANGELOG.md`
 3. Create release AAR in `000-docs/`
 4. Tag: `git tag -a v1.X.Y -m "Release v1.X.Y"`
 5. Push: `git push origin v1.X.Y`
+
+### Marketplace.json discipline
+
+`.claude-plugin/marketplace.json` deliberately lists only WORKING-only plugins (per CHANGELOG v1.9.0). Per-plugin expansion to all 19 plugins is deferred to the D1 health audit. Don't expand it without re-reading that CHANGELOG entry.
+
+### Public gist
+
+`.gist-id` at repo root holds the canonical Project Landing gist ID (`dcdd7d8a9a262ec1f556fcb60b7af4f9`). `/gist-auditor` uses it to scope audits; `/release` Phase 7.5 uses it to keep the gist in sync with HEAD.
 
 
 ## Testing baseline (2026-05-01 — Intent Solutions Testing SOP)
