@@ -22,7 +22,7 @@ Runs statsforecast baselines on M4 data. Fully offline, no API costs.
 
 ```bash
 # Clone and setup
-git clone https://github.com/intent-solutions-io/plugins-nixtla.git
+git clone https://github.com/jeremylongshore/plugins-nixtla.git
 cd plugins-nixtla/plugins/nixtla-baseline-lab
 ./scripts/setup_nixtla_env.sh --venv
 source .venv-nixtla-baseline/bin/activate
@@ -150,4 +150,4 @@ jeremy@intentsolutions.io | 251.213.1115
 
 ---
 
-**Repository:** https://github.com/intent-solutions-io/plugins-nixtla
+**Repository:** https://github.com/jeremylongshore/plugins-nixtla
