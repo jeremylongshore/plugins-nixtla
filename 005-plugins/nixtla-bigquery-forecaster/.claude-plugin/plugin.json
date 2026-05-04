@@ -1,7 +1,7 @@
 {
   "name": "nixtla-bigquery-forecaster",
-  "version": "0.1.0",
-  "description": "Run Nixtla statsforecast models on BigQuery time series data. Pull from BigQuery, forecast with AutoETS/AutoTheta, write results back.",
+  "version": "1.0.0",
+  "description": "Run Nixtla statsforecast / TimeGPT forecasting on BigQuery time-series data with SQL-injection-validated identifiers and exponential-backoff retry on transient GCP errors. Pull from BigQuery, forecast, write results back.",
   "author": {
     "name": "Jeremy Longshore",
     "email": "jeremy@intentsolutions.io",
