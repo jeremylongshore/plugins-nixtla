@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-05-03
+
+### Release Highlights
+**Plugin Ecosystem Maturation — 12 plugins ship v1.0, 6 WIP scaffolds added.** This release completes Phase 1–3 of the plugin build roadmap, delivering production-ready implementations for all 7 Phase 1 plugins plus 5 Phase 2/3 plugins (including 2 honest PoC patterns). Phase 4/5 plugin scaffolds added with honest v0.1.0-wip labeling.
+
+### Added
+- **Phase 1 Plugins — All 7 shipped v1.0:**
+  - `nixtla-roi-calculator` v1.0 — Real working ROI calculator (Epic 1.1) (#PR)
+  - `nixtla-forecast-explainer` v1.0 — STL decomposition + driver analysis (Epic 1.2)
+  - `nixtla-vs-statsforecast-benchmark` v1.0 — TimeGPT vs statsforecast comparison (Epic 1.3)
+  - `nixtla-cost-optimizer` v1.0 — Real cost optimization tooling (Epic 1.4)
+  - `nixtla-migration-assistant` v1.0 — Prophet/statsmodels/sklearn → Nixtla migration (Epic 1.5)
+  - `nixtla-airflow-operator` v1.0 — Real Airflow tooling integration (Epic 1.6)
+  - `nixtla-changelog-automation` v1.0 — Automated changelog generation (Epic 1.7)
+
+- **Phase 2 Plugins — Production Hardening:**
+  - `nixtla-baseline-lab` 1.0 hardening — pytest + validator gate (Epic 2.1) (#22)
+  - `nixtla-search-to-slack` v1.0 — Full implementation (Epic 2.2) (#23)
+  - `nixtla-snowflake-adapter` v1.0 — Complete implementation (Epic 2.3) (#24)
+  - `nixtla-bigquery-forecaster` v1.0 — Production hardening with SQL validation, retry logic, lazy imports (Epic 2.4) (#27)
+  - `nixtla-dbt-package` v1.0 — BigQuery canonical, Snowflake/Databricks honest PoC (Epic 0.1) (#28)
+
+- **Phase 3 Plugins — Honest PoC Labeling:**
+  - `nixtla-defi-sentinel` v1.0-poc — PoC with honest labeling pattern (Epic 3.1) (#20)
+  - `nixtla-anomaly-streaming-monitor` v1.0-poc — PoC with honest labeling (Epic 3.2) (#21)
+
+- **Phase 4/5 WIP Scaffolds (6 plugins):**
+  - `nixtla-sales-demo-builder` v0.1.0-wip — Scaffolded with honest WIP labeling
+  - `nixtla-forecast-workflow-templates` v0.1.0-wip
+  - `nixtla-forecast-audit-report` v0.1.0-wip
+  - `nixtla-support-deflector` v0.1.0-wip
+  - `nixtla-docs-qa-generator` v0.1.0-wip
+  - `nixtla-embedded-forecast-widget` v0.1.0-wip
+
+- **Honest Labeling Pattern** — Production plugins have no disclaimer; PoC plugins have `[PoC]` tool prefix + `_disclaimer` field; WIP scaffolds have `[WIP]` prefix + disclaimer. Dedicated test files (`test_poc_labeling.py`, `test_wip_labeling.py`) enforce labeling integrity.
+
+- **Production Hardening Patterns** — SQL injection mitigation via `sql_validation.py`, retry with exponential backoff via `retry.py`, lazy imports via PEP 562 `__getattr__`, per-plugin `DEPLOY.md` guides.
+
+### Fixed
+- `search-to-slack`: Restored 13 of 17 skipped tests + small implementation fix (#26)
+- CI: Vendored validator now accepts 'compatibility' as known field
+- CI: Rescued baseline-lab CI workflow + dropped vendored dirs from linters
+
+### Documentation
+- CLAUDE.md synced with v1.9.0 reality — 19 plugins documented, honest labeling pattern, production hardening patterns
+- Plugin build roadmap documented — 20 epics across 5 phases
+- Consistency sync after repo transfer (#25)
+
+### Technical Details
+- Commits since v1.9.0: 21
+- Plugins at v1.0: 12 (was 0)
+- Plugins at v1.0-poc: 2
+- Plugins at v0.1.0-wip: 6 (newly scaffolded)
+- Total plugins: 19
+- CI workflows: 28 (7 new for Phase 4/5 scaffolds)
+
 ## [1.9.0] - 2026-04-29
 
 ### Release Highlights

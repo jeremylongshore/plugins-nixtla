@@ -1,8 +1,8 @@
-# plugins-nixtla v1.9.0
+# plugins-nixtla v1.10.0
 
 Claude Code plugins and AI skills for time-series forecasting with Nixtla's statsforecast, mlforecast, neuralforecast, and TimeGPT.
 
-**Version**: 1.9.0 | **Plugins**: 13 (12 at v1.0 / v1.0-poc, 2 in progress) | **Skills**: 30 | **Validation**: Plugin Validator v7.0 (marketplace tier) per plugin
+**Version**: 1.10.0 | **Plugins**: 19 (13 at v1.0 / v1.0-poc, 6 WIP scaffolds) | **Skills**: 30 | **Validation**: Plugin Validator v7.0 (marketplace tier) per plugin
 
 **Links:** [Gist One-Pager](https://gist.github.com/jeremylongshore/dcdd7d8a9a262ec1f556fcb60b7af4f9) · [GitHub](https://github.com/jeremylongshore/plugins-nixtla) · [Nixtla SDK](https://github.com/Nixtla/nixtla)
 
@@ -12,9 +12,9 @@ Claude Code plugins and AI skills for time-series forecasting with Nixtla's stat
 
 | Question | Answer |
 |----------|--------|
-| **What** | 13 Claude Code plugins + 30 AI skills for time-series forecasting |
+| **What** | 19 Claude Code plugins + 30 AI skills for time-series forecasting |
 | **Who** | Forecasting practitioners, analytics engineers, ML platform owners |
-| **Status** | v1.9.0 — 12/13 plugins at v1.0 marketplace tier (or v1.0-poc with honest labeling); per-plugin CI gates on every PR |
+| **Status** | v1.10.0 — 13 plugins at v1.0 / v1.0-poc + 6 Phase 4/5 scaffolds at v0.1.0-wip; per-plugin CI gates on every PR |
 | **Stack** | Python 3.10+, statsforecast 1.7+, nixtla SDK 0.7.3+ (TimeGPT), pytest, MCP |
 | **Entry Point** | `005-plugins/nixtla-baseline-lab/` (working offline baselines, no API key) |
 

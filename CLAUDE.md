@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 | Attribute | Value |
 |-----------|-------|
-| **Version** | 1.9.0 (source: `VERSION`) |
+| **Version** | 1.10.0 (source: `VERSION`) |
 | **Status** | 13 plugins at v1.0 marketplace tier (or v1.0-poc); 6 Phase 4/5 plugins scaffolded as v0.1.0-wip |
 | **Stack** | Python 3.10+ (Nixtla SDK >=0.7.3 dropped 3.9), statsforecast, TimeGPT API, pytest, black, isort |
 | **Skills** | 30 (in `003-skills/.claude/skills/`) |
