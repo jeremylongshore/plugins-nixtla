@@ -16,14 +16,12 @@ from __future__ import annotations
 
 import asyncio
 
-import pytest
 from snowflake_mcp import (
     call_tool,
     generate_forecast_sql,
     generate_setup_validation_sql,
     list_tools,
 )
-
 
 # ---------------------------------------------------------------------------
 # generate_forecast_sql
@@ -156,9 +154,7 @@ class TestCallToolDispatch:
         assert "SHOW APPLICATIONS LIKE 'NIXTLA%'" in result[0].text
 
     def test_anomaly_sql_includes_level(self):
-        result = asyncio.run(
-            call_tool("generate_anomaly_sql", {"table": "metrics", "level": 99})
-        )
+        result = asyncio.run(call_tool("generate_anomaly_sql", {"table": "metrics", "level": 99}))
         assert "DETECT_ANOMALIES" in result[0].text
         assert "INPUT_TABLE => 'metrics'" in result[0].text
         assert "LEVEL => 99" in result[0].text
