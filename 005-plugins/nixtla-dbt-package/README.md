@@ -1,6 +1,8 @@
-# dbt_nixtla
+# dbt_nixtla v1.0.0
 
-Native dbt package for TimeGPT forecasting.
+Native dbt package for TimeGPT forecasting + anomaly detection across data warehouses.
+
+**Posture**: BigQuery is the **canonical** implementation. Snowflake and Databricks adapters ship as **honest PoCs** — the underlying integrations (Nixtla Snowflake Native App, registered Databricks Python UDF) are external dependencies the package does not own.
 
 ## Installation
 
@@ -9,7 +11,7 @@ Add to your `packages.yml`:
 ```yaml
 packages:
   - package: nixtla/dbt_nixtla
-    version: [">=0.1.0", "<1.0.0"]
+    version: [">=1.0.0", "<2.0.0"]
 ```
 
 Then run:
@@ -60,14 +62,16 @@ Detect anomalies in time series:
 ) }}
 ```
 
-## Supported Warehouses
+## Supported Warehouses (v1.0 honest matrix)
 
-| Warehouse | Status | Integration |
-|-----------|--------|-------------|
-| BigQuery | ✅ Phase 1 | Native UDF |
-| Snowflake | ✅ Phase 1 | Native App |
-| Databricks | ✅ Phase 1 | Python UDF |
-| Redshift | 🔜 Phase 2 | Lambda |
+| Warehouse | Status | Integration | Notes |
+|-----------|--------|-------------|-------|
+| BigQuery | **Canonical** | BQML `ML.FORECAST` | Production-ready. Set `var('nixtla_bq_model')` to your trained BQML model name; the macro emits the standard `ML.FORECAST` SELECT against it. |
+| Snowflake | **PoC** | Nixtla Snowflake Native App | Macro emits `CALL NIXTLA.FORECAST(...)`. Requires the Nixtla Native App installed in your Snowflake account (currently a private Nixtla deployment — contact Nixtla for access). |
+| Databricks | **PoC** | External Python UDF | Macro calls `nixtla_forecast_udf(...)` which you must register yourself (Nixtla SDK + spark UDF wrapper). No registration helper bundled in this package. |
+| Redshift | Not supported | — | Roadmap item; would need a Lambda invocation pattern. Macro raises a compiler error if you target Redshift. |
+
+**Why this matters**: the BigQuery adapter is buildable and runs end-to-end with public BQML credentials. The Snowflake / Databricks adapters compile to syntactically valid SQL but require infrastructure outside this package. Treat them as templates, not turnkey integrations.
 
 ## Example Model
 
@@ -75,4 +79,4 @@ See `models/examples/fct_sales_forecast.sql` for a complete example.
 
 ## License
 
-Proprietary - Intent Solutions
+MIT

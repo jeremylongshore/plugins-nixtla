@@ -1,12 +1,25 @@
 {
   "name": "nixtla-dbt-package",
-  "description": "dbt package with macros for Nixtla TimeGPT forecasting in data warehouses (Snowflake, BigQuery, Databricks, Redshift)",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "dbt package with macros for Nixtla TimeGPT forecasting + anomaly detection across data warehouses. BigQuery canonical (BQML ML.FORECAST); Snowflake / Databricks adapters ship as honest PoCs (depend on Nixtla Native App or external UDF registration).",
   "author": {
-    "name": "Intent Solutions"
+    "name": "Jeremy Longshore",
+    "email": "jeremy@intentsolutions.io",
+    "url": "https://github.com/jeremylongshore"
   },
-  "license": "Apache-2.0",
   "homepage": "https://github.com/jeremylongshore/plugins-nixtla",
   "repository": "https://github.com/jeremylongshore/plugins-nixtla",
-  "keywords": ["dbt", "nixtla", "timegpt", "forecasting", "snowflake", "bigquery"]
+  "license": "MIT",
+  "keywords": [
+    "dbt",
+    "nixtla",
+    "timegpt",
+    "forecasting",
+    "anomaly-detection",
+    "bigquery",
+    "snowflake",
+    "databricks",
+    "warehouse-native"
+  ],
+  "commands": "./commands"
 }
