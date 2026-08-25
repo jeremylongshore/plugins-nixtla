@@ -8,6 +8,8 @@ Claude Code plugins and AI skills for time-series forecasting with Nixtla's stat
 
 ---
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U5S225PTME)
+
 ## TL;DR (30 Seconds)
 
 | Question | Answer |
