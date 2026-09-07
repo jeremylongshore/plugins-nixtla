@@ -251,7 +251,7 @@ echo "════════════════════════�
 vim ~/.claude/005-plugins/nixtla-cost-optimizer/.env
 
 # Add your Nixtla API key
-NIXTLA_API_KEY=nixak-JNfT4z4JQb9uK3gdAyiWYWSBELdt6iW0PmE0Sy3k8ETAInJkFSPp4gOfyAZrENcGOsKyTqfDmuLghVq9
+NIXTLA_API_KEY=${NIXTLA_TIMEGPT_API_KEY}
 ```
 
 ### Step 4: Restart Claude Code
