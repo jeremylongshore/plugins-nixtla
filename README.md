@@ -8,6 +8,26 @@ Claude Code plugins and AI skills for time-series forecasting with Nixtla's stat
 
 ---
 
+## Skills.sh
+
+The official Skills CLI discovers two intentionally public packages from
+`.claude/skills/`:
+
+- `nixtla-baseline-review` validates and reviews Baseline Lab result CSVs.
+- `skills-expert` audits or repairs Agent Skills against an explicit standard.
+
+Install or inspect them with:
+
+```bash
+npx skills add jeremylongshore/plugins-nixtla --list
+npx skills add jeremylongshore/plugins-nixtla
+```
+
+The larger `003-skills/` collection and plugin-bundled skills remain separate
+distribution surfaces; they are not implied by the root skills.sh inventory.
+
+---
+
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U5S225PTME)
 
 ## TL;DR (30 Seconds)

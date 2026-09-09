@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Rebuilt the two root skills published by skills.sh. `nixtla-baseline-review`
+  now validates and summarizes real CSV results without universal accuracy
+  thresholds or fabricated production claims; `skills-expert` now separates
+  the portable format, current Claude Code behavior, and marketplace overlays.
+- Kept the Baseline Lab plugin's bundled review skill byte-identical to the
+  public root package and replaced stale metric guidance with a source-grounded
+  contract.
+- Updated the vendored validator to recognize the current `argument-hint`
+  frontmatter field used by the public skills.
+- Rebuilt the Baseline Lab analyst against the current Claude Code and
+  marketplace agent contract, removed the obsolete explicit agent-directory
+  manifest entry, and updated the vendored agent validator to reject the
+  retired `capabilities` field.
+
+### Added
+
+- Added a dependency-free baseline-results analyzer plus regression tests for
+  schema failures, aggregate receipts, intended public inventory, mirror
+  drift, and the current agent contract.
+
 ## [1.10.0] - 2026-05-03
 
 ### Release Highlights

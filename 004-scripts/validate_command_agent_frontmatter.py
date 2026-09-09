@@ -9,7 +9,7 @@ Validates frontmatter in:
 - 005-plugins/**/agents/*.md
 
 Author: Jeremy Longshore <jeremy@intentsolutions.io>
-Version: 1.0.0
+Version: 1.1.0
 """
 
 import re
@@ -117,8 +117,31 @@ def validate_command_frontmatter(frontmatter: Dict[str, Any], file_path: Path) -
 
 
 def validate_agent_frontmatter(frontmatter: Dict[str, Any], file_path: Path) -> List[str]:
-    """Validate frontmatter for agent files."""
+    """Validate current Claude Code agent fields plus the marketplace overlay."""
     errors = []
+
+    allowed_fields = {
+        "name",
+        "description",
+        "tools",
+        "disallowedTools",
+        "model",
+        "permissionMode",
+        "maxTurns",
+        "skills",
+        "mcpServers",
+        "hooks",
+        "memory",
+        "background",
+        "isolation",
+        "effort",
+        "color",
+        "version",
+        "author",
+        "tags",
+    }
+    for field in sorted(set(frontmatter) - allowed_fields):
+        errors.append(f"Unsupported agent field: {field}")
 
     # Required field: name
     if "name" not in frontmatter:
@@ -140,37 +163,41 @@ def validate_agent_frontmatter(frontmatter: Dict[str, Any], file_path: Path) -> 
         desc = frontmatter["description"]
         if len(desc) < 20:
             errors.append("Field 'description' must be at least 20 characters")
-        if len(desc) > 200:
-            errors.append("Field 'description' must be 200 characters or less")
+        if len(desc) > 1536:
+            errors.append("Field 'description' must be 1536 characters or less")
 
-    # Required field: capabilities
-    if "capabilities" not in frontmatter:
-        errors.append("Missing required field: capabilities")
-    elif not isinstance(frontmatter["capabilities"], list):
-        errors.append("Field 'capabilities' must be an array")
-    elif len(frontmatter["capabilities"]) < 2:
-        errors.append("Field 'capabilities' must have at least 2 items")
-    elif len(frontmatter["capabilities"]) > 10:
-        errors.append("Field 'capabilities' must have 10 or fewer items")
-    else:
-        # Check each capability is a string
-        for i, cap in enumerate(frontmatter["capabilities"]):
-            if not isinstance(cap, str):
-                errors.append(f"Field 'capabilities[{i}]' must be a string")
+    # Marketplace-required execution and provenance fields.
+    required_fields = {
+        "tools": list,
+        "disallowedTools": list,
+        "model": str,
+        "color": str,
+        "version": str,
+        "author": str,
+        "tags": list,
+    }
+    for field, expected_type in required_fields.items():
+        if field not in frontmatter:
+            errors.append(f"Missing required field: {field}")
+        elif not isinstance(frontmatter[field], expected_type):
+            errors.append(f"Field '{field}' must be a {expected_type.__name__}")
 
-    # Optional field: expertise_level
-    valid_expertise = ["intermediate", "advanced", "expert"]
-    if "expertise_level" in frontmatter:
-        if frontmatter["expertise_level"] not in valid_expertise:
-            errors.append(f"Invalid expertise_level. Must be one of: {', '.join(valid_expertise)}")
+    for field in ("tools", "disallowedTools", "skills", "tags"):
+        value = frontmatter.get(field)
+        if isinstance(value, list) and any(not isinstance(item, str) for item in value):
+            errors.append(f"Field '{field}' must contain only strings")
 
-    # Optional field: activation_priority
-    valid_priorities = ["low", "medium", "high", "critical"]
-    if "activation_priority" in frontmatter:
-        if frontmatter["activation_priority"] not in valid_priorities:
-            errors.append(
-                f"Invalid activation_priority. Must be one of: {', '.join(valid_priorities)}"
-            )
+    if isinstance(frontmatter.get("tools"), list) and not frontmatter["tools"]:
+        errors.append("Field 'tools' must list at least one tool")
+    if isinstance(frontmatter.get("tags"), list) and not frontmatter["tags"]:
+        errors.append("Field 'tags' must list at least one tag")
+
+    version = frontmatter.get("version")
+    if isinstance(version, str) and not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        errors.append("Field 'version' must use SemVer X.Y.Z")
+
+    if "background" in frontmatter and not isinstance(frontmatter["background"], bool):
+        errors.append("Field 'background' must be a boolean")
 
     return errors
 

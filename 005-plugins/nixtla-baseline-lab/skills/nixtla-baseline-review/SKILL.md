@@ -1,263 +1,114 @@
 ---
 name: nixtla-baseline-review
-description: Analyze Nixtla baseline forecasting results (sMAPE/MASE on M4 or other
-  benchmark datasets). Use when the user asks about baseline performance, model comparisons,
-  or metric interpretation for Nixtla time-series experiments. Trigger with "baseline review",
-  "interpret sMAPE/MASE", or "compare AutoETS vs AutoTheta".
-allowed-tools: Read,Grep,Bash(ls:*)
-version: 1.0.0
+description: |
+  Analyze real sMAPE and MASE results produced by the community Nixtla Baseline
+  Lab, compare models, and surface fragile series without inventing benchmarks.
+  Use when reviewing StatsForecast output; trigger with "baseline review",
+  "interpret sMAPE/MASE", or "compare AutoETS and AutoTheta".
+allowed-tools: 'Read, Glob, Bash(python3:*)'
+version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
-tags:
-  - forecasting
-  - time-series
-  - baseline
-  - statsforecast
-  - benchmarks
-  - sMAPE
-  - MASE
-compatibility: Claude Code 1.0+; Python 3.10+; reads outputs from the nixtla-baseline-m4 workflow (statsforecast 1.7+).
+compatibility: 'Claude Code with Python 3.10+; reads results_*.csv output from the community-built nixtla-baseline-lab plugin. No API key is required to review existing files.'
+tags: [nixtla, statsforecast, forecasting, smape, mase, model-evaluation]
+argument-hint: '[results CSV or output directory] [metric or question]'
+model: inherit
 ---
 
-# Nixtla Baseline Review Skill
+# Nixtla Baseline Review
 
 ## Overview
 
-Analyze baseline forecasting results from the `nixtla-baseline-m4` workflow. Interpret metrics, compare models, surface patterns, and recommend next steps.
-
-## When to Use This Skill
-
-Activate this skill when the user:
-- Asks "Which baseline model performed best?"
-- Requests interpretation of sMAPE or MASE metrics
-- Wants to compare AutoETS vs AutoTheta vs SeasonalNaive
-- Says "Explain these baseline results"
-- Needs guidance on model selection based on baseline performance
-
-## For StatsForecast Power Users
-
-This baseline lab is built on **Nixtla's statsforecast library**. What this plugin provides:
-- Real statsforecast models (SeasonalNaive, AutoETS, AutoTheta)
-- M4 dataset integration via datasetsforecast
-- Standard train/test evaluation with sMAPE and MASE metrics
-- Power-user controls: models, freq, season_length parameters
-- Demo preset mode for GitHub-style presentations
-
-**Important Disclaimers**:
-- This is a **community-built integration**, not an official Nixtla product
-- Built to demonstrate Claude Code plugin capabilities with real Nixtla libraries
-- For production use cases, always validate against official Nixtla examples
-
-**Advanced Example Questions**:
-- "Compare AutoETS vs AutoTheta on MASE only, and show me which series AutoETS loses on"
-- "Identify any series where SeasonalNaive still wins on sMAPE - what patterns do they share?"
-- "Given these statsforecast metrics, which series would you route to AutoTheta vs AutoETS and why?"
+Review one concrete Baseline Lab result set. Rank models from observed metrics,
+show both aggregate and per-series evidence, and keep benchmark conclusions
+inside the dataset, horizon, and series sample that produced them.
 
 ## Prerequisites
 
-- Baseline results must exist in `nixtla_baseline_m4/` directory
-- At minimum, `results_*.csv` file must be present
-- CSV format: columns `series_id`, `model`, `sMAPE`, `MASE`
+- Provide a `results_*.csv` path or a directory containing one.
+- Require columns `series_id`, `model`, `sMAPE`, and `MASE`.
+- Treat this repository as a community integration, not an official Nixtla
+  product or an independent reproduction of an entire benchmark.
 
 ## Instructions
 
-### Step 1: Locate Results Files
+1. Resolve the input with `Glob`. If several result files match, list their
+   paths and modification context and ask the user to choose; never silently
+   combine separate runs or pick a filename as "latest" without confirmation.
+2. Use `Read` to inspect the header, representative rows, sibling summary, and
+   `run_manifest.json` or `compat_info.json` when present. Record the dataset,
+   horizon, series count, models, frequency, and seasonal period that are
+   actually supported by those artifacts.
+3. Run the bundled analyzer:
 
-Use Read or Bash tool to find baseline results:
+   ```bash
+   python3 ${CLAUDE_SKILL_DIR}/scripts/analyze_results.py path/to/results.csv
+   ```
 
-```bash
-# Check for results directory
-ls -la nixtla_baseline_m4/
+4. Check the analyzer receipt for rejected rows, duplicate series/model pairs,
+   ties, model coverage, and non-finite values. Stop on schema or numeric
+   failures instead of averaging partial data.
+5. Rank models by the metric the user requested; otherwise lead with mean and
+   median sMAPE, then report MASE and win counts as supporting evidence. Do not
+   turn a small mean difference into a categorical claim.
+6. Inspect series where models disagree or all reported errors are high. State
+   patterns as hypotheses unless timestamps, seasonality, or covariates in the
+   source data actually support them.
+7. Give a bounded recommendation for the observed evaluation only. Require
+   out-of-sample validation, cost/latency checks, and operational review before
+   calling any model production-ready.
 
-# Identify most recent results file
-ls -t nixtla_baseline_m4/results_*.csv | head -1
-```
+## Metric guardrails
 
-Expected files:
-- `results_M4_Daily_h{horizon}.csv` - Full metrics table
-- `summary_M4_Daily_h{horizon}.txt` - Text summary (optional)
-- `benchmark_report_*.md` - Formatted report (optional)
+- Lower sMAPE and MASE are better, but neither has a universal "good" threshold.
+- Interpret MASE against the scaling denominator and seasonal period used by
+  the run. A model's MASE below 1 indicates lower test MAE than that in-sample
+  naive scale; it does not prove a fixed percentage improvement in every case.
+- Do not claim a SeasonalNaive forecast must have MASE exactly 1 on held-out
+  data. See [the result and metric contract](references/metric-contract.md).
 
-If files are missing, inform the user they need to run `/nixtla-baseline-m4` first.
+## Validation
 
-### Step 2: Load and Parse Metrics
-
-Read the metrics CSV file:
-
-```bash
-# View first few rows to confirm format
-head -10 nixtla_baseline_m4/results_M4_Daily_h*.csv
-```
-
-Expected CSV structure:
-```csv
-series_id,model,sMAPE,MASE
-D1,SeasonalNaive,15.23,1.05
-D1,AutoETS,13.45,0.92
-D1,AutoTheta,12.34,0.87
-D2,SeasonalNaive,18.67,1.23
-...
-```
-
-### Step 3: Calculate Summary Statistics
-
-For each model (SeasonalNaive, AutoETS, AutoTheta), calculate:
-- **Mean sMAPE**: Average across all series
-- **Median sMAPE**: Middle value (less sensitive to outliers)
-- **Standard Deviation**: Measure of consistency
-- **Series Won**: Count how many series each model performed best on
-
-### Step 4: Interpret Metrics
-
-For detailed metric interpretation, see `resources/METRIC_INTERPRETATION.md`.
-
-**Quick Reference**:
-- **sMAPE**: 0% (perfect) to 200% (worst). Good: < 15%, Acceptable: 15-20%
-- **MASE**: < 1.0 means better than seasonal naive baseline
-
-### Step 5: Generate Structured Explanation
-
-Provide analysis in this format:
-
-```markdown
-## Baseline Performance Analysis
-
-Based on {N} series from M4-Daily with horizon={H}:
-
-**Overall Winner**: {ModelName}
-- Mean sMAPE: {X.XX}% (vs {Y.YY}% for second place)
-- Wins on {N} out of {Total} series ({Percentage}%)
-- Consistent performance (std dev {X.X}%)
-
-**Key Insights**:
-1. {Insight about winner's strengths}
-2. {Insight about other models or patterns}
-3. {Insight about failure cases or opportunities}
-
-**Recommendation**: Use {ModelName} as production baseline. {Additional context}
-
-**Next Steps**:
-- {Actionable recommendation 1}
-- {Actionable recommendation 2}
-```
-
-## Examples
-
-### Example 1: Simple Query
-
-**User**: "Which model was best?"
-
-**Response**:
-```
-Based on the baseline results (50 series, horizon=14):
-
-**AutoTheta won** with average sMAPE of 12.3%
-- Outperformed AutoETS (13.5%) and SeasonalNaive (15.2%)
-- Most consistent with std dev of 4.2%
-- Recommended for production use
-```
-
-### Example 2: Detailed Comparison
-
-**User**: "Compare AutoETS vs AutoTheta performance"
-
-**Response**:
-```
-## AutoETS vs AutoTheta Comparison
-
-| Metric        | AutoETS | AutoTheta | Winner   |
-|---------------|---------|-----------|----------|
-| Mean sMAPE    | 13.5%   | 12.3%     | Theta ✓  |
-| Median sMAPE  | 12.9%   | 11.8%     | Theta ✓  |
-| Std Dev       | 5.1%    | 4.2%      | Theta ✓  |
-| Series Won    | 18/50   | 32/50     | Theta ✓  |
-
-**Key Differences**:
-- Theta handles trends better (exponential smoothing with drift)
-- ETS excels on strong seasonality (state space framework)
-- Theta more consistent across diverse patterns
-
-**Recommendation**: Use AutoTheta as default, fallback to AutoETS for highly seasonal data.
-```
-
-### Example 3: Metric Interpretation
-
-**User**: "What does sMAPE of 12.3% mean?"
-
-**Response**:
-```
-sMAPE of 12.3% is **good performance** for forecasting:
-
-- This means on average, predictions are off by about 12% from actual values
-- For M4 Daily benchmark, anything under 15% is considered good
-- This is in the "acceptable" range (10-20%)
-
-Context: If forecasting daily sales of 100 units, a 12.3% sMAPE means your forecast will typically be within ±12 units of the true value.
-
-For more details, see resources/METRIC_INTERPRETATION.md
-```
-
-## Advanced Features
-
-### Benchmark Reports
-
-If a benchmark report exists (`benchmark_report_*.md`), use Read tool to view formatted summaries suitable for GitHub issues or documentation.
-
-For details on benchmark reports, see the MCP server documentation.
-
-### TimeGPT Showdown
-
-If TimeGPT comparison data is present, incorporate it into your analysis. See `resources/TIMEGPT_COMPARISON.md` for detailed guidance.
-
-**Key points**:
-- Check `timegpt_status` field first
-- Emphasize limited sample size (typically 3-5 series)
-- Use language like "indicative" not "conclusive"
-- Never fabricate TimeGPT metrics that don't exist
-
-### GitHub Issue Drafts
-
-Help users create GitHub issue drafts to share results with Nixtla maintainers. See `resources/GITHUB_ISSUES.md` for complete guidance.
-
-**When to suggest**:
-- User wants to ask Nixtla maintainers a question
-- User suspects a bug or unexpected behavior
-- User wants to share benchmark results with the community
+- Cite the exact CSV and any manifest/summary used.
+- Reconcile reported row count with series count multiplied by model coverage.
+- Show ties and missing model/series combinations rather than hiding them.
+- Preserve units: Baseline Lab writes sMAPE as percentage points.
+- Never fabricate TimeGPT, benchmark, or production-performance results.
 
 ## Output
 
-- A structured markdown analysis with an overall winner, key insights, and recommended next steps.
-- Optional: a short “power user” section highlighting series-level anomalies and failure cases.
+Return scope and provenance, data-quality receipt, per-model mean/median/std-dev
+sMAPE, mean/median MASE, series win counts and ties, failure cases, a scoped
+recommendation, uncertainties, and reproducible next steps.
 
 ## Error Handling
 
-**If results files are missing**:
+- **No result file:** explain the expected filename/schema and point to the
+  Baseline Lab run workflow; do not manufacture sample metrics.
+- **Several result files:** ask the user to select or explicitly approve a
+  comparison across runs.
+- **Invalid or duplicate rows:** report exact row numbers and stop aggregation.
+- **Missing run metadata:** analyze the CSV but label dataset/horizon/frequency
+  unknown unless the filename or sibling artifacts establish them.
+- **TimeGPT requested without results:** state that no comparison is available;
+  never infer hosted-model performance from StatsForecast rows.
+
+## Examples
+
+Use prompts that name the evidence and comparison boundary:
+
+```text
+Review nixtla_baseline_m4/results_M4_Daily_h7.csv. Rank by median sMAPE,
+show ties and missing coverage, and keep conclusions limited to this run.
 ```
-I don't see baseline results in nixtla_baseline_m4/.
 
-Please run the baseline command first:
-Run: `/nixtla-baseline-m4 horizon=14 series_limit=50`
-
-This will generate the metrics files I need to analyze.
-```
-
-**If CSV is malformed**:
-```
-The results file exists but appears malformed. Expected columns:
-- series_id, model, sMAPE, MASE
-
-Please re-run /nixtla-baseline-m4 to regenerate clean results.
+```text
+Compare AutoETS and AutoTheta using both sMAPE and MASE. Identify series where
+the metrics disagree and do not use generic accuracy labels.
 ```
 
 ## Resources
 
-For detailed information on specific topics:
-- **Metric interpretation**: `resources/METRIC_INTERPRETATION.md`
-- **TimeGPT comparisons**: `resources/TIMEGPT_COMPARISON.md`
-- **GitHub issue drafts**: `resources/GITHUB_ISSUES.md`
-
-For complete technical details, see:
-- Architecture: `000-docs/6767-OD-ARCH-nixtla-claude-plugin-poc-baseline-lab.md`
-- Planning: `000-docs/6767-PP-PLAN-nixtla-claude-plugin-poc-baseline-lab.md`
-- Phase 3 AAR: `000-docs/017-AA-AACR-phase-03-mcp-baselines-nixtla-oss.md`
-- Phase 8 AAR: `000-docs/022-AA-AACR-phase-08-timegpt-showdown-and-evals.md`
+- [Result schema and metric guardrails](references/metric-contract.md)
+- Analyzer: `scripts/analyze_results.py`
+- Runtime source: `005-plugins/nixtla-baseline-lab/scripts/nixtla_baseline_mcp.py`
