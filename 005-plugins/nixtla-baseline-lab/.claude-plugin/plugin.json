@@ -22,7 +22,6 @@
     "seasonalnaive"
   ],
   "commands": "./commands",
-  "agents": "./agents",
   "skills": "./skills",
   "mcpServers": "./.mcp.json"
 }

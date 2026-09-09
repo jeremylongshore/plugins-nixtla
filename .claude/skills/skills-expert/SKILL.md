@@ -1,267 +1,112 @@
 ---
 name: skills-expert
-description: "Provide expert guidance on skills architecture, YAML frontmatter, tool permissions, and debugging. Use when creating, troubleshooting, or validating skills. Trigger with \"skill not loading\", \"frontmatter\", or \"allowed-tools\"."
-allowed-tools: Read,Write,Glob,Grep,Edit
-version: 1.0.0
+description: |
+  Audit, debug, and improve Agent Skills without conflating the portable base
+  format with repository-specific marketplace rules. Use when creating or
+  repairing SKILL.md packages; trigger with "skill not loading", "frontmatter",
+  "allowed-tools", or "validate this skill".
+allowed-tools: 'Read, Glob, Grep, Edit, Bash(python3:*)'
+version: 1.1.0
 author: Jeremy Longshore <jeremy@intentsolutions.io>
 license: MIT
+compatibility: "Claude Code with Agent Skills support. Repository-specific validation requires that repository's Python dependencies; edits require a writable target."
+tags: [agent-skills, skill-authoring, validation, frontmatter, permissions]
+argument-hint: '[path/to/skill] [audit | fix | explain]'
+model: inherit
 ---
 
 # Skills Expert
 
-Provide expert guidance on Claude Code skills development, validation, and troubleshooting.
-
 ## Overview
 
-This skill transforms Claude into a Claude Skills architecture expert. Use when:
-- Creating new skills
-- Debugging skill discovery/invocation issues
-- Validating YAML frontmatter
-- Understanding tool permissions
-- Optimizing skill descriptions for selection
+Diagnose or improve one Agent Skill against an explicit contract. Keep the
+portable Agent Skills format, Claude Code extensions, and local marketplace
+requirements separate; do not present one layer's rules as universal.
 
 ## Prerequisites
 
-- Access to skill files in `.claude/skills/` or `skills-pack/.claude/skills/`
-- Understanding of target skill's purpose
+- Identify the target skill directory or `SKILL.md` file.
+- Confirm whether the user wants a read-only audit or an implementation.
+- Locate repository instructions and validators before changing files.
 
-## Claude Skills Architecture
+## Authority and safety
 
-### YAML Frontmatter Fields
-
-#### Required Fields
-
-| Field | Max Length | Purpose |
-|-------|------------|---------|
-| `name` | 64 chars | Identifier used as `command` in Skill tool invocation |
-| `description` | 1024 chars | Primary signal Claude uses to decide when to invoke skill |
-
-#### Optional Fields
-
-| Field | Type | Purpose |
-|-------|------|---------|
-| `allowed-tools` | CSV string | Pre-approved tools during skill execution |
-| `model` | string | Override model (`"inherit"` or model ID) |
-| `version` | string | Semantic versioning (e.g., `"1.0.0"`) |
-| `license` | string | License metadata |
-| `mode` | boolean | `true` = appears in Mode Commands section |
-| `disable-model-invocation` | boolean | `true` = requires manual `/skill-name` |
-
-#### Undocumented but Functional
-
-| Field | Behavior |
-|-------|----------|
-| `when_to_use` | Appends to description with hyphen separator |
-
-**Critical Rule**: Skill MUST have `description` OR `when_to_use` or it's filtered out.
-
-### Directory Structure
-
-```
-skill-name/
-├── SKILL.md              # Core prompt + frontmatter (required)
-├── scripts/              # Python/Bash executables
-├── references/           # Documentation loaded via Read tool
-└── assets/               # Templates, static files (referenced by path)
-```
-
-### {baseDir} Variable
-
-Template variable resolving to skill installation directory:
-
-```markdown
-## Resources
-- Skill standard: `{baseDir}/references/skill-standard.md`
-```
-
-**Never hardcode absolute paths.**
-
-### Tool Permission Scoping
-
-Permissions in `allowed-tools` are scoped to skill execution only:
-
-```yaml
-# Granular scoping examples
-allowed-tools: "Bash(git:*),Read,Grep"     # Only git commands
-allowed-tools: "Bash(npm:*),Read,Write"    # Only npm commands
-allowed-tools: "Read,Glob,Grep"            # Read-only audit
-```
-
-### Skill Selection Mechanism
-
-Claude decides skill invocation through pure language understanding:
-
-1. Claude receives Skill tool with `<available_skills>` section
-2. Each skill formatted as: `"skill-name": description`
-3. Claude's transformer matches user intent to descriptions
-4. Claude invokes Skill tool with matching `command`
-
-**No embeddings, regex, or classifiers** - pure LLM reasoning.
-
-### Execution Flow
-
-1. User request matches skill description
-2. Claude invokes `Skill` tool with `command: "skill-name"`
-3. Two messages injected:
-   - **Visible**: `<command-message>The "skill-name" skill is loading</command-message>`
-   - **Hidden**: Full SKILL.md content (isMeta: true)
-4. Tool permissions scoped to `allowed-tools`
-5. Skill prompt expands into conversation context
-
-### Token Budget
-
-- Default skill description budget: **15,000 characters**
-- Typical skill prompt: 500-5,000 words
-
-### Discovery Priority
-
-Skills loaded in order (later overrides earlier):
-1. User settings (`~/.config/claude/skills/`)
-2. Project settings (`.claude/skills/`)
-3. Plugin-provided skills
-4. Built-in skills
-
-### Critical Gotchas
-
-1. **Skills are NOT concurrency-safe** - Multiple simultaneous skill invocations cause context conflicts
-2. **Skills don't live in system prompts** - They're in the `tools` array as part of Skill meta-tool
-3. **`when_to_use` is undocumented/experimental** - Safer to rely on detailed `description`
-4. **Hardcoded paths break portability** - Always use `{baseDir}`
-
-### Three-Stage Execution Pipeline
-
-```
-1. VALIDATION
-   - Syntax checking
-   - Skill existence verification
-   - Frontmatter parsing
-
-2. PERMISSION EVALUATION
-   - Deny rules checked first (blocking patterns)
-   - Allow rules checked second (pre-approved)
-   - Default: prompt user for approval
-
-3. LOADING & INJECTION
-   - SKILL.md content loaded
-   - Two messages injected (visible + hidden)
-   - Context modifier applied
-   - Tool permissions scoped
-```
-
-### Where Skills Actually Live
-
-Skills are NOT in system prompts. They're bundled in the `tools` array:
-
-```javascript
-tools: [
-  { name: "Read", ... },
-  { name: "Write", ... },
-  {
-    name: "Skill",           // Meta-tool
-    inputSchema: { command: string },
-    prompt: "<available_skills>..." // Dynamic, contains all skill descriptions
-  }
-]
-```
-
-This enables dynamic loading without system prompt manipulation.
+- Treat current official Claude Code documentation as authoritative for Claude
+  Code behavior. Use local validators for stricter repository overlays.
+- `allowed-tools` pre-approves matching tools; it does not remove every other
+  tool. Permission settings still govern tools not listed.
+- Never add broad write or shell permissions merely to raise a score.
+- Do not edit during an audit-only request. Before replacing behavior, explain
+  the mismatch and preserve intentional project conventions.
+- See [the source and contract map](references/skill-contract.md).
 
 ## Instructions
 
-### When Creating Skills
+1. Use `Glob` to resolve the canonical package. Confirm that the directory name
+   and frontmatter `name` agree, and distinguish live files from examples,
+   backups, generated copies, or archived packages.
+2. Read the complete `SKILL.md`, directly linked support files, applicable
+   `AGENTS.md`/`CLAUDE.md`, and the validator configuration.
+3. Select the contract explicitly:
+   - portable Agent Skills base;
+   - Claude Code invocation and permission extensions;
+   - repository or marketplace overlay.
+4. Check discovery metadata, activation boundaries, prerequisites, executable
+   steps, permissions, validation, outputs, failures, examples, and support-file
+   links. Use `Grep` to trace every claimed command, tool, path, and side effect
+   back to source.
+5. Run the repository's canonical validator. In this repository, use
+   `python3 004-scripts/validate_skills_v2.py --fail-on-warn`. When checking an
+   Intent Solutions marketplace submission, use its marketplace validator on
+   the specific file rather than silently applying that overlay everywhere.
+6. In fix mode, use `Edit` to make the smallest coherent change. Move durable
+   detail into one level of `references/`, remove stale claims and unused
+   permissions, and add focused regression tests for important contracts.
+7. Rerun the target validator and package tests. Inspect the diff for unrelated
+   rewrites and report residual warnings separately from failures.
 
-1. **Write action-oriented descriptions** that explicitly state use cases
-2. **Keep descriptions under 1024 chars** - be concise
-3. **Use minimal tool permissions** - principle of least privilege
-4. **Use {baseDir}** for all path references
-5. **Include all four directories** (scripts/, references/, assets/) even if empty
-6. **Test discovery** by asking Claude "what skills do you have?"
+## Validation
 
-### When Debugging Skills
-
-1. Check YAML frontmatter syntax (no tabs, proper quoting)
-2. Verify `description` or `when_to_use` exists
-3. Check skill directory is in correct location
-4. Verify SKILL.md filename (case-insensitive)
-5. Check for `disable-model-invocation: true` blocking auto-discovery
-
-### When Validating Compliance
-
-```yaml
-# Nixtla Standard Checklist
-- [ ] name: lowercase + hyphens, matches folder name
-- [ ] description: action-oriented, <1024 chars
-- [ ] version: semver format
-- [ ] allowed-tools: minimal necessary
-- [ ] NO deprecated fields (author, priority, audience)
-- [ ] mode: true ONLY for mode skills
-- [ ] disable-model-invocation: true ONLY for infra/dangerous skills
-```
+- Every support-file link resolves relative to the skill directory.
+- Every pre-approved tool is used by the workflow and no required tool is
+  omitted.
+- Examples demonstrate the real workflow rather than fabricated output.
+- Destructive or external side effects have explicit confirmation boundaries.
+- The final report names the standard and validator version actually used.
 
 ## Output
 
-- Validated SKILL.md frontmatter
-- Corrected skill configurations
-- Debugging recommendations
-- Skill architecture explanations
+Return the canonical path, selected contract, findings by severity, exact
+changes (when authorized), validator/test receipts, remaining risks, and a clear
+pass/fail result. Do not call a skill "valid" without naming the validation tier.
 
 ## Error Handling
 
-| Issue | Solution |
-|-------|----------|
-| Skill not discovered | Check description/when_to_use exists |
-| Tools not working | Verify allowed-tools syntax |
-| Wrong skill invoked | Improve description specificity |
-| Skill filtered out | Add required frontmatter fields |
+- **Multiple live copies:** identify the source of truth before editing and
+  test any required mirrors for drift.
+- **Missing validator:** perform a manual structural audit and label it as such.
+- **Conflicting rules:** follow the higher-precedence repository instruction and
+  describe the conflict.
+- **Unverified platform behavior:** consult current official documentation or
+  state the uncertainty; do not preserve folklore as fact.
+- **Unsafe requested permissions:** narrow the workflow or require explicit
+  approval instead of granting blanket access.
 
 ## Examples
 
-- Diagnose why a skill does not auto-trigger, then propose an updated `description` that includes both “Use when …” and “Trigger with …”.
-- Audit a skill for minimal `allowed-tools` and scoped `Bash(...)` usage.
+These requests demonstrate both read-only and authorized-fix modes:
 
-## Resources
-
-- Project validator: `004-scripts/validate_skills_v2.py`
-- Project skills: `003-skills/.claude/skills/`
-
-## Examples
-
-### Example 1: Minimal Skill
-
-```yaml
----
-name: my-skill
-description: Generate reports from CSV data. Use when user has CSV files and needs analysis.
-allowed-tools: "Read,Write,Glob"
-version: "1.0.0"
----
+```text
+Audit .claude/skills/release/SKILL.md against the portable format and this
+repository's marketplace overlay. Do not edit; list failures and warnings.
 ```
 
-### Example 2: Mode Skill
-
-```yaml
----
-name: expert-mode
-description: Transform Claude into domain expert for extended session.
-mode: true
-allowed-tools: "Read,Write,Glob,Grep,Edit,Bash"
-version: "1.0.0"
----
-```
-
-### Example 3: Infrastructure Skill
-
-```yaml
----
-name: deploy-skill
-description: Deploy application to production. Dangerous - requires explicit invocation.
-disable-model-invocation: true
-allowed-tools: "Bash(deploy:*),Read,Glob"
-version: "1.0.0"
----
+```text
+Fix skills/report-builder so its declared tools match its workflow, move the
+long API table into references/, and rerun the repository validator.
 ```
 
 ## Resources
 
-- Skill standard: `{baseDir}/references/skill-standard.md`
-- Deep dive source: https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/
+- [Skill contract and authority map](references/skill-contract.md)
+- Repository validator: `004-scripts/validate_skills_v2.py`
