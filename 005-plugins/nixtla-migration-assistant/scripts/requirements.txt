@@ -1,5 +1,5 @@
 # Nixtla Migration Assistant Dependencies
-mcp>=1.0.0
+mcp>=1.0.0,<2  # 2.x removed the Server.list_tools()/call_tool() decorators these servers use; migration tracked separately
 pandas>=2.0.0
 nixtla>=0.7.3
 statsforecast>=1.7.0

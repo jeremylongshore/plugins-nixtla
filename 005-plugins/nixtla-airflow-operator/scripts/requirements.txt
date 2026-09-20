@@ -1,5 +1,5 @@
 # Nixtla Airflow Operator Dependencies
-mcp>=1.0.0
+mcp>=1.0.0,<2  # 2.x removed the Server.list_tools()/call_tool() decorators these servers use; migration tracked separately
 apache-airflow>=2.7.0
 apache-airflow-providers-google>=10.0.0
 nixtla>=0.7.3

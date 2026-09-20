@@ -1,5 +1,5 @@
 # Nixtla Forecast Explainer Dependencies
-mcp>=1.0.0
+mcp>=1.0.0,<2  # 2.x removed the Server.list_tools()/call_tool() decorators these servers use; migration tracked separately
 numpy>=1.24.0
 pandas>=2.0.0
 scipy>=1.10.0
