@@ -407,26 +407,26 @@ class ChangelogMCPServer:
                 err = {"status": "error", "error": str(exc), "tool": name}
                 return [TextContent(type="text", text=json.dumps(err, indent=2))]
 
-
-        async def _on_list_tools(ctx: Any, params: PaginatedRequestParams | None) -> ListToolsResult:
+        async def _on_list_tools(
+            ctx: Any, params: PaginatedRequestParams | None
+        ) -> ListToolsResult:
             return ListToolsResult(tools=await list_tools())
-
 
         async def _on_call_tool(ctx: Any, params: CallToolRequestParams) -> CallToolResult:
             # The 1.x decorator turned a raised exception into an isError result; keep that.
             try:
-                return CallToolResult(content=await call_tool(params.name, dict(params.arguments or {})))
+                return CallToolResult(
+                    content=await call_tool(params.name, dict(params.arguments or {}))
+                )
             except Exception as exc:  # noqa: BLE001 - every failure becomes a tool error result
                 text = TextContent(type="text", text=f"{type(exc).__name__}: {exc}")
                 return CallToolResult(content=[text], is_error=True)
-
 
         # MCP Python SDK 2.x: the @self.server.list_tools()/@self.server.call_tool() decorators no
         # longer exist; handlers are registered by method, mirroring what the 2.x
         # Server constructor does with on_list_tools / on_call_tool.
         self.server.add_request_handler("tools/list", PaginatedRequestParams, _on_list_tools)
         self.server.add_request_handler("tools/call", CallToolRequestParams, _on_call_tool)
-
 
     async def fetch_changelog_data(
         self,

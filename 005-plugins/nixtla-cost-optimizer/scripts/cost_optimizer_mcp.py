@@ -657,6 +657,7 @@ async def _on_call_tool(ctx: Any, params: CallToolRequestParams) -> CallToolResu
 app.add_request_handler("tools/list", PaginatedRequestParams, _on_list_tools)
 app.add_request_handler("tools/call", CallToolRequestParams, _on_call_tool)
 
+
 async def main():
     async with stdio_server() as (read, write):
         await app.run(read, write, app.create_initialization_options())

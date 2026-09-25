@@ -105,6 +105,7 @@ async def _on_call_tool(ctx: Any, params: CallToolRequestParams) -> CallToolResu
 app.add_request_handler("tools/list", PaginatedRequestParams, _on_list_tools)
 app.add_request_handler("tools/call", CallToolRequestParams, _on_call_tool)
 
+
 def _handle_scaffold_demo(args: dict[str, Any]) -> dict[str, Any]:
     """Stub for scaffold_demo. Returns illustrative output."""
     return {

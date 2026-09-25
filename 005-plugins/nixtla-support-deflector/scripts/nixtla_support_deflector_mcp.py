@@ -105,6 +105,7 @@ async def _on_call_tool(ctx: Any, params: CallToolRequestParams) -> CallToolResu
 app.add_request_handler("tools/list", PaginatedRequestParams, _on_list_tools)
 app.add_request_handler("tools/call", CallToolRequestParams, _on_call_tool)
 
+
 def _handle_classify_question(args: dict[str, Any]) -> dict[str, Any]:
     """Stub for classify_question. Returns illustrative output."""
     return {
