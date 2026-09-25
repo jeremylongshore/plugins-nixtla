@@ -1,4 +1,4 @@
 # Nixtla Cost Optimizer Dependencies
-mcp>=1.0.0,<2  # 2.x removed the Server.list_tools()/call_tool() decorators these servers use; migration tracked separately
+mcp>=2,<3  # 2.x API: handlers registered by method; see the server module
 pandas>=2.0.0
 nixtla>=0.7.3
