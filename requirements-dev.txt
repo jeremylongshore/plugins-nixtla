@@ -24,7 +24,7 @@ myst-parser>=2.0.0
 
 # Jupyter/Notebooks (for examples)
 jupyter>=1.0.0
-ipykernel>=6.25.0
+ipykernel>=7.3.0
 
 # Cloud providers (optional)
 boto3>=1.26.0  # AWS
