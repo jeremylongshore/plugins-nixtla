@@ -34,7 +34,7 @@ jobs:
         working-directory: 005-plugins/nixtla-baseline-lab
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install 'pytest==9.1.1'
           pip install -r scripts/requirements.txt
 
       - name: Run pytest unit tests

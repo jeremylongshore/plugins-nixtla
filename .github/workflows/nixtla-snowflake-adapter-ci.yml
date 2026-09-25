@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest -r scripts/requirements.txt
+          pip install 'pytest==9.1.1' -r scripts/requirements.txt
           # snowflake-connector-python is a heavy install and is NOT
           # required for unit tests (the SQL generators are pure Python +
           # the MCP dispatch is offline). Skip it here.

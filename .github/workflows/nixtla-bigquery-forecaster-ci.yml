@@ -38,7 +38,7 @@ jobs:
           # don't need google-cloud-bigquery or statsforecast.
           # bigquery_connector tests mock the BQ client; they need
           # google-cloud-bigquery for the type imports.
-          pip install pytest pandas
+          pip install 'pytest==9.1.1' pandas
           pip install google-cloud-bigquery>=3.10.0
 
       - name: Run pytest
