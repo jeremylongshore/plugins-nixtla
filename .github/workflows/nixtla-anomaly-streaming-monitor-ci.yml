@@ -34,7 +34,7 @@ jobs:
       - name: Install pytest
         run: |
           python -m pip install --upgrade pip
-          pip install pytest
+          pip install 'pytest==9.1.1'
 
       - name: Run PoC labeling tests
         run: pytest tests/ -v -o addopts="" -p no:cacheprovider
