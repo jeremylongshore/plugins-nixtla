@@ -211,7 +211,7 @@ echo "3. GCP_WORKLOAD_IDENTITY_PROVIDER"
 echo "   Value: projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_NAME}/providers/${PROVIDER_NAME}"
 echo ""
 echo "4. NIXTLA_TIMEGPT_API_KEY (from Max)"
-echo "   Value: nixak-JNfT4z4JQb9uK3gdAyiWYWSBELdt6iW0PmE0Sy3k8ETAInJkFSPp4gOfyAZrENcGOsKyTqfDmuLghVq9"
+echo "   Value: ${NIXTLA_TIMEGPT_API_KEY}"
 echo ""
 echo "=========================================="
 echo ""
@@ -227,7 +227,7 @@ cat > "${CONFIG_FILE}" <<EOF
 export GCP_PROJECT_ID="${PROJECT_ID}"
 export GCP_SA_EMAIL="${SA_EMAIL}"
 export GCP_WORKLOAD_IDENTITY_PROVIDER="projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/${POOL_NAME}/providers/${PROVIDER_NAME}"
-export NIXTLA_TIMEGPT_API_KEY="nixak-JNfT4z4JQb9uK3gdAyiWYWSBELdt6iW0PmE0Sy3k8ETAInJkFSPp4gOfyAZrENcGOsKyTqfDmuLghVq9"
+export NIXTLA_TIMEGPT_API_KEY="${NIXTLA_TIMEGPT_API_KEY}"
 
 # For local development
 gcloud config set project "${PROJECT_ID}"

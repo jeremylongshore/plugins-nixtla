@@ -70,7 +70,7 @@ projects/123456789/locations/global/workloadIdentityPools/github-pool/providers/
 
 #### Secret 4: `NIXTLA_TIMEGPT_API_KEY`
 ```
-nixak-JNfT4z4JQb9uK3gdAyiWYWSBELdt6iW0PmE0Sy3k8ETAInJkFSPp4gOfyAZrENcGOsKyTqfDmuLghVq9
+${NIXTLA_TIMEGPT_API_KEY}
 ```
 (TimeGPT API key from Max)
 
