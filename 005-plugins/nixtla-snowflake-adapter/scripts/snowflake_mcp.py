@@ -10,7 +10,14 @@ from typing import Any, Optional
 
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
-from mcp.types import TextContent, Tool
+from mcp.types import (
+    CallToolRequestParams,
+    CallToolResult,
+    ListToolsResult,
+    PaginatedRequestParams,
+    TextContent,
+    Tool,
+)
 
 app = Server("nixtla-snowflake-adapter")
 
@@ -93,7 +100,6 @@ DROP TABLE IF EXISTS test_data;
 """
 
 
-@app.list_tools()
 async def list_tools() -> list[Tool]:
     return [
         Tool(
@@ -147,7 +153,6 @@ async def list_tools() -> list[Tool]:
     ]
 
 
-@app.call_tool()
 async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     if name == "generate_forecast_sql":
         sql = generate_forecast_sql(
@@ -212,6 +217,26 @@ SELECT * FROM NIXTLA.ANOMALY_RESULTS WHERE is_anomaly = TRUE;
         return [TextContent(type="text", text=lkml)]
 
     return [TextContent(type="text", text=f"Unknown tool: {name}")]
+
+
+async def _on_list_tools(ctx: Any, params: PaginatedRequestParams | None) -> ListToolsResult:
+    return ListToolsResult(tools=await list_tools())
+
+
+async def _on_call_tool(ctx: Any, params: CallToolRequestParams) -> CallToolResult:
+    # The 1.x decorator turned a raised exception into an isError result; keep that.
+    try:
+        return CallToolResult(content=await call_tool(params.name, dict(params.arguments or {})))
+    except Exception as exc:  # noqa: BLE001 - every failure becomes a tool error result
+        text = TextContent(type="text", text=f"{type(exc).__name__}: {exc}")
+        return CallToolResult(content=[text], is_error=True)
+
+
+# MCP Python SDK 2.x: the @app.list_tools()/@app.call_tool() decorators no
+# longer exist; handlers are registered by method, mirroring what the 2.x
+# Server constructor does with on_list_tools / on_call_tool.
+app.add_request_handler("tools/list", PaginatedRequestParams, _on_list_tools)
+app.add_request_handler("tools/call", CallToolRequestParams, _on_call_tool)
 
 
 async def main():

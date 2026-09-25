@@ -1,3 +1,3 @@
 # Nixtla Snowflake Adapter Dependencies
-mcp>=1.0.0,<2  # 2.x removed the Server.list_tools()/call_tool() decorators these servers use; migration tracked separately
+mcp>=2,<3  # 2.x API: handlers registered by method; see the server module
 snowflake-connector-python>=3.0.0

@@ -131,7 +131,7 @@ class TestListTools:
     def test_forecast_sql_tool_requires_table(self):
         tools = asyncio.run(list_tools())
         forecast = next(t for t in tools if t.name == "generate_forecast_sql")
-        assert "table" in forecast.inputSchema["required"]
+        assert "table" in forecast.input_schema["required"]
 
 
 # ---------------------------------------------------------------------------
