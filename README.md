@@ -1,5 +1,11 @@
 # plugins-nixtla v1.10.0
 
+<!-- intent-select-partner:start -->
+<p><a href="https://intentsolutions.io/"><img src="https://raw.githubusercontent.com/intent-solutions-io/.github/b82af5d3e7951d85e39ea9e65cc24ee8278722a7/assets/brand/claude-select-partner.svg" alt="Intent Solutions: Claude Partner Network Select Services Partner" width="300" height="95" /></a></p>
+
+Intent Solutions is a Claude Partner Network Select Services Partner.
+<!-- intent-select-partner:end -->
+
 Claude Code plugins and AI skills for time-series forecasting with Nixtla's statsforecast, mlforecast, neuralforecast, and TimeGPT.
 
 **Version**: 1.10.0 | **Plugins**: 19 (13 at v1.0 / v1.0-poc, 6 WIP scaffolds) | **Skills**: 30 | **Validation**: Plugin Validator v7.0 (marketplace tier) per plugin
